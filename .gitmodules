@@ -1,0 +1,3 @@
+[submodule "agentkit"]
+	path = agentkit
+	url = https://github.com/gorilli-team/agentkit.git
