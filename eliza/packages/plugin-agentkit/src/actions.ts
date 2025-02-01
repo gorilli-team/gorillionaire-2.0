@@ -88,6 +88,9 @@ export async function getAgentKitActions({
         },
         examples: [],
     }));
+
+    console.log('AGENTKIT ACTIONS', actions.map((action) => { return action?.name}))
+
     return actions;
 }
 
