@@ -2,15 +2,6 @@
 
 **Gorillionaire** is an AI-powered agent that trades meme coins in the cryptocurrency market, learns from Twitter trends, and adjusts its trading strategy accordingly. By analyzing social media sentiment and market data, it aims to predict and capitalize on trends to maximize profit in the ever-changing crypto landscape.
 
-## Table of Contents
-
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Architecture](#architecture)
-- [Contributing](#contributing)
-- [License](#license)
-
 ## Features
 
 - **AI-powered Trading**: The system automatically buys and sells meme coins based on real-time market data and social media trends.
