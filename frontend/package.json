@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@coinbase/onchainkit": "^0.36.9",
     "gorillionaire-frontend": "file:",
     "next": "15.1.6",
     "react": "^19.0.0",

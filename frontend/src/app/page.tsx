@@ -12,7 +12,7 @@ export default function AppLayout() {
     <div className="flex h-screen bg-gray-100 text-gray-800">
       <Sidebar selectedPage={selectedPage} setSelectedPage={setSelectedPage} />
       <div className="flex-1 flex flex-col">
-        <Header selectedPage={selectedPage} />
+        <Header/>
         <Main selectedPage={selectedPage} />
       </div>
     </div>
