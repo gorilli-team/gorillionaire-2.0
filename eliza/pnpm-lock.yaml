@@ -1658,11 +1658,11 @@ importers:
   packages/plugin-agentkit:
     dependencies:
       '@coinbase/cdp-agentkit-core':
-        specifier: ^0.0.10
-        version: 0.0.10(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@6.0.5)
+        specifier: file:../../../agentkit/typescript/agentkit
+        version: '@coinbase/agentkit@file:../agentkit/typescript/agentkit(bufferutil@4.0.9)(openai@4.82.0(encoding@0.1.13)(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(zod@3.23.8))(typescript@5.7.3)(utf-8-validate@6.0.5)'
       '@coinbase/cdp-langchain':
         specifier: ^0.0.11
-        version: 0.0.11(@coinbase/coinbase-sdk@0.15.0(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@6.0.5)(zod@3.23.8))(bufferutil@4.0.9)(openai@4.82.0(encoding@0.1.13)(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(zod@3.23.8))(typescript@5.7.3)(utf-8-validate@6.0.5)
+        version: 0.0.11(@coinbase/coinbase-sdk@0.17.0(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@6.0.5)(zod@3.23.8))(bufferutil@4.0.9)(openai@4.82.0(encoding@0.1.13)(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(zod@3.23.8))(typescript@5.7.3)(utf-8-validate@6.0.5)
       '@elizaos/core':
         specifier: workspace:*
         version: link:../core
@@ -1717,7 +1717,7 @@ importers:
         version: 2.7.0(encoding@0.1.13)
       ora:
         specifier: ^8.0.1
-        version: 8.1.1
+        version: 8.2.0
       zod:
         specifier: ^3.22.4
         version: 3.23.8
@@ -1805,7 +1805,7 @@ importers:
         version: 16.4.7
       ora:
         specifier: ^8.0.1
-        version: 8.1.1
+        version: 8.2.0
       ssh2:
         specifier: ^1.15.0
         version: 1.16.0
@@ -2437,7 +2437,7 @@ importers:
     dependencies:
       '@chain-registry/utils':
         specifier: ^1.51.41
-        version: 1.51.61
+        version: 1.51.62
       '@cosmjs/cosmwasm-stargate':
         specifier: ^0.32.4
         version: 0.32.4(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -2461,7 +2461,7 @@ importers:
         version: 9.1.2
       chain-registry:
         specifier: ^1.69.68
-        version: 1.69.111
+        version: 1.69.112
       interchain:
         specifier: ^1.10.4
         version: 1.10.4(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -2477,7 +2477,7 @@ importers:
         version: 1.9.4
       '@chain-registry/types':
         specifier: ^0.50.44
-        version: 0.50.61
+        version: 0.50.62
 
   packages/plugin-cronos:
     dependencies:
@@ -2600,7 +2600,7 @@ importers:
         version: link:../core
       inversify:
         specifier: ^6.2.1
-        version: 6.2.1(reflect-metadata@0.2.2)
+        version: 6.2.2(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
@@ -3102,7 +3102,7 @@ importers:
         version: 16.4.7
       ora:
         specifier: ^8.0.1
-        version: 8.1.1
+        version: 8.2.0
       ssh2:
         specifier: ^1.15.0
         version: 1.16.0
@@ -3960,7 +3960,7 @@ importers:
         version: 4.73.0(encoding@0.1.13)(zod@3.23.8)
       ora:
         specifier: ^8.1.1
-        version: 8.1.1
+        version: 8.2.0
       zod:
         specifier: ^3.23.8
         version: 3.23.8
@@ -4158,7 +4158,7 @@ importers:
         version: 1.9.6
       ora:
         specifier: ^8.1.1
-        version: 8.1.1
+        version: 8.2.0
       zod:
         specifier: ^3.23.8
         version: 3.23.8
@@ -6411,11 +6411,11 @@ packages:
   '@cfworker/json-schema@4.1.1':
     resolution: {integrity: sha512-gAmrUZSGtKc3AiBL71iNWxDsyUC5uMaKKGdvzYsBoTW/xi42JQHl7eKV2OYzCUqvc+D2RCcf7EXY2iCyFIk6og==}
 
-  '@chain-registry/types@0.50.61':
-    resolution: {integrity: sha512-YAuW2XUTVX4iEF4zRQpiSxeD3kCMJZwLYT0PzEDYOBBXDIv7y6Wr1V3o9aaajau0i0SfMknjlV0uHAiaOAqFAA==}
+  '@chain-registry/types@0.50.62':
+    resolution: {integrity: sha512-7o7ADxjo4J4Re43ZDh9hMnv2kcn1Lt2P3HudvV6Veb3VmTHakIXZJGmfx7Yr8YSfBhZP6kMimJU0Zk6TegGzeg==}
 
-  '@chain-registry/utils@1.51.61':
-    resolution: {integrity: sha512-GWtlAGN5iqs9e2JPCI3CWsdwtneg4MRutpZ3DcLzsjyLEwibUkCZdgfHJteOdM74/YHCe8MLavNHBZh4eEZ14g==}
+  '@chain-registry/utils@1.51.62':
+    resolution: {integrity: sha512-n6iwpRkgO8jHOksWTlZIFD8t75P72bjOnYKIalow1S8h+oy0yzOUJLWrIHXEp91RJuPDxUMonQ4eS4q10wWpOw==}
 
   '@changesets/apply-release-plan@7.0.8':
     resolution: {integrity: sha512-qjMUj4DYQ1Z6qHawsn7S71SujrExJ+nceyKKyI9iB+M5p9lCL55afuEd6uLBPRpLGWQwkwvWegDHtwHJb1UjpA==}
@@ -6511,13 +6511,27 @@ packages:
   '@coinbase-samples/advanced-sdk-ts@file:packages/plugin-coinbase/advanced-sdk-ts':
     resolution: {directory: packages/plugin-coinbase/advanced-sdk-ts, type: directory}
 
+  '@coinbase/agentkit@0.1.0':
+    resolution: {integrity: sha512-6QLg8QhXLlePPA8N7wPosCnvnM04Xopub0dLkJLIzBE+UvWf9f0yqP9SVZm0t97tn6YbaXpkDshKbYjPQnRs4A==}
+
+  '@coinbase/agentkit@file:../agentkit/typescript/agentkit':
+    resolution: {directory: ../agentkit/typescript/agentkit, type: directory}
+
   '@coinbase/cdp-agentkit-core@0.0.10':
     resolution: {integrity: sha512-EFTaCkCd1445B4jq3LxVJaqw+r4BrwyjTAOoEabKrv9BycCPgS7fPRLuuugmnJRbSEtlG90NbsRZ7B6YkQRJ/g==}
+
+  '@coinbase/cdp-agentkit-core@0.0.14':
+    resolution: {integrity: sha512-1MqlA8EQEiF+IQJ/cGk01Bug7/fxX9RFK+4UDBP27OkoZM8183KKEFU0qtRMwQCpev68+Oc7jWiaLtFEQGTn+A==}
 
   '@coinbase/cdp-langchain@0.0.11':
     resolution: {integrity: sha512-RqnViEuhPHa0uTWTA08R6G7JIco8s4hPiX/ChbeXC0q4h+0cGATC1bJxIW73NMJXEZfLPitM0871UZPdnDXxuw==}
     peerDependencies:
       '@coinbase/coinbase-sdk': ^0.13.0
+
+  '@coinbase/cdp-langchain@0.0.15':
+    resolution: {integrity: sha512-vDfpS/Xv4eh8cN1OWsiCOdLKhWa0UNebe5IcXFECGF9ZhDWN1huUNmra8E8sYKAJd2Q5fQl8rz2CWPzBIOb+JA==}
+    peerDependencies:
+      '@coinbase/coinbase-sdk': ^0.15.0
 
   '@coinbase/coinbase-sdk@0.10.0':
     resolution: {integrity: sha512-sqLH7dE/0XSn5jHddjVrC1PR77sQUEytYcQAlH2d8STqRARcvddxVAByECUIL32MpbdJY7Wca3KfSa6qo811Mg==}
@@ -6527,6 +6541,9 @@ packages:
 
   '@coinbase/coinbase-sdk@0.15.0':
     resolution: {integrity: sha512-i2YH/E/HcvUM+VgT+245CzcAyJ6kQg8PJDHBHsFwFdk2vAn+iQn0bjt+C9kgTWvzxUuJA4koHgkcGpdRQa2F/A==}
+
+  '@coinbase/coinbase-sdk@0.17.0':
+    resolution: {integrity: sha512-YdEO6kbi0EDTzmPBqKtvDR/78P2Zw72rLmM6LS6yGZuTnfrXRhYR7/xAY0Fesoc1BcCL4eodwc+txUxrpdYCcg==}
 
   '@coinbase/wallet-sdk@4.2.4':
     resolution: {integrity: sha512-wJ9QOXOhRdGermKAoJSr4JgGqZm/Um0m+ecywzEC9qSOu3TXuVcG3k0XXTXW11UBgjdoPRuf5kAwRX3T9BynFA==}
@@ -10892,8 +10909,8 @@ packages:
     resolution: {integrity: sha512-dfUnCxiN9H4ap84DvD2ubjw+3vUNpstxa0TneY/Paat8a3R4uQZDLSvWjmznAY/DoahqTHl9V46HF/Zs3F29pg==}
     engines: {node: '>= 10.0.0'}
 
-  '@passwordless-id/webauthn@2.1.2':
-    resolution: {integrity: sha512-Ahj+A3O0gP3EsLV4FRXjfhbzzP895d8CnHKmhT1hkAz1zLSBCRE/iXJsasL1kwGoriDFLJ+YtO6x1rok4SZH2g==}
+  '@passwordless-id/webauthn@2.2.0':
+    resolution: {integrity: sha512-EwwK6PiJ3H/LaWYE3is5EuMhBBZ3igsX9nSHuB5zT/ugD9TmOwGs8/D0lnkBJDRcgV8/smsW/GOXisIJXDPT1Q==}
 
   '@peculiar/asn1-schema@2.3.15':
     resolution: {integrity: sha512-QPeD8UA8axQREpgR5UTAfu2mqQmm97oUqahDtNdBcfj3qAnoXzFdQW+aNf/tD2WVXF8Fhmftxoj0eMIT++gX2w==}
@@ -16070,8 +16087,8 @@ packages:
     resolution: {integrity: sha512-aGtmf24DW6MLHHG5gCx4zaI3uBq3KRtxeVs0DjFH6Z0rDNbsvTxFASFvdj79pxjxZ8/5u3PIiN3IwEIQkiiuPw==}
     engines: {node: '>=12'}
 
-  chain-registry@1.69.111:
-    resolution: {integrity: sha512-5CzA998mwb2PpYfutN3ZlDF4jF/ONIjEmgE9sOX3LS3VvHQLz4yqhbEl2bDN9B5LDuUf+b0ik4h1+kzj0Z7Zbw==}
+  chain-registry@1.69.112:
+    resolution: {integrity: sha512-q9FY+BbbmjpAxZjf6l4d2VGFRbNrYH6o7WTaWx5icMGwYdur6LY9iwciY3LJMUqxHR18p+Lgj3jE/n5D79MEBw==}
 
   chalk@1.1.3:
     resolution: {integrity: sha512-U3lRVLMSlsCfjqYPbLyVv11M9CPW4I728d6TCKMAOJueEeB9/8o+eSsMnxPJD+Q+K909sdESg7C+tIkoH6on1A==}
@@ -16122,6 +16139,9 @@ packages:
 
   chardet@0.7.0:
     resolution: {integrity: sha512-mT8iDcrh03qDGRRmoA2hmBJnxpllMR+0/0qlzjqZES6NdiWDcZkCNAk4rPFZ9Q85r27unkiNNg8ZOiwZXBHwcA==}
+
+  charenc@0.0.2:
+    resolution: {integrity: sha512-yrLQ/yVUFXkzg7EDQsPieE/53+0RlaWTs+wBrvW36cyilJ2SaDWfl4Yj7MtLTXleV9uEKefbAGUPv2/iWSooRA==}
 
   charm@0.1.2:
     resolution: {integrity: sha512-syedaZ9cPe7r3hoQA9twWYKu5AIyCswN5+szkmPBe9ccdLrj4bYaCnLVPTLd2kgVRc7+zoX4tyPgRnFKCj5YjQ==}
@@ -16791,6 +16811,9 @@ packages:
 
   crossws@0.3.3:
     resolution: {integrity: sha512-/71DJT3xJlqSnBr83uGJesmVHSzZEvgxHt/fIKxBAAngqMHmnBWQNxCphVxxJ2XL3xleu5+hJD6IQ3TglBedcw==}
+
+  crypt@0.0.2:
+    resolution: {integrity: sha512-mCxBlsHFYh9C+HVpiEacem8FEBnMXgU9gy4zmNC+SXAZNB/1idgp/aulFJ4FgCi7GPEVbfyng092GqL2k2rmow==}
 
   crypto-browserify@3.12.1:
     resolution: {integrity: sha512-r4ESw/IlusD17lgQi1O20Fa3qNnsckR126TdUuBgAu7GBYSIPvdNyONd3Zrxh0xCwA4+6w/TDArBPsMvhur+KQ==}
@@ -17536,8 +17559,8 @@ packages:
   discord-api-types@0.37.100:
     resolution: {integrity: sha512-a8zvUI0GYYwDtScfRd/TtaNBDTXwP5DiDVX7K5OmE+DRT57gBqKnwtOC5Ol8z0mRW8KQfETIgiB8U0YZ9NXiCA==}
 
-  discord-api-types@0.37.118:
-    resolution: {integrity: sha512-MQkHHZcytmNQ3nQOBj6a0z38swsmHiROX7hdayfd0eWVrLxaQp/6tWBZ7FO2MCKKsc+W3QWnnfOJTbtyk8C4TQ==}
+  discord-api-types@0.37.119:
+    resolution: {integrity: sha512-WasbGFXEB+VQWXlo6IpW3oUv73Yuau1Ig4AZF/m13tXcTKnMpc/mHjpztIlz4+BM9FG9BHQkEXiPto3bKduQUg==}
 
   discord-api-types@0.37.83:
     resolution: {integrity: sha512-urGGYeWtWNYMKnYlZnOnDHm8fVRffQs3U0SpE8RHeiuLKb/u92APS8HoQnPTFbnXmY1vVnXjXO4dOxcAn3J+DA==}
@@ -18147,8 +18170,8 @@ packages:
   estree-util-to-js@2.0.0:
     resolution: {integrity: sha512-WDF+xj5rRWmD5tj6bIqRi6CkLIXbbNQUcxQHzGysQzvHmdYG2G7p/Tf0J0gpxGgkeMZNTIjT/AoSvC9Xehcgdg==}
 
-  estree-util-value-to-estree@3.2.1:
-    resolution: {integrity: sha512-Vt2UOjyPbNQQgT5eJh+K5aATti0OjCIAGc9SgMdOFYbohuifsWclR74l0iZTJwePMgWYdX1hlVS+dedH9XV8kw==}
+  estree-util-value-to-estree@3.3.2:
+    resolution: {integrity: sha512-hYH1aSvQI63Cvq3T3loaem6LW4u72F187zW4FHpTrReJSm6W66vYTFNO1vH/chmcOulp1HlAj1pxn8Ag0oXI5Q==}
 
   estree-util-visit@2.0.0:
     resolution: {integrity: sha512-m5KgiH85xAhhW8Wta0vShLcUvOsh3LLPI2YVwcbio1l7E09NTLL1EyMZFM1OyWowoH0skScNbhOPl4kcBgzTww==}
@@ -19586,8 +19609,8 @@ packages:
   immutable@4.3.7:
     resolution: {integrity: sha512-1hqclzwYwjRDFLjcFxOM5AYkkG0rpFPpr1RLPMEuGczoS7YA8gLhy8SWXYRAA/XwfEHpfo3cw5JGioS32fnMRw==}
 
-  import-fresh@3.3.0:
-    resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==}
+  import-fresh@3.3.1:
+    resolution: {integrity: sha512-TR3KfrTZTYLPB6jUjfx6MF9WcWrHL9su5TObK4ZkYgBdWKPOFoSoQIdEuTuR82pmtxH2spWG9h6etwfr1pLBqQ==}
     engines: {node: '>=6'}
 
   import-lazy@4.0.0:
@@ -19719,8 +19742,8 @@ packages:
   invariant@2.2.4:
     resolution: {integrity: sha512-phJfQVBuaJM5raOpJjSfkiD6BpbCE4Ns//LaXl6wGYtUBY83nWS6Rf9tXm2e8VaK60JEjYldbPif/A2B1C2gNA==}
 
-  inversify@6.2.1:
-    resolution: {integrity: sha512-W6Xi0icXIiC48RWdT681+GlZVgAKmCrNTiP7hj4IVPFbcxHz+Jj8Gxz5qr/Az2cgcZMYdB8tKIr2e68LUi1LYQ==}
+  inversify@6.2.2:
+    resolution: {integrity: sha512-KB836KHbZ9WrUnB8ax5MtadOwnqQYa+ZJO3KWbPFgcr4RIEnHM621VaqFZzOZd9+U7ln6upt9n0wJei7x2BNqw==}
     peerDependencies:
       reflect-metadata: ~0.2.2
 
@@ -21420,6 +21443,9 @@ packages:
   md5.js@1.3.5:
     resolution: {integrity: sha512-xitP+WxNPcTTOgnTJcrhM0xvdPepipPSf3I8EIpGKeFLjt3PlJLIDG3u8EX53ZIubkb+5U2+3rELYpEhHhzdkg==}
 
+  md5@2.3.0:
+    resolution: {integrity: sha512-T1GITYmFaKuO91vxyoQMFETst+O71VUPEU3ze5GNzDm0OWdP8v1ziTaAEPUr/3kLsY3Sftgz242A1SetQiDL7g==}
+
   mdast-util-directive@3.1.0:
     resolution: {integrity: sha512-I3fNFt+DHmpWCYAT7quoM6lHf9wuqtI+oCOfvILnoicNIqjh5E3dEJWiXuYME2gNe8vl1iMQwyUHa7bgFmak6Q==}
 
@@ -22655,8 +22681,8 @@ packages:
     resolution: {integrity: sha512-5b6Y85tPxZZ7QytO+BQzysW31HJku27cRIlkbAXaNx+BdcVi+LlRFmVXzeF6a7JCwJpyw5c4b+YSVImQIrBpuQ==}
     engines: {node: '>=10'}
 
-  ora@8.1.1:
-    resolution: {integrity: sha512-YWielGi1XzG1UTvOaCFaNgEnuhZVMSHYkW/FQ7UX8O26PtlpdM84c0f7wLPlkvx2RfiQmnzd61d/MGxmpQeJPw==}
+  ora@8.2.0:
+    resolution: {integrity: sha512-weP+BZ8MVNnlCm8c0Qdc1WSWq4Qn7I+9CJGm7Qali6g44e/PUzbjNqJX5NJ9ljlNMosfJvg1fKEGILklK9cwnw==}
     engines: {node: '>=18'}
 
   os-browserify@0.3.0:
@@ -26679,8 +26705,8 @@ packages:
   tweetnacl@1.0.3:
     resolution: {integrity: sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==}
 
-  twitter-api-v2@1.19.0:
-    resolution: {integrity: sha512-jfG4aapNPM9+4VxNxn0TXvD8Qj8NmVx6cY0hp5K626uZ41qXPaJz33Djd3y6gfHF/+W29+iZz0Y5qB869d/akA==}
+  twitter-api-v2@1.19.1:
+    resolution: {integrity: sha512-X7+j1/VBiynw443ugDtEbFspYrWN26WH117uFc89K1+FkAgcSvj2GGMF8mIWPag2K4eS1Vd5HW35zorNdTveOg==}
 
   tx2@1.0.5:
     resolution: {integrity: sha512-sJ24w0y03Md/bxzK4FU8J8JveYYUbSs2FViLJ2D/8bytSiyPRbuE3DyL/9UKYXTZlV3yXq0L8GLlhobTnekCVg==}
@@ -30874,11 +30900,11 @@ snapshots:
 
   '@cfworker/json-schema@4.1.1': {}
 
-  '@chain-registry/types@0.50.61': {}
+  '@chain-registry/types@0.50.62': {}
 
-  '@chain-registry/utils@1.51.61':
+  '@chain-registry/utils@1.51.62':
     dependencies:
-      '@chain-registry/types': 0.50.61
+      '@chain-registry/types': 0.50.62
       bignumber.js: 9.1.2
       sha.js: 2.4.11
 
@@ -31128,10 +31154,12 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  '@coinbase/cdp-agentkit-core@0.0.10(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@6.0.5)':
+  '@coinbase/agentkit@0.1.0(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@6.0.5)':
     dependencies:
-      '@coinbase/coinbase-sdk': 0.13.0(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@6.0.5)(zod@3.23.8)
-      twitter-api-v2: 1.19.0
+      '@coinbase/coinbase-sdk': 0.17.0(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@6.0.5)(zod@3.23.8)
+      md5: 2.3.0
+      reflect-metadata: 0.2.2
+      twitter-api-v2: 1.19.1
       viem: 2.21.58(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@6.0.5)(zod@3.23.8)
       zod: 3.23.8
     transitivePeerDependencies:
@@ -31140,10 +31168,65 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@coinbase/cdp-langchain@0.0.11(@coinbase/coinbase-sdk@0.15.0(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@6.0.5)(zod@3.23.8))(bufferutil@4.0.9)(openai@4.82.0(encoding@0.1.13)(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(zod@3.23.8))(typescript@5.7.3)(utf-8-validate@6.0.5)':
+  '@coinbase/agentkit@file:../agentkit/typescript/agentkit(bufferutil@4.0.9)(openai@4.82.0(encoding@0.1.13)(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(zod@3.23.8))(typescript@5.7.3)(utf-8-validate@6.0.5)':
+    dependencies:
+      '@coinbase/agentkit': 0.1.0(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@6.0.5)
+      '@coinbase/cdp-agentkit-core': 0.0.14(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@6.0.5)
+      '@coinbase/cdp-langchain': 0.0.15(@coinbase/coinbase-sdk@0.17.0(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@6.0.5)(zod@3.23.8))(bufferutil@4.0.9)(openai@4.82.0(encoding@0.1.13)(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(zod@3.23.8))(typescript@5.7.3)(utf-8-validate@6.0.5)
+      '@coinbase/coinbase-sdk': 0.17.0(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@6.0.5)(zod@3.23.8)
+      md5: 2.3.0
+      reflect-metadata: 0.2.2
+      twitter-api-v2: 1.19.1
+      viem: 2.21.58(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@6.0.5)(zod@3.23.8)
+      zod: 3.23.8
+    transitivePeerDependencies:
+      - bufferutil
+      - debug
+      - openai
+      - typescript
+      - utf-8-validate
+
+  '@coinbase/cdp-agentkit-core@0.0.10(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@6.0.5)':
+    dependencies:
+      '@coinbase/coinbase-sdk': 0.13.0(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@6.0.5)(zod@3.23.8)
+      twitter-api-v2: 1.19.1
+      viem: 2.21.58(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@6.0.5)(zod@3.23.8)
+      zod: 3.23.8
+    transitivePeerDependencies:
+      - bufferutil
+      - debug
+      - typescript
+      - utf-8-validate
+
+  '@coinbase/cdp-agentkit-core@0.0.14(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@6.0.5)':
+    dependencies:
+      '@coinbase/coinbase-sdk': 0.15.0(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@6.0.5)(zod@3.23.8)
+      twitter-api-v2: 1.19.1
+      viem: 2.21.58(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@6.0.5)(zod@3.23.8)
+      zod: 3.23.8
+    transitivePeerDependencies:
+      - bufferutil
+      - debug
+      - typescript
+      - utf-8-validate
+
+  '@coinbase/cdp-langchain@0.0.11(@coinbase/coinbase-sdk@0.17.0(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@6.0.5)(zod@3.23.8))(bufferutil@4.0.9)(openai@4.82.0(encoding@0.1.13)(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(zod@3.23.8))(typescript@5.7.3)(utf-8-validate@6.0.5)':
     dependencies:
       '@coinbase/cdp-agentkit-core': 0.0.10(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@6.0.5)
-      '@coinbase/coinbase-sdk': 0.15.0(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@6.0.5)(zod@3.23.8)
+      '@coinbase/coinbase-sdk': 0.17.0(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@6.0.5)(zod@3.23.8)
+      '@langchain/core': 0.3.37(openai@4.82.0(encoding@0.1.13)(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(zod@3.23.8))
+      zod: 3.23.8
+    transitivePeerDependencies:
+      - bufferutil
+      - debug
+      - openai
+      - typescript
+      - utf-8-validate
+
+  '@coinbase/cdp-langchain@0.0.15(@coinbase/coinbase-sdk@0.17.0(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@6.0.5)(zod@3.23.8))(bufferutil@4.0.9)(openai@4.82.0(encoding@0.1.13)(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(zod@3.23.8))(typescript@5.7.3)(utf-8-validate@6.0.5)':
+    dependencies:
+      '@coinbase/cdp-agentkit-core': 0.0.14(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@6.0.5)
+      '@coinbase/coinbase-sdk': 0.17.0(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@6.0.5)(zod@3.23.8)
       '@langchain/core': 0.3.37(openai@4.82.0(encoding@0.1.13)(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(zod@3.23.8))
       zod: 3.23.8
     transitivePeerDependencies:
@@ -31198,6 +31281,28 @@ snapshots:
       - zod
 
   '@coinbase/coinbase-sdk@0.15.0(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@6.0.5)(zod@3.23.8)':
+    dependencies:
+      '@scure/bip32': 1.6.2
+      abitype: 1.0.8(typescript@5.7.3)(zod@3.23.8)
+      axios: 1.7.9
+      axios-mock-adapter: 1.22.0(axios@1.7.9)
+      axios-retry: 4.5.0(axios@1.7.9)
+      bip32: 4.0.0
+      bip39: 3.1.0
+      decimal.js: 10.5.0
+      dotenv: 16.4.7
+      ethers: 6.13.5(bufferutil@4.0.9)(utf-8-validate@6.0.5)
+      node-jose: 2.2.0
+      secp256k1: 5.0.1
+      viem: 2.21.58(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@6.0.5)(zod@3.23.8)
+    transitivePeerDependencies:
+      - bufferutil
+      - debug
+      - typescript
+      - utf-8-validate
+      - zod
+
+  '@coinbase/coinbase-sdk@0.17.0(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@6.0.5)(zod@3.23.8)':
     dependencies:
       '@scure/bip32': 1.6.2
       abitype: 1.0.8(typescript@5.7.3)(zod@3.23.8)
@@ -31319,7 +31424,7 @@ snapshots:
     dependencies:
       '@commitlint/config-validator': 18.6.1
       '@commitlint/types': 18.6.1
-      import-fresh: 3.3.0
+      import-fresh: 3.3.1
       lodash.mergewith: 4.6.2
       resolve-from: 5.0.0
       resolve-global: 1.0.0
@@ -32460,7 +32565,7 @@ snapshots:
       '@discordjs/formatters': 0.6.0
       '@discordjs/util': 1.1.1
       '@sapphire/shapeshift': 4.0.0
-      discord-api-types: 0.37.118
+      discord-api-types: 0.37.119
       fast-deep-equal: 3.1.3
       ts-mixer: 6.0.4
       tslib: 2.8.1
@@ -32475,7 +32580,7 @@ snapshots:
 
   '@discordjs/formatters@0.6.0':
     dependencies:
-      discord-api-types: 0.37.118
+      discord-api-types: 0.37.119
 
   '@discordjs/node-pre-gyp@0.4.5(encoding@0.1.13)':
     dependencies:
@@ -32732,7 +32837,7 @@ snapshots:
       '@mdx-js/mdx': 3.1.0(acorn@8.14.0)
       '@slorber/remark-comment': 1.0.0
       escape-html: 1.0.3
-      estree-util-value-to-estree: 3.2.1
+      estree-util-value-to-estree: 3.3.2
       file-loader: 6.2.0(webpack@5.97.1(@swc/core@1.10.12(@swc/helpers@0.5.15)))
       fs-extra: 11.2.0
       image-size: 1.2.0
@@ -34524,7 +34629,7 @@ snapshots:
       espree: 9.6.1
       globals: 13.24.0
       ignore: 5.3.2
-      import-fresh: 3.3.0
+      import-fresh: 3.3.1
       js-yaml: 4.1.0
       minimatch: 3.1.2
       strip-json-comments: 3.1.1
@@ -34538,7 +34643,7 @@ snapshots:
       espree: 10.3.0
       globals: 14.0.0
       ignore: 5.3.2
-      import-fresh: 3.3.0
+      import-fresh: 3.3.1
       js-yaml: 4.1.0
       minimatch: 3.1.2
       strip-json-comments: 3.1.1
@@ -41228,7 +41333,7 @@ snapshots:
       '@parcel/watcher-win32-ia32': 2.5.1
       '@parcel/watcher-win32-x64': 2.5.1
 
-  '@passwordless-id/webauthn@2.1.2': {}
+  '@passwordless-id/webauthn@2.2.0': {}
 
   '@peculiar/asn1-schema@2.3.15':
     dependencies:
@@ -48747,7 +48852,7 @@ snapshots:
       set-cookie-parser: 2.7.1
       tough-cookie: 4.1.4
       tslib: 2.8.1
-      twitter-api-v2: 1.19.0
+      twitter-api-v2: 1.19.1
       undici: 7.3.0
       ws: 8.18.0(bufferutil@4.0.9)(utf-8-validate@6.0.5)
     transitivePeerDependencies:
@@ -50429,9 +50534,9 @@ snapshots:
       loupe: 3.1.3
       pathval: 2.0.0
 
-  chain-registry@1.69.111:
+  chain-registry@1.69.112:
     dependencies:
-      '@chain-registry/types': 0.50.61
+      '@chain-registry/types': 0.50.62
 
   chalk@1.1.3:
     dependencies:
@@ -50479,6 +50584,8 @@ snapshots:
   character-reference-invalid@2.0.1: {}
 
   chardet@0.7.0: {}
+
+  charenc@0.0.2: {}
 
   charm@0.1.2: {}
 
@@ -51100,7 +51207,7 @@ snapshots:
   cosmiconfig@6.0.0:
     dependencies:
       '@types/parse-json': 4.0.2
-      import-fresh: 3.3.0
+      import-fresh: 3.3.1
       parse-json: 5.2.0
       path-type: 4.0.0
       yaml: 1.10.2
@@ -51108,21 +51215,21 @@ snapshots:
   cosmiconfig@7.1.0:
     dependencies:
       '@types/parse-json': 4.0.2
-      import-fresh: 3.3.0
+      import-fresh: 3.3.1
       parse-json: 5.2.0
       path-type: 4.0.0
       yaml: 1.10.2
 
   cosmiconfig@8.1.3:
     dependencies:
-      import-fresh: 3.3.0
+      import-fresh: 3.3.1
       js-yaml: 4.1.0
       parse-json: 5.2.0
       path-type: 4.0.0
 
   cosmiconfig@8.3.6(typescript@5.6.3):
     dependencies:
-      import-fresh: 3.3.0
+      import-fresh: 3.3.1
       js-yaml: 4.1.0
       parse-json: 5.2.0
       path-type: 4.0.0
@@ -51131,7 +51238,7 @@ snapshots:
 
   cosmiconfig@8.3.6(typescript@5.7.3):
     dependencies:
-      import-fresh: 3.3.0
+      import-fresh: 3.3.1
       js-yaml: 4.1.0
       parse-json: 5.2.0
       path-type: 4.0.0
@@ -51303,6 +51410,8 @@ snapshots:
   crossws@0.3.3:
     dependencies:
       uncrypto: 0.1.3
+
+  crypt@0.0.2: {}
 
   crypto-browserify@3.12.1:
     dependencies:
@@ -52062,7 +52171,7 @@ snapshots:
 
   discord-api-types@0.37.100: {}
 
-  discord-api-types@0.37.118: {}
+  discord-api-types@0.37.119: {}
 
   discord-api-types@0.37.83: {}
 
@@ -53140,7 +53249,7 @@ snapshots:
       astring: 1.9.0
       source-map: 0.7.4
 
-  estree-util-value-to-estree@3.2.1:
+  estree-util-value-to-estree@3.3.2:
     dependencies:
       '@types/estree': 1.0.6
 
@@ -55295,7 +55404,7 @@ snapshots:
 
   immutable@4.3.7: {}
 
-  import-fresh@3.3.0:
+  import-fresh@3.3.1:
     dependencies:
       parent-module: 1.0.1
       resolve-from: 4.0.0
@@ -55476,7 +55585,7 @@ snapshots:
     dependencies:
       loose-envify: 1.4.0
 
-  inversify@6.2.1(reflect-metadata@0.2.2):
+  inversify@6.2.2(reflect-metadata@0.2.2):
     dependencies:
       '@inversifyjs/common': 1.4.0
       '@inversifyjs/core': 1.3.5(reflect-metadata@0.2.2)
@@ -58048,6 +58157,12 @@ snapshots:
       inherits: 2.0.4
       safe-buffer: 5.2.1
 
+  md5@2.3.0:
+    dependencies:
+      charenc: 0.0.2
+      crypt: 0.0.2
+      is-buffer: 1.1.6
+
   mdast-util-directive@3.1.0:
     dependencies:
       '@types/mdast': 4.0.4
@@ -59331,7 +59446,7 @@ snapshots:
       nanoid: 5.0.9
       node-addon-api: 8.3.0
       octokit: 4.1.0
-      ora: 8.1.1
+      ora: 8.2.0
       pretty-ms: 9.2.0
       proper-lockfile: 4.1.2
       semver: 7.7.0
@@ -59941,7 +60056,7 @@ snapshots:
       strip-ansi: 6.0.1
       wcwidth: 1.0.1
 
-  ora@8.1.1:
+  ora@8.2.0:
     dependencies:
       chalk: 5.4.1
       cli-cursor: 5.0.0
@@ -64353,7 +64468,7 @@ snapshots:
       '@google/model-viewer': 2.1.1
       '@noble/curves': 1.8.1
       '@noble/hashes': 1.7.1
-      '@passwordless-id/webauthn': 2.1.2
+      '@passwordless-id/webauthn': 2.2.0
       '@radix-ui/react-dialog': 1.1.5(@types/react-dom@19.0.3(@types/react@19.0.8))(@types/react@19.0.8)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@radix-ui/react-focus-scope': 1.1.1(@types/react-dom@19.0.3(@types/react@19.0.8))(@types/react@19.0.8)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@radix-ui/react-icons': 1.3.2(react@19.0.0)
@@ -65144,7 +65259,7 @@ snapshots:
 
   tweetnacl@1.0.3: {}
 
-  twitter-api-v2@1.19.0: {}
+  twitter-api-v2@1.19.1: {}
 
   tx2@1.0.5:
     dependencies:
