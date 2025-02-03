@@ -28,6 +28,7 @@ export async function getAgentKitActions({
     const agentkit = await getClient();
     const cdpToolkit = new CdpToolkit(agentkit);
     const tools = cdpToolkit.getTools();
+
     const actions = tools.map((tool: Tool) => ({
         name: tool.name.toUpperCase(),
         description: tool.description,
@@ -89,7 +90,11 @@ export async function getAgentKitActions({
         examples: [],
     }));
 
-    console.log('AGENTKIT ACTIONS', actions.map((action) => { return action?.name}))
+    console.log('AGENTKIT ACTIONS', actions.map((action) => { 
+        // return `${action?.name} - ${action?.description?.trim().substring(0, 30)}...`
+        return `${action?.name}`
+ 
+    }))
 
     return actions;
 }

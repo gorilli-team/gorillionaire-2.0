@@ -21,6 +21,8 @@ const initializeActions = async () => {
             return [];
         }
 
+        
+
         const actions = await getAgentKitActions({
             getClient,
         });
