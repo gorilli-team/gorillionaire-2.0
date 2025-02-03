@@ -20,11 +20,20 @@ contract GorillionaireVault is ERC4626, Ownable {
         address requester,
         uint256 assets
     );
+    event RedeemRequest(
+        address indexed owner,
+        address indexed requester,
+        uint256 requestId,
+        uint256 shares,
+        uint256 assets
+    );
     event OperatorSet(address owner, address operator, bool approved);
 
-    // ensures that requester is owner or explicitly allowed to make requests on his behalf
     modifier canMakeRequests(address owner) {
-        require(owner == msg.sender || isOperator[owner][msg.sender]);
+        require(
+            owner == msg.sender || isOperator[owner][msg.sender],
+            "Not authorized"
+        );
         _;
     }
 
@@ -33,11 +42,11 @@ contract GorillionaireVault is ERC4626, Ownable {
         address controller,
         address owner
     ) external canMakeRequests(owner) returns (uint256 requestId) {
-        require(assets != 0);
+        require(assets != 0, "Assets cannot be zero");
 
         requestId = 0; // request ID logic to be implemented
 
-        IERC20(asset()).transferFrom(owner, address(this), assets); // asset here is the Vault underlying asset
+        IERC20(asset()).transferFrom(owner, address(this), assets);
 
         pendingDepositRequest[controller] += assets;
 
@@ -45,23 +54,22 @@ contract GorillionaireVault is ERC4626, Ownable {
         return requestId;
     }
 
-    // function deposit(
-    //     uint256 assets,
-    //     address receiver,
-    //     address controller
-    // ) external canMakeRequests(controller) returns (uint256 shares) {
-    //     require(assets != 0);
+    function requestRedeem(
+        uint256 shares,
+        address owner
+    ) external canMakeRequests(owner) returns (uint256 requestId) {
+        require(shares != 0, "Shares cannot be zero");
 
-    //     claimableDepositRequest[controller] -= assets; // underflow would revert if not enough claimable assets
+        uint256 assets = previewRedeem(shares);
 
-    //     shares = convertToShares(assets); // this naive example uses the instantaneous exchange rate. It may be more common to use the rate locked in upon Claimable stage.
+        _transfer(owner, address(this), shares);
 
-    //     balanceOf[receiver] += shares;
+        requestId = 0; // request ID logic to be implemented
 
-    //     emit Deposit(controller, receiver, assets, shares);
-    // }
+        emit RedeemRequest(owner, msg.sender, requestId, shares, assets);
 
-    function requestRedeem() external virtual;
+        return requestId;
+    }
 
     function setOperator(
         address operator,
@@ -92,8 +100,6 @@ contract GorillionaireVault is ERC4626, Ownable {
         maxEntryFeeBasisPoints = _maxBasisPoints;
     }
 
-    // === New Function: Update Entry Fee ===
-
     function updateEntryFeeBasisPoints(
         uint256 newBasisPoints
     ) external onlyOwner {
@@ -102,9 +108,6 @@ contract GorillionaireVault is ERC4626, Ownable {
         entryFeeBasisPoints = newBasisPoints;
     }
 
-    // === Overrides ===
-
-    /// @dev Preview taking an entry fee on deposit. See {IERC4626-previewDeposit}.
     function previewDeposit(
         uint256 assets
     ) public view virtual override returns (uint256) {
@@ -112,7 +115,6 @@ contract GorillionaireVault is ERC4626, Ownable {
         return super.previewDeposit(assets - fee);
     }
 
-    /// @dev Preview adding an entry fee on mint. See {IERC4626-previewMint}.
     function previewMint(
         uint256 shares
     ) public view virtual override returns (uint256) {
@@ -120,7 +122,6 @@ contract GorillionaireVault is ERC4626, Ownable {
         return assets + _feeOnRaw(assets, _entryFeeBasisPoints());
     }
 
-    /// @dev Preview adding an exit fee on withdraw. See {IERC4626-previewWithdraw}.
     function previewWithdraw(
         uint256 assets
     ) public view virtual override returns (uint256) {
@@ -128,7 +129,6 @@ contract GorillionaireVault is ERC4626, Ownable {
         return super.previewWithdraw(assets + fee);
     }
 
-    /// @dev Preview taking an exit fee on redeem. See {IERC4626-previewRedeem}.
     function previewRedeem(
         uint256 shares
     ) public view virtual override returns (uint256) {
@@ -136,7 +136,6 @@ contract GorillionaireVault is ERC4626, Ownable {
         return assets - _feeOnTotal(assets, _exitFeeBasisPoints());
     }
 
-    /// @dev Send entry fee to {_entryFeeRecipient}. See {IERC4626-_deposit}.
     function _deposit(
         address caller,
         address receiver,
@@ -153,7 +152,6 @@ contract GorillionaireVault is ERC4626, Ownable {
         }
     }
 
-    /// @dev Send exit fee to {_exitFeeRecipient}. See {IERC4626-_withdraw}.
     function _withdraw(
         address caller,
         address receiver,
@@ -171,8 +169,6 @@ contract GorillionaireVault is ERC4626, Ownable {
         }
     }
 
-    // === Fee configuration ===
-
     function _entryFeeBasisPoints() internal view virtual returns (uint256) {
         return entryFeeBasisPoints;
     }
@@ -189,10 +185,6 @@ contract GorillionaireVault is ERC4626, Ownable {
         return address(0); // Set this to the treasury address or another recipient
     }
 
-    // === Fee operations ===
-
-    /// @dev Calculates the fees that should be added to an amount `assets` that does not already include fees.
-    /// Used in {IERC4626-mint} and {IERC4626-withdraw} operations.
     function _feeOnRaw(
         uint256 assets,
         uint256 feeBasisPoints
@@ -203,8 +195,6 @@ contract GorillionaireVault is ERC4626, Ownable {
         return result + (numerator % denominator != 0 ? 1 : 0);
     }
 
-    /// @dev Calculates the fee part of an amount `assets` that already includes fees.
-    /// Used in {IERC4626-deposit} and {IERC4626-redeem} operations.
     function _feeOnTotal(
         uint256 assets,
         uint256 feeBasisPoints

@@ -1,5 +1,4 @@
 //SPDX-License-Identifier: MIT
-
 pragma solidity ^0.8.19;
 
 import {Script, console} from "forge-std/Script.sol";
@@ -14,15 +13,18 @@ contract DeployGorillionaireVault is Script {
         vm.startBroadcast();
 
         console.log("Deploying GorillionaireVault...");
-        // I want to console.log the usdcContractAddress from helperConfig
         console.log(
             "USDC contract address:",
             helperConfig.getUsdcContractAddress()
         );
+
+        // Passa i tre parametri richiesti dal costruttore
         GorillionaireVault vault = new GorillionaireVault(
-            IERC20(helperConfig.getUsdcContractAddress()),
-            10000
+            IERC20(helperConfig.getUsdcContractAddress()), // _asset
+            10000, // _basisPoints (entry fee basis points)
+            20000 // _maxBasisPoints (max entry fee basis points)
         );
+
         console.log("GorillionaireVault deployed at:", address(vault));
 
         vm.stopBroadcast();
