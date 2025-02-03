@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: MIT
-
 pragma solidity ^0.8.19;
 
 import {Test, console} from "forge-std/Test.sol";
-import {GorillionaireVault} from "../src/GorillionaireVault.sol";
-import {GorillionaireToken} from "../src/GorillionaireToken.sol";
+import {GorillionaireVault} from "../../src/GorillionaireVault.sol";
+import {GorillionaireToken} from "../../src/GorillionaireToken.sol";
 import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
 contract GorillionaireVaultExtendedTest is Test {
@@ -20,11 +19,16 @@ contract GorillionaireVaultExtendedTest is Test {
     uint256 constant FIRST_DEPOSIT = 10 ether;
     uint256 constant SECOND_DEPOSIT = 20 ether;
     uint256 constant ENTRY_FEE_BASIS_POINTS = 500; // 5% entry fee
+    uint256 constant MAX_ENTRY_FEE_BASIS_POINTS = 20000; // 200% max entry fee (per esempio)
 
     function setUp() public {
         vm.startBroadcast();
         token = new GorillionaireToken();
-        vault = new GorillionaireVault(token, ENTRY_FEE_BASIS_POINTS);
+        vault = new GorillionaireVault(
+            token, // _asset
+            ENTRY_FEE_BASIS_POINTS, // _basisPoints
+            MAX_ENTRY_FEE_BASIS_POINTS // _maxBasisPoints
+        );
         // Assign owner
         vault.transferOwnership(owner); // Add this line to assign the correct owner
         vm.stopBroadcast();
@@ -47,6 +51,7 @@ contract GorillionaireVaultExtendedTest is Test {
         );
         vm.stopPrank();
     }
+
     // Test withdrawal with exit fee applied
     function testWithdrawWithExitFee() public {
         uint256 assets = ASSETS_DEPOSITED;
@@ -94,58 +99,6 @@ contract GorillionaireVaultExtendedTest is Test {
         // );
         vm.stopPrank();
     }
-
-    /// Test multiple deposits and withdrawals with fees applied
-    // function testMultipleDepositsAndWithdrawals() public {
-    //   uint256 assets = ASSETS_DEPOSITED;
-
-    //   // Bob and Alice both deposit
-    //   deal(address(token), bob, assets);
-    //   deal(address(token), alice, assets);
-
-    //   vm.startPrank(bob);
-    //   token.approve(address(vault), assets);
-    //   vault.deposit(FIRST_DEPOSIT, bob);
-    //   vm.stopPrank();
-
-    //   vm.startPrank(alice);
-    //   token.approve(address(vault), assets);
-    //   vault.deposit(SECOND_DEPOSIT, alice);
-    //   vm.stopPrank();
-
-    //   // Verify balances
-    //   assertEq(
-    //     vault.balanceOf(bob),
-    //     vault.previewDeposit(FIRST_DEPOSIT),
-    //     "Incorrect Bob's balance after deposit"
-    //   );
-    //   assertEq(
-    //     vault.balanceOf(alice),
-    //     vault.previewDeposit(SECOND_DEPOSIT),
-    //     "Incorrect Alice's balance after deposit"
-    //   );
-
-    //   // Withdraw funds
-    //   vm.startPrank(bob);
-    //   vault.withdraw(FIRST_DEPOSIT, bob, bob);
-    //   vm.stopPrank();
-
-    //   vm.startPrank(alice);
-    //   vault.withdraw(SECOND_DEPOSIT, alice, alice);
-    //   vm.stopPrank();
-
-    //   // Verify the final balances
-    //   assertEq(
-    //     token.balanceOf(bob),
-    //     assets - FIRST_DEPOSIT,
-    //     "Bob's balance incorrect after withdrawal"
-    //   );
-    //   assertEq(
-    //     token.balanceOf(alice),
-    //     assets - SECOND_DEPOSIT,
-    //     "Alice's balance incorrect after withdrawal"
-    //   );
-    // }
 
     /// Test fee changes
     function testEntryFeeChange() public {
