@@ -32,10 +32,12 @@ We welcome contributions to **Gorillionaire**! To get started:
 
 Please ensure that your contributions align with the project's coding standards and include relevant tests.
 
-## License
+## Utils
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+### Start Gorillionaire
 
----
+To start Gorillionaire, run the following command:
 
-This should better match your project's AI-driven crypto trading focus. Let me know if you need further adjustments!
+```sh
+pnpm clean && pnpm install --no-frozen-lockfile && pnpm run build && pnpm start --characters="./characters/gorillionaire.character.json"
+```
