@@ -7,9 +7,9 @@ import {GorillionaireVault} from "../src/GorillionaireVault.sol";
 import {GorillionaireToken} from "../src/GorillionaireToken.sol";
 import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
-contract DropletsVaultExtendedTest is Test {
-    DropletToken token;
-    DropletsVault vault;
+contract GorillionaireVaultExtendedTest is Test {
+    GorillionaireToken token;
+    GorillionaireVault vault;
 
     address bob = makeAddr("bob");
     address alice = makeAddr("alice");
@@ -23,8 +23,8 @@ contract DropletsVaultExtendedTest is Test {
 
     function setUp() public {
         vm.startBroadcast();
-        token = new DropletToken();
-        vault = new DropletsVault(token, ENTRY_FEE_BASIS_POINTS);
+        token = new GorillionaireToken();
+        vault = new GorillionaireVault(token, ENTRY_FEE_BASIS_POINTS);
         // Assign owner
         vault.transferOwnership(owner); // Add this line to assign the correct owner
         vm.stopBroadcast();

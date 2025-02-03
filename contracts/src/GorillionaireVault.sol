@@ -86,7 +86,7 @@ contract GorillionaireVault is ERC4626, Ownable {
     )
         Ownable(msg.sender)
         ERC4626(_asset)
-        ERC20("Droplet Vault Token", "vDROP")
+        ERC20("Gorillionaire Vault Token", "gDROP")
     {
         entryFeeBasisPoints = _basisPoints;
         maxEntryFeeBasisPoints = _maxBasisPoints;
