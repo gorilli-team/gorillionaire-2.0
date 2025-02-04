@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Card } from "../vault_card/index";
 import VaultDetail from "../vault_detail/index";
-import { ModalDeposit } from "../modal_deposit"; // Importa la modale di deposito
+import { ModalDeposit } from "../modal_deposit";
 
 interface MainProps {
   selectedPage: string;
@@ -41,6 +41,8 @@ export default function Main({
     }
 
     switch (selectedPage) {
+      case "Feed":
+        return <div className="p-4 text-gray-800">Feed</div>;
       case "My Account":
         return <div className="p-4 text-gray-800">Welcome to My Account</div>;
       case "Vaults":
@@ -56,34 +58,6 @@ export default function Main({
                 onCardClick={() => handleCardClick("Vault Test 1")}
                 onDeposit={() => handleDepositClick("Vault Test 1")}
               />
-              <Card
-                title="Vault Test 2"
-                apy="3.5%"
-                tvl="$138.8k"
-                chainName="Base"
-                chainImage="/base.png"
-                onCardClick={() => handleCardClick("Vault Test 1")}
-                onDeposit={() => handleDepositClick("Vault Test 1")}
-              />
-              <Card
-                title="Vault Test 3"
-                apy="3.5%"
-                tvl="$138.8k"
-                chainName="Base"
-                chainImage="/base.png"
-                onCardClick={() => handleCardClick("Vault Test 1")}
-                onDeposit={() => handleDepositClick("Vault Test 1")}
-              />
-              <Card
-                title="Vault Test 4"
-                apy="3.5%"
-                tvl="$138.8k"
-                chainName="Base"
-                chainImage="/base.png"
-                onCardClick={() => handleCardClick("Vault Test 1")}
-                onDeposit={() => handleDepositClick("Vault Test 1")}
-              />
-
             </div>
           </div>
         );
