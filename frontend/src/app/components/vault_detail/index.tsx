@@ -26,7 +26,7 @@ const VaultDetail: React.FC<VaultDetailProps> = ({ vaultName, onBack }) => {
     <div className="p-4">
       <button
         onClick={onBack}
-        className={`${styles['button-back']} px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-400 transition`}>
+        className={`${styles['button-back']} px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-300 transition`}>
         Back
       </button>
       <h2 className="text-lg font-semibold text-gray-800 mb-4">{vaultName}</h2>

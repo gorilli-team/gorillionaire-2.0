@@ -42,6 +42,33 @@ export default function Main({ selectedPage, selectedVault, setSelectedVault }: 
                 onCardClick={() => handleCardClick("Vault Test 1")}
                 onDeposit={handleDeposit}
               />
+              <Card
+                title="Vault Test 1"
+                apy="3.5%"
+                tvl="$138.8k"
+                chainName="Base"
+                chainImage="/base.png"
+                onCardClick={() => handleCardClick("Vault Test 1")}
+                onDeposit={handleDeposit}
+              />
+              <Card
+                title="Vault Test 1"
+                apy="3.5%"
+                tvl="$138.8k"
+                chainName="Base"
+                chainImage="/base.png"
+                onCardClick={() => handleCardClick("Vault Test 1")}
+                onDeposit={handleDeposit}
+              />
+              <Card
+                title="Vault Test 1"
+                apy="3.5%"
+                tvl="$138.8k"
+                chainName="Base"
+                chainImage="/base.png"
+                onCardClick={() => handleCardClick("Vault Test 1")}
+                onDeposit={handleDeposit}
+              />
             </div>
           </div>
         );
