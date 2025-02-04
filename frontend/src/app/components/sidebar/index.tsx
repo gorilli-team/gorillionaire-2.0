@@ -16,24 +16,42 @@ export default function Sidebar({ selectedPage, setSelectedPage }: SidebarProps)
         className="h-16 text-xl font-bold flex items-center border-b border-gray-300 ps-4 cursor-pointer"
         onClick={handleGorillionaireClick}
       >
-        <span>Gorillionaire</span>
+        <img className="w-12 h-12 rounded-full" src="/gorillionaire.jpg" alt="logo-gorillionaire" />
+        <span className="ps-2">Gorillionaire</span>
       </div>
       <nav className="flex-1 p-4">
         <ul className="space-y-2">
           <li>
             <button
-              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${selectedPage === "My Account" ? "bg-gray-200" : ""}`}
-              onClick={() => setSelectedPage("My Account")}
+              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
+                selectedPage === "Feed" ? "bg-gray-200" : ""
+              }`}
+              onClick={() => setSelectedPage("Feed")}
             >
-              My Account
+              <i className="fa-regular fa-newspaper pr-2"></i>
+              <span>Feed</span>
             </button>
           </li>
           <li>
             <button
-              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${selectedPage === "Vaults" ? "bg-gray-200" : ""}`}
+              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
+                selectedPage === "Vaults" ? "bg-gray-200" : ""
+              }`}
               onClick={() => setSelectedPage("Vaults")}
             >
-              Vaults
+              <i className="fa-solid fa-shield pr-2"></i>
+              <span>Vaults</span>
+            </button>
+          </li>
+          <li>
+            <button
+              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
+                selectedPage === "My Account" ? "bg-gray-200" : ""
+              }`}
+              onClick={() => setSelectedPage("My Account")}
+            >
+              <i className="fa-solid fa-circle-user pr-2"></i>
+              <span>My account</span>
             </button>
           </li>
         </ul>
