@@ -21,7 +21,7 @@ export default function Main({ selectedPage }: MainProps) {
       case "Vaults":
         return (
           <div className="p-4 text-gray-800">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-4 gap-4">
               <Card
                 title="Vault Test 1"
                 apy="3.5%"

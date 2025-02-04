@@ -18,7 +18,6 @@ contract DeployGorillionaireVault is Script {
             helperConfig.getUsdcContractAddress()
         );
 
-        // Passa i tre parametri richiesti dal costruttore
         GorillionaireVault vault = new GorillionaireVault(
             IERC20(helperConfig.getUsdcContractAddress()), // _asset
             10000, // _basisPoints (entry fee basis points)
