@@ -13,9 +13,7 @@ export default function Sidebar({ selectedPage, setSelectedPage }: SidebarProps)
         <ul className="space-y-2">
           <li>
             <button
-              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
-                selectedPage === "My Account" ? "bg-gray-200" : ""
-              }`}
+              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${selectedPage === "My Account" ? "bg-gray-200" : ""}`}
               onClick={() => setSelectedPage("My Account")}
             >
               My Account
@@ -23,9 +21,7 @@ export default function Sidebar({ selectedPage, setSelectedPage }: SidebarProps)
           </li>
           <li>
             <button
-              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
-                selectedPage === "Vaults" ? "bg-gray-200" : ""
-              }`}
+              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${selectedPage === "Vaults" ? "bg-gray-200" : ""}`}
               onClick={() => setSelectedPage("Vaults")}
             >
               Vaults

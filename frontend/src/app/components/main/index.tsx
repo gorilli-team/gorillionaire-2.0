@@ -1,20 +1,31 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card } from "../vault_card/index";
+import VaultDetail from "../vault_detail/index";
 
 interface MainProps {
   selectedPage: string;
+  selectedVault: string | null;
+  setSelectedVault: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-export default function Main({ selectedPage }: MainProps) {
+export default function Main({ selectedPage, selectedVault, setSelectedVault }: MainProps) {
   const handleDeposit = () => {
     console.log("Deposit clicked");
   };
 
-  const handleWithdraw = () => {
-    console.log("Withdraw clicked");
+  const handleCardClick = (vaultName: string) => {
+    setSelectedVault(vaultName);
+  };
+
+  const handleBack = () => {
+    setSelectedVault(null);
   };
 
   const renderContent = () => {
+    if (selectedVault) {
+      return <VaultDetail vaultName={selectedVault} onBack={handleBack} />;
+    }
+
     switch (selectedPage) {
       case "My Account":
         return <div className="p-4 text-gray-800">Welcome to My Account</div>;
@@ -28,8 +39,8 @@ export default function Main({ selectedPage }: MainProps) {
                 tvl="$138.8k"
                 chainName="Base"
                 chainImage="/base.png"
+                onCardClick={() => handleCardClick("Vault Test 1")}
                 onDeposit={handleDeposit}
-                onWithdraw={handleWithdraw}
               />
             </div>
           </div>
