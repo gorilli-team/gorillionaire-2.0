@@ -4,4 +4,7 @@ out = "out"
 libs = ["lib"]
 mappings = ["@openzeppelin/contracts=lib/openzeppelin/contracts"]
 
+[rpc_endpoints]
+base_sepolia = "https://base-sepolia-rpc.publicnode.com"
+
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
