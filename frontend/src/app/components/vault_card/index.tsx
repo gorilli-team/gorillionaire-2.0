@@ -7,6 +7,7 @@ interface CardProps {
   chainName: string;
   chainImage: string;
   onDeposit: () => void;
+  onCardClick: () => void;
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -16,9 +17,10 @@ export const Card: React.FC<CardProps> = ({
   chainName,
   chainImage,
   onDeposit,
+  onCardClick
 }) => {
   return (
-    <div className="bg-white shadow-md rounded-2xl p-4 mx-auto flex items-center space-x-6">
+    <div onClick={onCardClick} className="cursor-pointer bg-white shadow-md rounded-2xl p-4 mx-auto flex items-center space-x-6">
       <div className="flex-shrink-0">
         <img
           src={chainImage}
