@@ -11,7 +11,7 @@ export function Providers({ children }: { children: ReactNode }) {
       config={{
         appearance: {
           name: 'Gorillionaire',
-          logo: 'https://your-logo.com',
+          logo: '/gorillionaire.jpg',
           mode: 'auto',
           theme: 'default',
         },
