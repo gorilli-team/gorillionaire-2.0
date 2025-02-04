@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Card } from "../vault_card/index";
 import VaultDetail from "../vault_detail/index";
+import { ModalDeposit } from "../modal_deposit"; // Importa la modale di deposito
 
 interface MainProps {
   selectedPage: string;
@@ -8,9 +9,17 @@ interface MainProps {
   setSelectedVault: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-export default function Main({ selectedPage, selectedVault, setSelectedVault }: MainProps) {
-  const handleDeposit = () => {
-    console.log("Deposit clicked");
+export default function Main({
+  selectedPage,
+  selectedVault,
+  setSelectedVault,
+}: MainProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedVaultForDeposit, setSelectedVaultForDeposit] = useState<string | null>(null);
+
+  const handleDeposit = (amount: number) => {
+    console.log(`Depositing ${amount} ETH`);
+    setIsModalOpen(false);
   };
 
   const handleCardClick = (vaultName: string) => {
@@ -19,6 +28,11 @@ export default function Main({ selectedPage, selectedVault, setSelectedVault }: 
 
   const handleBack = () => {
     setSelectedVault(null);
+  };
+
+  const handleDepositClick = (vaultName: string) => {
+    setSelectedVaultForDeposit(vaultName);
+    setIsModalOpen(true);
   };
 
   const renderContent = () => {
@@ -40,35 +54,36 @@ export default function Main({ selectedPage, selectedVault, setSelectedVault }: 
                 chainName="Base"
                 chainImage="/base.png"
                 onCardClick={() => handleCardClick("Vault Test 1")}
-                onDeposit={handleDeposit}
+                onDeposit={() => handleDepositClick("Vault Test 1")}
               />
               <Card
-                title="Vault Test 1"
+                title="Vault Test 2"
                 apy="3.5%"
                 tvl="$138.8k"
                 chainName="Base"
                 chainImage="/base.png"
                 onCardClick={() => handleCardClick("Vault Test 1")}
-                onDeposit={handleDeposit}
+                onDeposit={() => handleDepositClick("Vault Test 1")}
               />
               <Card
-                title="Vault Test 1"
+                title="Vault Test 3"
                 apy="3.5%"
                 tvl="$138.8k"
                 chainName="Base"
                 chainImage="/base.png"
                 onCardClick={() => handleCardClick("Vault Test 1")}
-                onDeposit={handleDeposit}
+                onDeposit={() => handleDepositClick("Vault Test 1")}
               />
               <Card
-                title="Vault Test 1"
+                title="Vault Test 4"
                 apy="3.5%"
                 tvl="$138.8k"
                 chainName="Base"
                 chainImage="/base.png"
                 onCardClick={() => handleCardClick("Vault Test 1")}
-                onDeposit={handleDeposit}
+                onDeposit={() => handleDepositClick("Vault Test 1")}
               />
+
             </div>
           </div>
         );
@@ -77,5 +92,15 @@ export default function Main({ selectedPage, selectedVault, setSelectedVault }: 
     }
   };
 
-  return <main className="flex-1 overflow-y-auto bg-gray-200">{renderContent()}</main>;
+  return (
+    <main className="flex-1 overflow-y-auto bg-gray-200">
+      {renderContent()}
+
+      <ModalDeposit
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onDeposit={handleDeposit}
+      />
+    </main>
+  );
 }
