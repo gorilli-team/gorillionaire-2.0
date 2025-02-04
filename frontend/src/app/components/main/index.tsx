@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Card } from "../vault_card/index";
 import VaultDetail from "../vault_detail/index";
 import { ModalDeposit } from "../modal_deposit";
+import FeedNews from "../feed_news/index";
+import styles from "./index.module.css";
 
 interface MainProps {
   selectedPage: string;
@@ -42,7 +44,16 @@ export default function Main({
 
     switch (selectedPage) {
       case "Feed":
-        return <div className="p-4 text-gray-800">Feed</div>;
+        return (
+          <div className="p-4 text-gray-800">
+            <FeedNews 
+              imageUrl="/gorillionaire.jpg"
+              timestamp={new Date().toISOString()}
+              content="This is a sample news update."
+              vaultName="Vault Test 1"
+            />
+          </div>
+        );
       case "My Account":
         return <div className="p-4 text-gray-800">Welcome to My Account</div>;
       case "Vaults":
@@ -67,7 +78,7 @@ export default function Main({
   };
 
   return (
-    <main className="flex-1 overflow-y-auto bg-gray-200">
+    <main className={`flex-1 overflow-y-auto bg-gray-200 ${styles.mainContent}`}>
       {renderContent()}
 
       <ModalDeposit

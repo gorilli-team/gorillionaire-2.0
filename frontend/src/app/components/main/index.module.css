@@ -1,0 +1,8 @@
+.mainContent {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .mainContent::-webkit-scrollbar {
+    display: none;
+  }
