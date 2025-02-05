@@ -103,9 +103,9 @@ export default function Main({
   //   setSelectedVault(vaultName);
   //  };
 
-  const handleBack = () => {
-    setSelectedVault(null);
-  };
+  // const handleBack = () => {
+  //   setSelectedVault(null);
+  // };
 
   const handleDepositClick = (vaultName: string) => {
     setSelectedVaultForDeposit(vaultName);
@@ -126,6 +126,8 @@ export default function Main({
               timestamp={new Date().toISOString()}
               content="Yo degens! Just sold some PENGU and bought WOW. Time to ride the meme coin wave! 🌊🚀 WAGMI!"
               vaultName="Vault Test 1"
+              onDepositClick={handleDepositClick}
+              onCardClick={setSelectedVault}
             />
           </div>
         );
