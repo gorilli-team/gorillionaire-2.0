@@ -25,7 +25,7 @@ import { vaultAbi } from "../../../../public/abi/vaultabi";
 import { erc20abi } from "../../../../public/abi/erc20abi";
 
 const VAULT_ADDRESS =
-  "0x4173151106c668B79fb2aF40e6894f12A91B4d2F" as `0x${string}`;
+  "0x5B1C72fEC49EfdDBc12E57fe1837D27B1356f8ed" as `0x${string}`;
 const USDC_ADDRESS = "0x036CbD53842c5426634e7929541eC2318f3dCF7e";
 
 interface MainProps {
