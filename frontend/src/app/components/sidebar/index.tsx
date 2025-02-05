@@ -1,4 +1,5 @@
 import React from "react";
+import { useAccount } from "wagmi";
 
 interface SidebarProps {
   selectedPage: string;
@@ -11,6 +12,8 @@ export default function Sidebar({
   setSelectedPage,
   setSelectedVault,
 }: SidebarProps) {
+  const { address } = useAccount();
+
   const handleGorillionaireClick = () => {
     window.location.reload();
   };
@@ -53,17 +56,20 @@ export default function Sidebar({
               <span>Vaults</span>
             </button>
           </li>
-          <li>
-            <button
-              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
-                selectedPage === "My Account" ? "bg-gray-200" : ""
-              }`}
-              onClick={() => handlePageChange("My Account")}
-            >
-              <i className="fa-solid fa-circle-user pr-2"></i>
-              <span>My account</span>
-            </button>
-          </li>
+
+          {address && (
+            <li>
+              <button
+                className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
+                  selectedPage === "My Account" ? "bg-gray-200" : ""
+                }`}
+                onClick={() => handlePageChange("My Account")}
+              >
+                <i className="fa-solid fa-circle-user pr-2"></i>
+                <span>My account</span>
+              </button>
+            </li>
+          )}
         </ul>
       </nav>
     </aside>

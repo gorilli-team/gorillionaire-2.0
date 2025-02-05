@@ -42,6 +42,13 @@ export default function Main({
   const { address } = useAccount();
   const { data: hash, writeContract } = useWriteContract();
 
+  const account = useAccount();
+
+  useEffect(() => {
+    console.log("useAccount() Data:", account);
+  }, [account]);
+
+
   const {
     data: allowanceData,
     isError: allowanceIsError,
@@ -115,12 +122,6 @@ export default function Main({
       case "Feed":
         return (
           <div className="w-full flex flex-col justify-center items-center p-4 text-gray-800">
-            <FeedNews 
-              imageUrl="/gorillionaire.jpg"
-              timestamp={new Date().toISOString()}
-              content="Yo degens! Just sold some PENGU and bought WOW. Time to ride the meme coin wave! 🌊🚀 WAGMI!"
-              vaultName="Vault Test 1"
-            />
             <FeedNews 
               imageUrl="/gorillionaire.jpg"
               timestamp={new Date().toISOString()}

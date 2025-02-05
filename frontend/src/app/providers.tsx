@@ -10,7 +10,7 @@ export function Providers({ children }: { children: ReactNode }) {
       chain={baseSepolia}
       config={{
         appearance: {
-          name: 'Gorillionaire',
+          name: 'Connect Wallet',
         //   logo: '/gorillionaire.jpg',
           mode: 'auto',
           theme: 'default',
