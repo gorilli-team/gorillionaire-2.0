@@ -4,12 +4,14 @@ interface ModalDepositProps {
   isOpen: boolean;
   onClose: () => void;
   onDeposit: (amount: number) => void;
+  allowance: bigint;
 }
 
 export const ModalDeposit: React.FC<ModalDepositProps> = ({
   isOpen,
   onClose,
   onDeposit,
+  allowance,
 }) => {
   const [depositAmount, setDepositAmount] = useState<number | string>("");
 
@@ -65,7 +67,9 @@ export const ModalDeposit: React.FC<ModalDepositProps> = ({
                 onClick={handleDepositSubmit}
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg w-full"
               >
-                Deposit
+                {BigInt(Number(depositAmount) * Math.pow(10, 18) > allowance)
+                  ? "Approve"
+                  : "Deposit"}
               </button>
             </div>
           </div>
