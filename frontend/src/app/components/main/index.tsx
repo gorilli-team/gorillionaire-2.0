@@ -45,11 +45,11 @@ export default function Main({
     switch (selectedPage) {
       case "Feed":
         return (
-          <div className="p-4 text-gray-800">
+          <div className="w-full flex justify-center p-4 text-gray-800">
             <FeedNews 
               imageUrl="/gorillionaire.jpg"
               timestamp={new Date().toISOString()}
-              content="This is a sample news update."
+              content="Yo degens! Just sold some PENGU and bought WOW. Time to ride the meme coin wave! 🌊🚀 WAGMI!"
               vaultName="Vault Test 1"
             />
           </div>

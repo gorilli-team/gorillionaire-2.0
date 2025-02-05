@@ -1,8 +1,9 @@
 import React from "react";
+import { Card } from "../vault_card/index";
+import styles from "./index.module.css";
 
 interface FeedNewsProps {
   imageUrl: string;
-  
   timestamp: string | Date;
   content: string;
   vaultName: string;
@@ -26,15 +27,25 @@ const timeAgo = (timestamp: string | Date) => {
 
 const FeedNews: React.FC<FeedNewsProps> = ({ imageUrl, timestamp, content, vaultName }) => {
   return (
-    <div className="bg-white shadow-md rounded-2xl p-4 flex items-start gap-4 w-full">
+    <div className={`${styles.feedNews} p-4 flex items-start gap-4 w-[600px]`}>
       <img src={imageUrl} alt="Profile" className="w-10 h-10 rounded-full" />
       <div className="flex-1">
         <div className="flex items-center justify-between">
           <span className="font-semibold text-gray-800">Gorillionaire</span>
           <span className="text-xs text-gray-500">{timeAgo(timestamp)}</span>
         </div>
-        <p className="text-gray-700 mt-1">{content}</p>
-        <div className="mt-2 text-blue-500 font-medium">{vaultName}</div>
+        <p className="text-gray-700 mt-2">{content}</p>
+        <div className="mt-4">
+          <Card
+            title={vaultName}
+            apy="3.5%"
+            tvl="$138.8k"
+            chainName="Base"
+            chainImage="/base.png"
+            onCardClick={() => console.log(`${vaultName} clicked`)}
+            onDeposit={() => console.log(`Deposit clicked for ${vaultName}`)}
+          />
+        </div>
       </div>
     </div>
   );
