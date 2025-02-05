@@ -3,10 +3,9 @@ import styles from "./index.module.css";
 
 interface VaultDetailProps {
   vaultName: string;
-  onBack: () => void;
 }
 
-const VaultDetail: React.FC<VaultDetailProps> = ({ vaultName, onBack }) => {
+const VaultDetail: React.FC<VaultDetailProps> = ({ vaultName}) => {
   const [activeTab, setActiveTab] = useState<string>("Stats");
 
   const renderTabContent = () => {
@@ -71,12 +70,6 @@ const VaultDetail: React.FC<VaultDetailProps> = ({ vaultName, onBack }) => {
 
   return (
     <div className="p-4">
-      <button
-        onClick={onBack}
-        className={`${styles['button-back']} px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-300 transition`}
-      >
-        Back
-      </button>
       <h2 className="text-lg font-semibold text-gray-800 pb-2">{vaultName}</h2>
       <div className="flex space-x-4 border-b mb-4">
         {["Stats", "Depositors", "Strategy", "News"].map((tab) => (
