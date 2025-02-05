@@ -99,25 +99,25 @@ export default function Main({
     setIsModalOpen(false);
   };
 
-  const handleCardClick = (vaultName: string) => {
-    setSelectedVault(vaultName);
-  };
+  // const handleCardClick = (vaultName: string) => {
+  //   setSelectedVault(vaultName);
+  // };
 
   const handleBack = () => {
     setSelectedVault(null);
   };
 
-  const handleDepositClick = (vaultName: string) => {
-    setSelectedVaultForDeposit(vaultName);
+  // const handleDepositClick = (vaultName: string) => {
+  //   setSelectedVaultForDeposit(vaultName);
 
-    setIsModalOpen(true);
-  };
+  //   setIsModalOpen(true);
+  // };
 
   const renderContent = () => {
     if (selectedVault) {
       return <VaultDetail vaultName={selectedVault} onBack={handleBack} />;
     }
-
+  
     switch (selectedPage) {
       case "Feed":
         return (
@@ -131,23 +131,37 @@ export default function Main({
           </div>
         );
       case "My Account":
-        return <div className="p-4 text-gray-800">Welcome to My Account</div>;
-      case "Vault":
         return (
-          <div className="p-4 text-gray-800">
+          <div className="p-6 pt-4 text-gray-800">
+            <div className="text-xl font-bold text-gray-800 mb-4">Welcome back!</div>
+            <div className="flex items-center bg-white shadow-md rounded-2xl p-4 mb-6">
+              <img
+                src="/user.jpg"
+                alt="User Profile"
+                className="h-12 w-12 rounded-full mr-4"
+              />
+              <div>
+                <h2 className="text-lg font-semibold text-gray-800">Your Wallet</h2>
+                <p className="text-gray-600">{account.address}</p>
+              </div>
+            </div>
+
+            <h2 className="text-xl font-bold text-gray-800 mb-4">Your Investments</h2>
             <div className="grid grid-cols-4 gap-4">
-              <Card
-                title="Vault Test 1"
-                apy="3.5%"
-                tvl="$138.8k"
-                chainName="Base"
-                chainImage="/base.png"
-                onCardClick={() => handleCardClick("Vault Test 1")}
-                onDeposit={() => handleDepositClick("Vault Test 1")}
+              <Card 
+                title="Vault Test 1" 
+                apy="3.5%" 
+                tvl="$138.8k" 
+                chainName="Base" 
+                chainImage="/base.png" 
+                onDeposit={() => console.log("Deposit clicked")} 
+                onCardClick={() => console.log("Card clicked")} 
               />
             </div>
           </div>
         );
+      case "Vault":
+        return <VaultDetail vaultName="Vault Test 1" onBack={handleBack} />;
       default:
         return <div className="p-4 text-gray-800">Select a page</div>;
     }

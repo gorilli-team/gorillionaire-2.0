@@ -48,7 +48,7 @@ export default function Sidebar({
           <li>
             <button
               className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
-                selectedPage === "Vaults" ? "bg-gray-200" : ""
+                selectedPage === "Vault" ? "bg-gray-200" : ""
               }`}
               onClick={() => handlePageChange("Vault")}
             >

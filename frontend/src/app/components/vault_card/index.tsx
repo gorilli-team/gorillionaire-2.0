@@ -26,7 +26,7 @@ export const Card: React.FC<CardProps> = ({
   return (
     <div
       onClick={onCardClick}
-      className="cursor-pointer bg-white shadow-md rounded-2xl p-4 mx-auto flex-col justify-center w-full"
+      className="cursor-pointer bg-white shadow-md rounded-2xl p-4 mx-auto flex-col justify-center"
     >
       <div>
         <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
