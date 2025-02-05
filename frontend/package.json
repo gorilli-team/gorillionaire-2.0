@@ -13,7 +13,8 @@
     "gorillionaire-frontend": "file:",
     "next": "15.1.6",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "wagmi": "^2.14.9"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
