@@ -99,23 +99,22 @@ export default function Main({
     setIsModalOpen(false);
   };
 
-  // const handleCardClick = (vaultName: string) => {
+  //  const handleCardClick = (vaultName: string) => {
   //   setSelectedVault(vaultName);
-  // };
+  //  };
 
   const handleBack = () => {
     setSelectedVault(null);
   };
 
-  // const handleDepositClick = (vaultName: string) => {
-  //   setSelectedVaultForDeposit(vaultName);
-
-  //   setIsModalOpen(true);
-  // };
+  const handleDepositClick = (vaultName: string) => {
+    setSelectedVaultForDeposit(vaultName);
+    setIsModalOpen(true);
+  };
 
   const renderContent = () => {
     if (selectedVault) {
-      return <VaultDetail vaultName={selectedVault} onBack={handleBack} />;
+      return <VaultDetail vaultName={selectedVault}/>;
     }
   
     switch (selectedPage) {
@@ -147,21 +146,21 @@ export default function Main({
             </div>
 
             <h2 className="text-xl font-bold text-gray-800 mb-4">Your Investments</h2>
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-4 gap-2 w-full flex">
               <Card 
                 title="Vault Test 1" 
                 apy="3.5%" 
                 tvl="$138.8k" 
                 chainName="Base" 
                 chainImage="/base.png" 
-                onDeposit={() => console.log("Deposit clicked")} 
-                onCardClick={() => console.log("Card clicked")} 
+                onDeposit={() => handleDepositClick("Vault Test 1")} 
+                onCardClick={() => setSelectedVault("Vault Test 1")} 
               />
             </div>
           </div>
         );
       case "Vault":
-        return <VaultDetail vaultName="Vault Test 1" onBack={handleBack} />;
+        return <VaultDetail vaultName="Vault Test 1" />;
       default:
         return <div className="p-4 text-gray-800">Select a page</div>;
     }
