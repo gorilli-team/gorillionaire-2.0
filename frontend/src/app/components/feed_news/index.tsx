@@ -27,7 +27,7 @@ const timeAgo = (timestamp: string | Date) => {
 
 const FeedNews: React.FC<FeedNewsProps> = ({ imageUrl, timestamp, content, vaultName }) => {
   return (
-    <div className={`${styles.feedNews} p-4 flex items-start gap-4 w-[600px]`}>
+    <div className={`${styles.feedNews} pt-6 p-2 flex items-start gap-4 w-[600px]`}>
       <img src={imageUrl} alt="Profile" className="w-10 h-10 rounded-full" />
       <div className="flex-1">
         <div className="flex items-center justify-between">

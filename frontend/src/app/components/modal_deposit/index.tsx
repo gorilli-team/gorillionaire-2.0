@@ -31,8 +31,17 @@ export const ModalDeposit: React.FC<ModalDepositProps> = ({
     <>
       {isOpen && (
         <div className="fixed inset-0 flex justify-center items-center bg-gray-500 bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <div className="text-lg font-semibold mb-4">Deposit Token on </div>
+          <div className="bg-white p-6 pt-4 rounded-lg shadow-lg w-96 relative">
+            <div className="flex justify-between items-center mb-4">
+              <div className="text-lg font-semibold">Deposit on</div>
+              <button
+                onClick={onClose}
+                className="text-xl text-gray-600 hover:text-gray-800"
+              >
+                <i className="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+
             <div className="flex items-center mb-4">
               <span className="mr-2 text-sm">Token:</span>
               <img
@@ -51,16 +60,10 @@ export const ModalDeposit: React.FC<ModalDepositProps> = ({
                 placeholder="Enter amount"
               />
             </div>
-            <div className="flex justify-between">
-              <button
-                onClick={onClose}
-                className="px-4 py-2 bg-gray-300 rounded-lg"
-              >
-                Close
-              </button>
+            <div>
               <button
                 onClick={handleDepositSubmit}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg w-full"
               >
                 Deposit
               </button>

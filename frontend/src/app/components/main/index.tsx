@@ -45,7 +45,13 @@ export default function Main({
     switch (selectedPage) {
       case "Feed":
         return (
-          <div className="w-full flex justify-center p-4 text-gray-800">
+          <div className="w-full flex flex-col justify-center items-center p-4 text-gray-800">
+            <FeedNews 
+              imageUrl="/gorillionaire.jpg"
+              timestamp={new Date().toISOString()}
+              content="Yo degens! Just sold some PENGU and bought WOW. Time to ride the meme coin wave! 🌊🚀 WAGMI!"
+              vaultName="Vault Test 1"
+            />
             <FeedNews 
               imageUrl="/gorillionaire.jpg"
               timestamp={new Date().toISOString()}
