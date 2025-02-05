@@ -1,4 +1,6 @@
 import React from "react";
+import { useAccount } from "wagmi";
+import { WalletDefault } from "@coinbase/onchainkit/wallet";
 
 interface CardProps {
   title: string;
@@ -17,8 +19,10 @@ export const Card: React.FC<CardProps> = ({
   chainName,
   chainImage,
   onDeposit,
-  onCardClick
+  onCardClick,
 }) => {
+  const { address } = useAccount();
+
   return (
     <div
       onClick={onCardClick}
@@ -46,12 +50,18 @@ export const Card: React.FC<CardProps> = ({
         </div>
       </div>
       <div className="flex-shrink-0 mt-4">
-        <button
-          onClick={onDeposit}
-          className="px-4 py-2 bg-blue-500 text-white font-medium rounded-lg hover:bg-blue-600 transition w-full"
-        >
-          Deposit
-        </button>
+        {address ? (
+          <button
+            onClick={onDeposit}
+            className="px-4 py-2 bg-blue-500 text-white font-medium rounded-lg hover:bg-blue-600 transition w-full"
+          >
+            Deposit
+          </button>
+        ) : (
+          <div className="w-full flex justify-center">
+            <WalletDefault />
+          </div>
+        )}
       </div>
     </div>
   );

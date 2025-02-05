@@ -132,7 +132,7 @@ export default function Main({
         );
       case "My Account":
         return <div className="p-4 text-gray-800">Welcome to My Account</div>;
-      case "Vaults":
+      case "Vault":
         return (
           <div className="p-4 text-gray-800">
             <div className="grid grid-cols-4 gap-4">

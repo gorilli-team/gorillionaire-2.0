@@ -50,10 +50,10 @@ export default function Sidebar({
               className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
                 selectedPage === "Vaults" ? "bg-gray-200" : ""
               }`}
-              onClick={() => handlePageChange("Vaults")}
+              onClick={() => handlePageChange("Vault")}
             >
               <i className="fa-solid fa-shield pr-2"></i>
-              <span>Vaults</span>
+              <span>Vault</span>
             </button>
           </li>
 
