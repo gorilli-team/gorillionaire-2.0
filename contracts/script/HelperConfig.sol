@@ -21,7 +21,7 @@ contract HelperConfig is Script {
 
     function getBaseSepoliaConfig() public view returns (NetworkConfig memory) {
         NetworkConfig memory baseSepoliaNetworkConfig = NetworkConfig({
-            usdcContractAddress: 0x5dEaC602762362FE5f135FA5904351916053cF70
+            usdcContractAddress: 0x036CbD53842c5426634e7929541eC2318f3dCF7e
         });
 
         console.log(
@@ -37,7 +37,7 @@ contract HelperConfig is Script {
         }
         vm.startBroadcast();
         NetworkConfig memory anvilEthNetworkConfig = NetworkConfig({
-            usdcContractAddress: 0x5dEaC602762362FE5f135FA5904351916053cF70
+            usdcContractAddress: 0x036CbD53842c5426634e7929541eC2318f3dCF7e
         });
         vm.stopBroadcast();
         console.log(
