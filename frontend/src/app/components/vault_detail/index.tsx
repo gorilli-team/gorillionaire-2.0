@@ -3,6 +3,8 @@ import VaultStats from "../vault_stats";
 import { useAccount } from "wagmi";
 import VaultDepositors from "../vault_depositors";
 import VaultStrategy from "../vault_strategy";
+import VaultExplorer from "../vault_explorer";
+import { Transaction } from "../../types"; 
 
 interface VaultDetailProps {
   vaultName: string;
@@ -29,6 +31,28 @@ const VaultDetail: React.FC<VaultDetailProps> = ({ vaultName, onDeposit, onWithd
     { name: "Cream Finance", value: 28736.42, color: "#FFA500" }
   ];
 
+  const mockTransactions: Transaction[] = [
+    {
+      hash: "0x1234567890abcdef",
+      method: "Deposit",
+      block: 1203948,
+      age: 600,
+      from: "0xa1b2c3d4e5f6g7h8",
+      amount: "1000 USDT",
+      txnFee: "0.02 ETH",
+    },
+    {
+      hash: "0xabcdef1234567890",
+      method: "Withdraw",
+      block: 1203950,
+      age: 1200,
+      from: "0xa9b8c7d6e5f4g3h2",
+      amount: "500 USDT",
+      txnFee: "0.01 ETH",
+    }
+  ];
+  
+
   const renderTabContent = () => {
     switch (activeTab) {
       case "Stats":
@@ -38,7 +62,7 @@ const VaultDetail: React.FC<VaultDetailProps> = ({ vaultName, onDeposit, onWithd
       case "Strategy":
         return <VaultStrategy tokens={strategyTokens} />;
       case "Explorer":
-        return <div className="p-4">Latest news and updates about {vaultName}</div>;
+        return <VaultExplorer transactions={mockTransactions} />;
       default:
         return null;
     }
