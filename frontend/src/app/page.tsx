@@ -22,6 +22,7 @@ export default function AppLayout() {
           selectedPage={selectedPage} 
           selectedVault={selectedVault} 
           setSelectedVault={setSelectedVault} 
+          setSelectedPage={setSelectedPage}
         />
       </div>
     </div>

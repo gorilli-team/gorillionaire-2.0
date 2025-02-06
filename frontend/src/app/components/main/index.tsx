@@ -32,12 +32,14 @@ interface MainProps {
   selectedPage: string;
   selectedVault: string | null;
   setSelectedVault: React.Dispatch<React.SetStateAction<string | null>>;
+  setSelectedPage: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export default function Main({
   selectedPage,
   selectedVault,
   setSelectedVault,
+  setSelectedPage
 }: MainProps) {
   const { address } = useAccount();
   const { data: hash, writeContract } = useWriteContract();
@@ -99,9 +101,10 @@ export default function Main({
     setIsModalOpen(false);
   };
 
-  //  const handleCardClick = (vaultName: string) => {
-  //   setSelectedVault(vaultName);
-  //  };
+  const handleCardClick = (vaultName: string) => {
+    setSelectedVault(vaultName);
+    setSelectedPage("Vault");
+  };
 
   // const handleBack = () => {
   //   setSelectedVault(null);
@@ -118,8 +121,15 @@ export default function Main({
 
   const renderContent = () => {
     if (selectedVault) {
-      return <VaultDetail vaultName={selectedVault}/>;
+      return (
+        <VaultDetail
+          vaultName={selectedVault}
+          onDeposit={() => handleDepositClick(selectedVault)}
+          onWithdraw={handleWithdrawClick}
+        />
+      );
     }
+  
   
     switch (selectedPage) {
       case "Feed":
@@ -133,6 +143,7 @@ export default function Main({
               onDepositClick={handleDepositClick}
               onCardClick={setSelectedVault}
               onWithdrawClick={handleWithdrawClick}
+              setSelectedPage={setSelectedPage}
             />
           </div>
         );
@@ -154,21 +165,28 @@ export default function Main({
 
             <h2 className="text-xl font-bold text-gray-800 mb-4">Your Investments</h2>
             <div className="grid grid-cols-4 gap-2 w-full flex">
-              <Card 
-                title="Vault Test 1" 
-                apy="3.5%" 
-                tvl="$138.8k" 
-                chainName="Base" 
-                chainImage="/base.png" 
-                onDeposit={() => handleDepositClick("Vault Test 1")} 
-                onCardClick={() => setSelectedVault("Vault Test 1")} 
-                onWithdraw={handleWithdrawClick}
-              />
+            <Card 
+              title="Vault Test 1"
+              apy="3.5%"
+              tvl="$138.8k"
+              chainName="Base"
+              chainImage="/base.png"
+              onDeposit={() => handleDepositClick("Vault Test 1")}
+              onCardClick={() => handleCardClick("Vault Test 1")}
+              onWithdraw={handleWithdrawClick}
+            />
+
             </div>
           </div>
         );
       case "Vault":
-        return <VaultDetail vaultName="Vault Test 1" />;
+        return (
+            <VaultDetail
+                vaultName="Vault Test 1"
+                onDeposit={() => handleDepositClick("Vault Test 1")}
+                onWithdraw={handleWithdrawClick}
+            />
+        );      
       default:
         return <div className="p-4 text-gray-800">Select a page</div>;
     }
