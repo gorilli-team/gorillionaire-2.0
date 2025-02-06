@@ -170,7 +170,7 @@ export default function Main({
                 apy="3.5%"
                 tvl="$138.8k"
                 chainName="Base"
-                chainImage="/base.png"
+                chainImage="/base.jpg"
                 onDeposit={() => handleDepositClick("Vault Test 1")}
                 onCardClick={() => handleCardClick("Vault Test 1")}
                 onWithdraw={handleWithdrawClick}

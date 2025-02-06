@@ -61,7 +61,7 @@ const FeedNews: React.FC<FeedNewsProps> = ({
             apy="3.5%"
             tvl="$138.8k"
             chainName="Base"
-            chainImage="/base.png"
+            chainImage="/base.jpg"
             onDeposit={() => onDepositClick(vaultName)}
             onCardClick={() => handleCardClick(vaultName)}
             onWithdraw={() => onWithdrawClick(vaultName)}

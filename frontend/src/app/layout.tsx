@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "Gorillionaire",
   description: "Gorillionaire is an AI-powered agent that trades meme coins in the cryptocurrency market, learns from Twitter trends, and adjusts its trading strategy accordingly. By analyzing social media sentiment and market data, it aims to predict and capitalize on trends to maximize profit in the ever-changing crypto landscape.",
   icons: {
-    icon: "gorillionaire.jpg",
+    icon: "fav_gorillionaire.png",
   },
 };
 

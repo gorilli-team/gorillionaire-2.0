@@ -20,7 +20,7 @@ const VaultStats: React.FC<VaultStatsProps> = ({ vaultName }) => {
         <div className="flex justify-between pb-2">
           <strong>Chain:</strong>
           <div className="flex">
-            <img className="w-6 h-6" src="/base.png" alt="img-base" />
+            <img className="w-6 h-6" src="/base.jpg" alt="img-base" />
             <span className="ps-1">Base</span>
           </div>
         </div>
