@@ -1,10 +1,11 @@
 import React from "react";
-import { PieChart, Pie, Cell, Tooltip } from "recharts";
+import { PieChart, Pie, Cell, Tooltip, Label } from "recharts";
 
 interface Token {
   name: string;
   value: number;
   color: string;
+  logo: string;
 }
 
 interface VaultStrategyProps {
@@ -18,14 +19,21 @@ const VaultStrategy: React.FC<VaultStrategyProps> = ({ tokens }) => {
     <div className="flex justify-between items-center p-4 bg-white rounded-lg">
       <div className="w-1/3">
         {tokens.map((token) => (
-          <div key={token.name} className="flex justify-between p-2 bg-white border border-gray-200 rounded-lg mb-2">
-            <span>{token.name}</span>
-            <span className="font-bold">${token.value.toLocaleString()}</span>
+          <div key={token.name} className="flex justify-between items-center p-2 bg-white border border-gray-200 rounded-lg mb-2">
+            <div className="flex items-center">
+              <img src={token.logo} alt={token.name} className="w-6 h-6 mr-2" />
+              <span>{token.name}</span>
+            </div>
+            <div className="flex items-center">
+              <span className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: token.color }}></span>
+              <span className="font-bold">${token.value.toLocaleString()}</span>
+              <span className="ml-2 text-gray-500">({((token.value / total) * 100).toFixed(2)}%)</span>
+            </div>
           </div>
         ))}
       </div>
 
-      <div className="w-1/3 flex justify-end">
+      <div className="w-1/3 flex justify-end relative">
         <PieChart width={200} height={200}>
           <Pie
             data={tokens}

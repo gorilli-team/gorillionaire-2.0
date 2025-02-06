@@ -25,11 +25,11 @@ const VaultDetail: React.FC<VaultDetailProps> = ({ vaultName, onDeposit, onWithd
   };
 
   const strategyTokens = [
-    { name: "Compound", value: 49357.35, color: "#00C49F" },
-    { name: "Uniswap", value: 31212.68, color: "#FF6384" },
-    { name: "AAVE", value: 28991.33, color: "#8A2BE2" },
-    { name: "Cream Finance", value: 28736.42, color: "#FFA500" }
-  ];
+    { name: "Compound", value: 49357.35, color: "#00C49F", logo: "/gorillionaire.jpg" },
+    { name: "Uniswap", value: 31212.68, color: "#FF6384", logo: "/gorillionaire.jpg" },
+    { name: "AAVE", value: 28991.33, color: "#8A2BE2", logo: "/gorillionaire.jpg" },
+    { name: "Cream Finance", value: 28736.42, color: "#FFA500", logo: "/gorillionaire.jpg" }
+  ];  
 
   const mockTransactions: Transaction[] = [
     {

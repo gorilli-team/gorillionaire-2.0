@@ -10,8 +10,8 @@ interface Depositor {
 
 const VaultDepositors: React.FC = () => {
   const depositors: Depositor[] = [
-    { rank: 1, investor: "0x86fd0D762B53f21011e531fa57629D294d576A36", percentage: "10.00%", value: "$5,000", image: "/gorillionaire.jpg" },
-    { rank: 2, investor: "0x86fd0D762B53f21011e531fa57629D294d576A36", percentage: "5.00%", value: "$2,500", image: "/gorillionaire.jpg" },
+    { rank: 1, investor: "0x86fd0D762B53f21011e531fa57629D294d576A36", percentage: "10.00%", value: "$5,000", image: "/avatar_1.png" },
+    { rank: 2, investor: "0x86fd0D762B53f21011e531fa57629D294d576A36", percentage: "5.00%", value: "$2,500", image: "/avatar_2.png" },
   ];
 
   return (
