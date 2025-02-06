@@ -9,6 +9,7 @@ interface FeedNewsProps {
     vaultName: string;
     onDepositClick: (vaultName: string) => void;
     onCardClick: (vaultName: string) => void;
+    onWithdrawClick: (vaultName: string) => void;
 }
   
 
@@ -36,7 +37,8 @@ const FeedNews: React.FC<FeedNewsProps> = ({
     content, 
     vaultName, 
     onDepositClick,
-    onCardClick
+    onCardClick,
+    onWithdrawClick
   }) => {
     return (
       <div className={`${styles.feedNews} pt-6 p-2 flex items-start gap-4 w-[600px]`}>
@@ -56,6 +58,7 @@ const FeedNews: React.FC<FeedNewsProps> = ({
               chainImage="/base.png"
               onDeposit={() => onDepositClick(vaultName)}
               onCardClick={() => onCardClick(vaultName)}
+              onWithdraw={() => onWithdrawClick(vaultName)}
             />
           </div>
         </div>

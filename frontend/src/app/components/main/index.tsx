@@ -112,6 +112,10 @@ export default function Main({
     setIsModalOpen(true);
   };
 
+  const handleWithdrawClick = () => {
+    console.log("Withdraw clicked");
+  };
+
   const renderContent = () => {
     if (selectedVault) {
       return <VaultDetail vaultName={selectedVault}/>;
@@ -128,6 +132,7 @@ export default function Main({
               vaultName="Vault Test 1"
               onDepositClick={handleDepositClick}
               onCardClick={setSelectedVault}
+              onWithdrawClick={handleWithdrawClick}
             />
           </div>
         );
@@ -157,6 +162,7 @@ export default function Main({
                 chainImage="/base.png" 
                 onDeposit={() => handleDepositClick("Vault Test 1")} 
                 onCardClick={() => setSelectedVault("Vault Test 1")} 
+                onWithdraw={handleWithdrawClick}
               />
             </div>
           </div>
