@@ -19,6 +19,9 @@ export const createPriceService = (apiKey: string) => {
         const normalizedSymbol = symbol.toUpperCase().trim();
         const normalizedCurrency = currency.toUpperCase().trim();
 
+        console.log('normalizedSymbol', normalizedSymbol);
+        console.log('normalizedCurrency', normalizedCurrency);
+
         try {
             const response = await client.get<ApiResponse>(
                 "/cryptocurrency/quotes/latest",

@@ -10,6 +10,16 @@ Here are the cryptocurrency symbol mappings:
 - polkadot/dot -> DOT
 - usdc -> USDC
 - tether/usdt -> USDT
+- brett -> BRETT
+- toshi -> TOSHI
+- akuma inu -> AKUMA
+- ski mask dog -> SKI
+- degen -> DEGEN
+- keyboard cat -> KEYCAT
+- higher -> HIGHER
+- baby tiger -> BBT
+- doginme -> DOGINME
+- based pepe -> PEPE
 
 IMPORTANT: Response must ALWAYS include both "symbol" and "currency" fields.
 
