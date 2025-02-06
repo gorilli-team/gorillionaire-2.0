@@ -28,19 +28,19 @@ export const Card: React.FC<CardProps> = ({
   return (
     <div
       onClick={onCardClick}
-      className="cursor-pointer bg-white shadow-md rounded-2xl p-4 mx-auto flex-col justify-center"
+      className="cursor-pointer bg-white shadow-md rounded-2xl p-4 mx-auto flex-col justify-center text-[14px]"
     >
       <div>
         <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
       </div>
       <div className="flex gap-2 mt-2">
         <div className="flex items-center justify-center bg-gray-300 p-2 rounded-lg w-1/3">
-          <span className="text-xs text-gray-600">30D APY:</span>
-          <span className="font-medium text-gray-800">{apy}</span>
+          <span className="text-gray-600 pr-2">30D APY:</span>
+          <span className="text-gray-800">{apy}</span>
         </div>
         <div className="flex items-center justify-center bg-gray-300 p-2 rounded-lg w-1/3">
-          <span className="text-xs text-gray-600">TVL:</span>
-          <span className="font-medium text-gray-800">{tvl}</span>
+          <span className="text-gray-600 pr-2">TVL:</span>
+          <span className="text-gray-800">{tvl}</span>
         </div>
         <div className="flex items-center justify-center bg-gray-300 p-2 rounded-lg w-1/3">
           <img
@@ -48,7 +48,7 @@ export const Card: React.FC<CardProps> = ({
             alt={chainName}
             className="h-4 w-4 rounded-full mr-2"
           />
-          <span className="text-xs font-medium text-gray-800">{chainName}</span>
+          <span className="text-gray-800">{chainName}</span>
         </div>
       </div>
       <div className="flex-shrink-0 mt-4 flex gap-2">

@@ -164,18 +164,17 @@ export default function Main({
             </div>
 
             <h2 className="text-xl font-bold text-gray-800 mb-4">Your Investments</h2>
-            <div className="grid grid-cols-4 gap-2 w-full flex">
-            <Card 
-              title="Vault Test 1"
-              apy="3.5%"
-              tvl="$138.8k"
-              chainName="Base"
-              chainImage="/base.png"
-              onDeposit={() => handleDepositClick("Vault Test 1")}
-              onCardClick={() => handleCardClick("Vault Test 1")}
-              onWithdraw={handleWithdrawClick}
-            />
-
+            <div className="w-[38%] gap-2">
+              <Card 
+                title="Vault Test 1"
+                apy="3.5%"
+                tvl="$138.8k"
+                chainName="Base"
+                chainImage="/base.png"
+                onDeposit={() => handleDepositClick("Vault Test 1")}
+                onCardClick={() => handleCardClick("Vault Test 1")}
+                onWithdraw={handleWithdrawClick}
+              />
             </div>
           </div>
         );

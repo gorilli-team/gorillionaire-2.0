@@ -37,23 +37,23 @@ const VaultDetail: React.FC<VaultDetailProps> = ({ vaultName, onDeposit, onWithd
 
   return (
     <div className="p-4">
-      <div className="flex justify-between">
-        <h2 className="text-lg font-semibold text-gray-800 pb-2">{vaultName}</h2>
-          {address ? (
-          <div className="flex gap-2">
-            <button
-              onClick={onWithdraw}
-              className="px-4 py-2 bg-white border border-blue-500 hover:bg-blue-500 text-sm hover:text-white text-blue-500 font-small rounded-lg transition"
-            >
-              Withdraw
-            </button>
-            <button
-              onClick={onDeposit}
-              className="px-4 py-2 bg-blue-500 border border-transparent text-white text-sm rounded-lg hover:bg-white hover:border-blue-500 hover:text-blue-500 transition"
-            >
-              Deposit
-            </button>
-          </div>
+      <div className="flex justify-between items-center pb-2">
+        <h2 className="text-lg font-semibold text-gray-800">{vaultName}</h2>
+        {address ? (
+        <div className="flex gap-2">
+          <button
+            onClick={onWithdraw}
+            className="px-4 py-2 bg-white border border-blue-500 hover:bg-blue-500 text-sm hover:text-white text-blue-500 font-small rounded-lg transition w-[100px]"
+          >
+            Withdraw
+          </button>
+          <button
+            onClick={onDeposit}
+            className="px-4 py-2 bg-blue-500 border border-transparent text-white text-sm rounded-lg hover:bg-white hover:border-blue-500 hover:text-blue-500 transition w-[100px]"
+          >
+            Deposit
+          </button>
+        </div>
         ) : null}
       </div>
       <div className="flex space-x-4 border-b mb-4">
