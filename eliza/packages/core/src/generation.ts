@@ -367,6 +367,8 @@ export async function generateText({
         return "";
     }
 
+    console.log('*** Generating text... ***')
+
     elizaLogger.log("Generating text...");
 
     elizaLogger.info("Generating text with options:", {
@@ -524,6 +526,8 @@ export async function generateText({
             `Using provider: ${provider}, model: ${model}, temperature: ${temperature}, max response length: ${max_response_length}`
         );
 
+        console.log('provider', provider);
+
         switch (provider) {
             // OPENAI & LLAMACLOUD shared same structure.
             case ModelProviderName.OPENAI:
@@ -567,7 +571,7 @@ export async function generateText({
                 });
 
                 response = openaiResponse;
-                console.log("Received response from OpenAI model.", JSON.stringify(openaiResponse).replace(/\n+/g, ' ').trim());
+                console.log("Received response from OpenAI model.", openaiResponse);
                 break;
             }
 
@@ -1292,6 +1296,7 @@ export async function generateText({
 
         return response;
     } catch (error) {
+        console.log("Error in generateText:", error);
         elizaLogger.error("Error in generateText:", error);
         throw error;
     }

@@ -629,6 +629,7 @@ export class TwitterPostClient {
                 elizaLogger.error("Error sending tweet:", error);
             }
         } catch (error) {
+            console.log('ERROR', error);
             elizaLogger.error("Error generating new tweet:", error);
         }
     }
