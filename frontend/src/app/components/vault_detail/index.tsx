@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import styles from "./index.module.css";
+import VaultStats from "../vault_stats";
+
 
 interface VaultDetailProps {
   vaultName: string;
@@ -11,57 +12,12 @@ const VaultDetail: React.FC<VaultDetailProps> = ({ vaultName}) => {
   const renderTabContent = () => {
     switch (activeTab) {
       case "Stats":
-        return (
-          <div className="p-4">
-            <h3 className="text-md font-semibold mb-2">Details</h3>
-            <div className="border p-4 rounded-lg mb-4 bg-gray-100">
-              <div className="flex justify-between pb-2">
-                <strong>Vault name:</strong>
-                <span>{vaultName}</span>
-              </div>
-              <div className="flex justify-between pb-2">
-                <strong>Created by:</strong> 
-                <span>TrollDetective.Eve</span>
-              </div>
-              <div className="flex justify-between pb-2">
-                <strong>List date:</strong> 
-                <span>05/02/2025</span>
-              </div>
-              <div className="flex justify-between pb-2">
-                <strong>Chain:</strong>
-                <div className="flex">
-                    <img className="w-6 h-6" src="/base.png" alt="img-base" />
-                    <span className="ps-1">Base</span>
-                </div>
-              </div>
-              <div className="flex justify-between pb-2">
-                <strong>Contract address:</strong>  
-                <span>0x4173151106c668B79fb2aF40e6894f12A91B4d2F</span>
-              </div>
-              <div className="flex justify-between pb-2">
-                <strong>Last updated:</strong>  
-                <span>05/02/2025</span>
-              </div>
-            </div>
-
-            <h3 className="text-md font-semibold mb-2">APY</h3>
-            <div className="border p-4 rounded-lg mb-4 bg-gray-100">
-              <p>APY: 3.5%</p>
-              <p>[Placeholder for APY chart]</p>
-            </div>
-
-            <h3 className="text-md font-semibold mb-2">TVL</h3>
-            <div className="border p-4 rounded-lg bg-gray-100">
-              <p>TVL: $138,297.78</p>
-              <p>[Placeholder for TVL chart]</p>
-            </div>
-          </div>
-        );
+        return <VaultStats vaultName={vaultName} />;
       case "Depositors":
         return <div className="p-4">Depositors content for {vaultName}</div>;
       case "Strategy":
         return <div className="p-4">Strategy content for {vaultName}</div>;
-      case "News":
+      case "Explorer":
         return <div className="p-4">Latest news and updates about {vaultName}</div>;
       default:
         return null;
@@ -72,7 +28,7 @@ const VaultDetail: React.FC<VaultDetailProps> = ({ vaultName}) => {
     <div className="p-4">
       <h2 className="text-lg font-semibold text-gray-800 pb-2">{vaultName}</h2>
       <div className="flex space-x-4 border-b mb-4">
-        {["Stats", "Depositors", "Strategy", "News"].map((tab) => (
+        {["Stats", "Depositors", "Strategy", "Explorer"].map((tab) => (
           <button
             key={tab}
             className={`px-4 py-2 ${
