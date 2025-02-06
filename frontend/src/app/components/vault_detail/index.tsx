@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import VaultStats from "../vault_stats";
 import { useAccount } from "wagmi";
+import VaultDepositors from "../vault_depositors";
 
 interface VaultDetailProps {
   vaultName: string;
@@ -25,7 +26,7 @@ const VaultDetail: React.FC<VaultDetailProps> = ({ vaultName, onDeposit, onWithd
       case "Stats":
         return <VaultStats vaultName={vaultName} />;
       case "Depositors":
-        return <div className="p-4">Depositors content for {vaultName}</div>;
+        return <VaultDepositors />;
       case "Strategy":
         return <div className="p-4">Strategy content for {vaultName}</div>;
       case "Explorer":
