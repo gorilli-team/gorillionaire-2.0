@@ -74,9 +74,9 @@ export const Card: React.FC<CardProps> = ({
             </button>
           </>
         ) : (
-          <div className="w-full flex justify-center">
+          <div className="w-full flex justify-center" onClick={(e) => e.stopPropagation()}>
             <WalletDefault />
-          </div>
+          </div> 
         )}
       </div>
     </div>
