@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import VaultStats from "../vault_stats";
 import { useAccount } from "wagmi";
 import VaultDepositors from "../vault_depositors";
+import VaultStrategy from "../vault_strategy";
 
 interface VaultDetailProps {
   vaultName: string;
@@ -21,6 +22,13 @@ const VaultDetail: React.FC<VaultDetailProps> = ({ vaultName, onDeposit, onWithd
     console.log("Deposit clicked");
   };
 
+  const strategyTokens = [
+    { name: "Compound", value: 49357.35, color: "#00C49F" },
+    { name: "Uniswap", value: 31212.68, color: "#FF6384" },
+    { name: "AAVE", value: 28991.33, color: "#8A2BE2" },
+    { name: "Cream Finance", value: 28736.42, color: "#FFA500" }
+  ];
+
   const renderTabContent = () => {
     switch (activeTab) {
       case "Stats":
@@ -28,7 +36,7 @@ const VaultDetail: React.FC<VaultDetailProps> = ({ vaultName, onDeposit, onWithd
       case "Depositors":
         return <VaultDepositors />;
       case "Strategy":
-        return <div className="p-4">Strategy content for {vaultName}</div>;
+        return <VaultStrategy tokens={strategyTokens} />;
       case "Explorer":
         return <div className="p-4">Latest news and updates about {vaultName}</div>;
       default:
