@@ -1,5 +1,5 @@
 import React from "react";
-import { PieChart, Pie, Cell, Tooltip, Label } from "recharts";
+import { PieChart, Pie, Cell, Tooltip } from "recharts";
 
 interface Token {
   name: string;

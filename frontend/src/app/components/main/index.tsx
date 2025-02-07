@@ -164,7 +164,7 @@ export default function Main({
             </div>
 
             <h2 className="text-xl font-bold text-gray-800 mb-4">Your Investments</h2>
-            <div className="w-[38%] gap-2">
+            <div className="w-[34%] gap-2">
               <Card 
                 title="Vault Test 1"
                 apy="3.5%"

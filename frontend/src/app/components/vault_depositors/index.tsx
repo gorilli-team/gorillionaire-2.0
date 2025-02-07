@@ -28,8 +28,8 @@ const VaultDepositors: React.FC = () => {
         <tbody>
           {depositors.map((depositor) => (
             <tr key={depositor.rank}>
-              <td className="border border-gray-300 px-4 py-2">{depositor.rank}</td>
-              <td className="border border-gray-300 px-4 py-2 flex items-center gap-2">
+              <td className="border-b border-l border-gray-300 px-4 py-2">{depositor.rank}</td>
+              <td className="border-b border-l border-gray-300 px-4 py-2 flex items-center gap-2">
                 <img
                   src={depositor.image}
                   alt="Investor"

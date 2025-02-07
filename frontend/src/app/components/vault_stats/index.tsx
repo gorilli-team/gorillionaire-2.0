@@ -1,10 +1,21 @@
 import React from "react";
+import SentimentChart from "../sentiment_chart";
 
 interface VaultStatsProps {
   vaultName: string;
 }
 
 const VaultStats: React.FC<VaultStatsProps> = ({ vaultName }) => {
+
+    const sentimentData = [
+        { date: "Feb 05", sentiment: 10 },  // HOLD 🤔
+        { date: "Feb 06", sentiment: -5 },  // HOLD 🤔
+        { date: "Feb 07", sentiment: -20 }, // SELL 🟥
+        { date: "Feb 08", sentiment: 8 },   // HOLD 🤔
+        { date: "Feb 09", sentiment: 25 },  // BUY 🚀
+        { date: "Feb 10", sentiment: -12 }, // SELL 🟥
+    ];
+
   return (
     <div className="p-4">
       <h3 className="text-md font-semibold mb-2">Details</h3>
@@ -38,8 +49,11 @@ const VaultStats: React.FC<VaultStatsProps> = ({ vaultName }) => {
         </div>
       </div>
       <div className="flex w-full gap-2">
-        <div className="border p-4 rounded-lg bg-gray-100 w-full flex flex-col">
-          
+        <div className="border p-4 rounded-lg bg-gray-100 w-1/2">
+            <SentimentChart data={sentimentData} />
+        </div>
+        <div className="border p-4 rounded-lg bg-gray-100 w-1/2">
+            
         </div>
       </div>
     </div>
