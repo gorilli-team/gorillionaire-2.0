@@ -1,4 +1,5 @@
 import { setAppState, getAppState } from "../store/appStore";
+import { Transaction } from "../types";
 
 export const fetchVaultAddress = async () => {
   try {
@@ -36,6 +37,57 @@ export const fetchVaultTransactions = async () => {
     return data.result || [];
   } catch (error) {
     console.error("Error fetching transactions:", error);
+    return [];
+  }
+};
+
+
+export const fetchVaultDepositors = async (): Promise<
+  { investor: string; deposits: number; withdraws: number; image: string }[]
+> => {
+  try {
+    const vaultAddress = getAppState("vaultAddress");
+
+    if (!vaultAddress) {
+      console.error("Vault address is missing.");
+      return [];
+    }
+
+    const transactions: Transaction[] = await fetchVaultTransactions();
+    if (!transactions?.length) return [];
+
+    const depositorsMap: Record<string, { deposits: number; withdraws: number }> = {};
+
+    transactions.forEach((tx) => {
+      const from = tx.from?.toLowerCase();
+      const to = tx.to?.toLowerCase();
+      const vault = vaultAddress.toLowerCase();
+
+      if (from) {
+        if (!depositorsMap[from]) {
+          depositorsMap[from] = { deposits: 0, withdraws: 0 };
+        }
+        depositorsMap[from].deposits += 1;
+      }
+
+      if (to) {
+        if (!depositorsMap[to]) {
+          depositorsMap[to] = { deposits: 0, withdraws: 0 };
+        }
+        depositorsMap[to].withdraws += 1;
+      }
+    });
+
+    return Object.entries(depositorsMap)
+      .filter(([wallet]) => wallet && wallet !== vaultAddress.toLowerCase())
+      .map(([wallet, { deposits, withdraws }], index) => ({
+        investor: wallet,
+        deposits,
+        withdraws,
+        image: `/avatar_${(index % 5) + 1}.png`,
+      }));
+  } catch (error) {
+    console.error("Error fetching vault depositors:", error);
     return [];
   }
 };

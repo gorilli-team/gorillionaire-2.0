@@ -10,9 +10,3 @@ export const setAppState = (key: keyof typeof appState, value: string) => {
 export const getAppState = (key: keyof typeof appState) => appState[key];
 
 export default appState;
-
-
-
-
-
-

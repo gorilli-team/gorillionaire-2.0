@@ -3,6 +3,7 @@ export interface Transaction {
     method: "Deposit" | "Withdraw";
     block: number;
     age: string;
+    to: string;
     from: string;
     // amount: string;
     // txnFee: string;

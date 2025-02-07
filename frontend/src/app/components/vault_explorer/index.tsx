@@ -39,6 +39,7 @@ const VaultExplorer: React.FC<{ transactions: any[], vaultAddress: string }> = (
           block: tx.blockNumber,
           age: formatTimestamp(tx.timeStamp),
           from: tx.from,
+          to: tx.to,
         //   amount: tx.value,
         //   txnFee: formatTxnFee(tx.gasUsed, tx.gasPrice)
         }))

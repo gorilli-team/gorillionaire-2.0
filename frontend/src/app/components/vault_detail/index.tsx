@@ -6,7 +6,7 @@ import VaultStrategy from "../vault_strategy";
 import VaultExplorer from "../vault_explorer";
 import { Transaction } from "../../types";
 import { getAppState } from "../../store/appStore";
-import { fetchVaultAddress, fetchVaultTransactions } from "../../api/fetchVaultData";
+import { fetchVaultAddress, fetchVaultTransactions, fetchVaultDepositors } from "../../api/fetchVaultData";
 
 interface VaultDetailProps {
   vaultName: string;
@@ -19,6 +19,8 @@ const VaultDetail: React.FC<VaultDetailProps> = ({ vaultName, onDeposit, onWithd
   const [activeTab, setActiveTab] = useState<string>("Stats");
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const vaultAddress = getAppState("vaultAddress");
+  const [depositors, setDepositors] = useState<{ investor: string; deposits: number; withdraws: number; image: string }[]>([]);
+
 
   useEffect(() => {
     const initializeVaultAddress = async () => {
@@ -38,6 +40,17 @@ const VaultDetail: React.FC<VaultDetailProps> = ({ vaultName, onDeposit, onWithd
     }
   }, [vaultAddress]);
 
+  useEffect(() => {
+    const loadDepositors = async () => {
+      const wallets = await fetchVaultDepositors();
+      setDepositors(wallets);
+    };
+
+    if (vaultAddress) {
+      loadDepositors();
+    }
+  }, [vaultAddress]);
+
   const strategyTokens = [
     { name: "Compound", value: 49357.35, color: "#00C49F", logo: "/gorillionaire.jpg" },
     { name: "Uniswap", value: 31212.68, color: "#FF6384", logo: "/gorillionaire.jpg" },
@@ -50,7 +63,7 @@ const VaultDetail: React.FC<VaultDetailProps> = ({ vaultName, onDeposit, onWithd
       case "Stats":
         return <VaultStats vaultName={vaultName} />;
       case "Depositors":
-        return <VaultDepositors />;
+        return <VaultDepositors depositors={depositors} />;
       case "Strategy":
         return <VaultStrategy tokens={strategyTokens} />;
       case "Explorer":
