@@ -3,7 +3,7 @@ import { setAppState, getAppState } from "../store/appStore";
 export const fetchVaultAddress = async () => {
   try {
     /*
-    const response = await fetch("URL_DELL_API_DI_ELIZA");
+    const response = await fetch("ELIZA_URL_API");
     const data = await response.json();
     const vaultAddress = data.vaultAddress;
     */
@@ -26,7 +26,7 @@ export const fetchVaultTransactions = async () => {
     return [];
   }
 
-  const BLOCKSCOUT_API_KEY = "9392e205-7aaf-4069-871e-632706779609";
+  const BLOCKSCOUT_API_KEY = process.env.NEXT_PUBLIC_BLOCKSCOUT_API_KEY;
   const url = `https://base-sepolia.blockscout.com/api?module=account&action=txlist&address=${vaultAddress}&startblock=0&endblock=99999999&sort=desc&apikey=${BLOCKSCOUT_API_KEY}`;
 
   try {
