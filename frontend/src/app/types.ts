@@ -4,8 +4,8 @@ export interface Transaction {
     block: number;
     age: string;
     from: string;
-    amount: string;
-    txnFee: string;
+    // amount: string;
+    // txnFee: string;
   }
 
 declare global {

@@ -16,11 +16,11 @@ const formatTimestamp = (timestamp: string): string => {
     return `${daysAgo}d ago`;
 };
   
-const formatTxnFee = (gasUsed: string, gasPrice: string): string => {
-    const feeInWei = BigInt(gasUsed) * BigInt(gasPrice);
-    const feeInEth = Number(feeInWei) / 1e18;
-    return feeInEth.toFixed(8);
-};
+// const formatTxnFee = (gasUsed: string, gasPrice: string): string => {
+//     const feeInWei = BigInt(gasUsed) * BigInt(gasPrice);
+//     const feeInEth = Number(feeInWei) / 1e18;
+//     return feeInEth.toFixed(8);
+// };
   
 const formatHash = (hash: string): string => {
     return `${hash.slice(0, 10)}...${hash.slice(-4)}`;
@@ -39,8 +39,8 @@ const VaultExplorer: React.FC<{ transactions: any[], vaultAddress: string }> = (
           block: tx.blockNumber,
           age: formatTimestamp(tx.timeStamp),
           from: tx.from,
-          amount: tx.value,
-          txnFee: formatTxnFee(tx.gasUsed, tx.gasPrice)
+        //   amount: tx.value,
+        //   txnFee: formatTxnFee(tx.gasUsed, tx.gasPrice)
         }))
         .sort((a, b) => parseInt(b.block) - parseInt(a.block));
     
@@ -55,9 +55,9 @@ const VaultExplorer: React.FC<{ transactions: any[], vaultAddress: string }> = (
               <th className="border border-gray-300 px-4 py-2 text-left">Transaction Hash</th>
               <th className="border border-gray-300 px-4 py-2 text-left">Method</th>
               <th className="border border-gray-300 px-4 py-2 text-left">Block</th>
-              <th className="border border-gray-300 px-4 py-2 text-left">Age</th>
-              <th className="border border-gray-300 px-4 py-2 text-left">Amount ETH</th>
-              <th className="border border-gray-300 px-4 py-2 text-left">Fee ETH</th>
+              <th className="border border-gray-300 px-4 py-2 text-left">Timestamp</th>
+              {/* <th className="border border-gray-300 px-4 py-2 text-left">Amount ETH</th>
+              <th className="border border-gray-300 px-4 py-2 text-left">Fee ETH</th> */}
             </tr>
           </thead>
           <tbody>
@@ -77,8 +77,8 @@ const VaultExplorer: React.FC<{ transactions: any[], vaultAddress: string }> = (
                 </td>
                 <td className="border border-gray-300 px-4 py-2">{tx.block}</td>
                 <td className="border border-gray-300 px-4 py-2">{tx.age}</td>
-                <td className="border border-gray-300 px-4 py-2">{tx.amount}</td>
-                <td className="border border-gray-300 px-4 py-2">{tx.txnFee}</td>
+                {/* <td className="border border-gray-300 px-4 py-2">{tx.amount}</td>
+                <td className="border border-gray-300 px-4 py-2">{tx.txnFee}</td> */}
               </tr>
             ))}
           </tbody>

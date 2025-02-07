@@ -43,7 +43,8 @@ const VaultDetail: React.FC<VaultDetailProps> = ({ vaultName, onDeposit, onWithd
     { name: "Uniswap", value: 31212.68, color: "#FF6384", logo: "/gorillionaire.jpg" },
     { name: "AAVE", value: 28991.33, color: "#8A2BE2", logo: "/gorillionaire.jpg" },
     { name: "Cream Finance", value: 28736.42, color: "#FFA500", logo: "/gorillionaire.jpg" }
-  ];  
+  ];
+  
   const renderTabContent = () => {
     switch (activeTab) {
       case "Stats":

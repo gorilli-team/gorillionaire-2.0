@@ -87,14 +87,14 @@ export default function Main({
         address: USDC_ADDRESS,
         abi: erc20abi,
         functionName: "approve",
-        args: [VAULT_ADDRESS, BigInt(amount * Math.pow(10, 6))],
+        args: [VAULT_ADDRESS, amountParsed],
       });
     } else {
       writeContract({
         address: VAULT_ADDRESS,
         abi: vaultAbi,
         functionName: "deposit",
-        args: [BigInt(1), address],
+        args: [amountParsed, address],
       });
     }
 

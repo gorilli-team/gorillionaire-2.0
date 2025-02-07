@@ -7,7 +7,7 @@ interface SentimentChartProps {
 
 const SentimentChart: React.FC<SentimentChartProps> = ({ data }) => {
   return (
-    <div className="p-4 bg-gray-900 text-white rounded-lg shadow-md">
+    <div className="p-4 bg-gray-900 text-white shadow-md">
       <h3 className="text-lg font-semibold text-center">🔥 Sentiment Trend</h3>
       <ResponsiveContainer width="100%" height={300}>
         <AreaChart data={data}>

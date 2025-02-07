@@ -68,11 +68,11 @@ const VaultStats: React.FC<VaultStatsProps> = ({ vaultName }) => {
         </div>
       </div>
       <div className="flex w-full gap-2">
-        <div className="border p-4 rounded-lg bg-gray-100 w-1/2">
+        <div className="border p-4 bg-gray-100 w-1/2">
             <SentimentChart data={sentimentData} />
         </div>
         <div className="border p-4 rounded-lg bg-gray-100 w-1/2">
-            <div ref={chartContainerRef} id="tradingview-chart" style={{ height: "440px" }} />
+            <div ref={chartContainerRef} id="tradingview-chart" style={{ height: "440px", borderRadius: "0.5rem"}} />
         </div>
       </div>
     </div>

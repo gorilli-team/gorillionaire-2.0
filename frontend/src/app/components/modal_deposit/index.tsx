@@ -67,7 +67,7 @@ export const ModalDeposit: React.FC<ModalDepositProps> = ({
                 onClick={handleDepositSubmit}
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg w-full"
               >
-                {BigInt(Number(depositAmount) * Math.pow(10, 18) > allowance)
+                {BigInt(Number(depositAmount) * Math.pow(10, 6) > allowance)
                   ? "Approve"
                   : "Deposit"}
               </button>
