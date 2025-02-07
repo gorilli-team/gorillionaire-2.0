@@ -7,3 +7,9 @@ export interface Transaction {
     amount: string;
     txnFee: string;
 }
+
+declare global {
+    interface Window {
+      TradingView: any;
+    }
+  }

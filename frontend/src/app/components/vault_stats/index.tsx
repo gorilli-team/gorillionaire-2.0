@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import SentimentChart from "../sentiment_chart";
 
 interface VaultStatsProps {
@@ -8,13 +8,32 @@ interface VaultStatsProps {
 const VaultStats: React.FC<VaultStatsProps> = ({ vaultName }) => {
 
     const sentimentData = [
-        { date: "Feb 05", sentiment: 10 },  // HOLD 🤔
-        { date: "Feb 06", sentiment: -5 },  // HOLD 🤔
-        { date: "Feb 07", sentiment: -20 }, // SELL 🟥
-        { date: "Feb 08", sentiment: 8 },   // HOLD 🤔
-        { date: "Feb 09", sentiment: 25 },  // BUY 🚀
-        { date: "Feb 10", sentiment: -12 }, // SELL 🟥
+        { date: "Feb 05", sentiment: 10 },
+        { date: "Feb 06", sentiment: -5 },
+        { date: "Feb 07", sentiment: -20 },
+        { date: "Feb 08", sentiment: 8 },
+        { date: "Feb 09", sentiment: 25 },
+        { date: "Feb 10", sentiment: -12 },
     ];
+
+    const chartContainerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (chartContainerRef.current) {
+            new window.TradingView.widget({
+                autosize: true,
+                symbol: "BINANCE:ETHUSDT",
+                interval: "60",
+                container_id: chartContainerRef.current.id,
+                theme: "dark", 
+                style: "2",
+                locale: "en",
+                toolbar_bg: "#f1f3f6",
+                hide_side_toolbar: true,
+                allow_symbol_change: true,
+            });
+        }
+    }, []);
 
   return (
     <div className="p-4">
@@ -53,7 +72,7 @@ const VaultStats: React.FC<VaultStatsProps> = ({ vaultName }) => {
             <SentimentChart data={sentimentData} />
         </div>
         <div className="border p-4 rounded-lg bg-gray-100 w-1/2">
-            
+            <div ref={chartContainerRef} id="tradingview-chart" style={{ height: "440px" }} />
         </div>
       </div>
     </div>

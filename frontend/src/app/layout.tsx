@@ -30,6 +30,7 @@ export default function RootLayout({
           href="https://fonts.googleapis.com" 
           crossOrigin="anonymous" 
         />
+        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
       </head>
       <body>
         <Providers>{children}</Providers>
