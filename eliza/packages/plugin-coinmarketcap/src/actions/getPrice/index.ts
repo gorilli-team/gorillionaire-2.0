@@ -42,7 +42,6 @@ export default {
         elizaLogger.log("Starting CoinMarketCap GET_PRICE handler...");
 
         // Initialize or update state
-        // Initialize or update state
         let currentState = state;
         if (!currentState) {
             currentState = (await runtime.composeState(message)) as State;
@@ -86,7 +85,7 @@ export default {
 
                 if (callback) {
                     callback({
-                        text: `The current price of ${content.symbol} is ${priceData.price} ${content.currency.toUpperCase()}`,
+                        text: `The current price of ${content.symbol} at ${new Date().toISOString()} is ${priceData.price} ${content.currency.toUpperCase()}`,
                         content: {
                             symbol: content.symbol,
                             currency: content.currency,

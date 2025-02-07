@@ -12,6 +12,8 @@ export const createPriceService = (apiKey: string) => {
         },
     });
 
+    let pollInterval: NodeJS.Timeout | null = null;
+
     const getPrice = async (
         symbol: string,
         currency: string
@@ -19,8 +21,8 @@ export const createPriceService = (apiKey: string) => {
         const normalizedSymbol = symbol.toUpperCase().trim();
         const normalizedCurrency = currency.toUpperCase().trim();
 
-        console.log('normalizedSymbol', normalizedSymbol);
-        console.log('normalizedCurrency', normalizedCurrency);
+        console.log(new Date().toISOString(), 'normalizedSymbol', normalizedSymbol);
+        console.log(new Date().toISOString(), 'normalizedCurrency', normalizedCurrency);
 
         try {
             const response = await client.get<ApiResponse>(
@@ -70,5 +72,37 @@ export const createPriceService = (apiKey: string) => {
         }
     };
 
-    return { getPrice };
+    const startPolling = (
+        symbol: string,
+        currency: string,
+        intervalSeconds: number = 120, // Default to 2 minutes
+        onPrice: (price: PriceData) => void,
+        onError?: (error: Error) => void
+    ) => {
+        const handlePricePollingLoop = async () => {
+            try {
+                const price = await getPrice(symbol, currency);
+                onPrice(price);
+            } catch (error) {
+                if (onError && error instanceof Error) {
+                    onError(error);
+                }
+            }
+            pollInterval = setTimeout(
+                handlePricePollingLoop,
+                intervalSeconds * 1000
+            );
+        };
+
+        handlePricePollingLoop();
+    };
+
+    const stopPolling = () => {
+        if (pollInterval) {
+            clearTimeout(pollInterval);
+            pollInterval = null;
+        }
+    };
+
+    return { getPrice, startPolling, stopPolling };
 };
