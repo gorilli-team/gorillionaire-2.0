@@ -76,7 +76,7 @@ export default function Main({
 
   const handleDeposit = (amount: number) => {
     console.log(`Depositing ${amount} USDC`);
-    const amountParsed = BigInt(amount * Math.pow(10, 18));
+    const amountParsed = BigInt(amount * Math.pow(10, 6));
     if (!address) {
       console.log("no wallet connected");
       return;
@@ -87,7 +87,7 @@ export default function Main({
         address: USDC_ADDRESS,
         abi: erc20abi,
         functionName: "approve",
-        args: [VAULT_ADDRESS, BigInt(amount * Math.pow(10, 18))],
+        args: [VAULT_ADDRESS, BigInt(amount * Math.pow(10, 6))],
       });
     } else {
       writeContract({
