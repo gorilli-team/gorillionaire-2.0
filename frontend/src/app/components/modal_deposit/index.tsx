@@ -35,7 +35,7 @@ export const ModalDeposit: React.FC<ModalDepositProps> = ({
         <div className="fixed inset-0 flex justify-center items-center bg-gray-500 bg-opacity-50">
           <div className="bg-white p-6 pt-4 rounded-lg shadow-lg w-96 relative">
             <div className="flex justify-between items-center mb-4">
-              <div className="text-lg font-semibold">Deposit on</div>
+              <div className="text-lg font-semibold">Deposit on Vault</div>
               <button
                 onClick={onClose}
                 className="text-xl text-gray-600 hover:text-gray-800"
@@ -47,11 +47,11 @@ export const ModalDeposit: React.FC<ModalDepositProps> = ({
             <div className="flex items-center mb-4">
               <span className="mr-2 text-sm">Token:</span>
               <img
-                src="https://cryptologos.cc/logos/ethereum-eth-logo.png"
+                src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png?v=040"
                 alt="ETH"
                 className="h-6 w-6"
               />
-              <span className="ml-2">ETH</span>
+              <span className="ml-2">USDC</span>
             </div>
             <div className="mb-4">
               <input

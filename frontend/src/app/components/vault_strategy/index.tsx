@@ -33,7 +33,7 @@ const VaultStrategy: React.FC<VaultStrategyProps> = ({ tokens }) => {
         ))}
       </div>
 
-      <div className="w-1/3 flex justify-end relative">
+      <div className="flex justify-end">
         <PieChart width={200} height={200}>
           <Pie
             data={tokens}
@@ -42,13 +42,16 @@ const VaultStrategy: React.FC<VaultStrategyProps> = ({ tokens }) => {
             cx="50%"
             cy="50%"
             outerRadius={80}
+
             fill="#8884d8"
           >
             {tokens.map((token, index) => (
               <Cell key={`cell-${index}`} fill={token.color} />
             ))}
           </Pie>
-          <Tooltip formatter={(value: any) => `$${value.toLocaleString()}`} />
+          <Tooltip
+            formatter={(value: any, name: any) => `${name}`}
+          />
         </PieChart>
       </div>
 
