@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Transaction } from "../../types";
 
-const VAULT_ADDRESS = "0x5B1C72fEC49EfdDBc12E57fe1837D27B1356f8ed";
-
 const formatTimestamp = (timestamp: string): string => {
     const txTime = new Date(parseInt(timestamp) * 1000);
     const now = new Date();

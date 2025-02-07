@@ -6,7 +6,7 @@ import VaultStrategy from "../vault_strategy";
 import VaultExplorer from "../vault_explorer";
 import { Transaction } from "../../types";
 import { getAppState } from "../../store/appStore";
-import { fetchVaultAddress } from "@/app/api/fetchElizaDatas";
+import { fetchVaultAddress, fetchVaultTransactions } from "../../api/fetchVaultData";
 
 interface VaultDetailProps {
   vaultName: string;
@@ -32,31 +32,11 @@ const VaultDetail: React.FC<VaultDetailProps> = ({ vaultName, onDeposit, onWithd
       const txs = await fetchVaultTransactions();
       setTransactions(txs);
     };
-
+  
     if (vaultAddress) {
       loadTransactions();
     }
   }, [vaultAddress]);
-
-  const fetchVaultTransactions = async () => {
-    if (!vaultAddress) {
-      console.error("Vault address is missing in the store.");
-      return [];
-    }
-
-    const BLOCKSCOUT_API_KEY = "9392e205-7aaf-4069-871e-632706779609";
-    const url = `https://base-sepolia.blockscout.com/api?module=account&action=txlist&address=${vaultAddress}&startblock=0&endblock=99999999&sort=desc&apikey=${BLOCKSCOUT_API_KEY}`;
-
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
-      console.log("API response transaction:", data);
-      return data.result || [];
-    } catch (error) {
-      console.error("Error fetching transactions:", error);
-      return [];
-    }
-  };
 
   const strategyTokens = [
     { name: "Compound", value: 49357.35, color: "#00C49F", logo: "/gorillionaire.jpg" },
