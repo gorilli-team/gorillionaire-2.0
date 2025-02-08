@@ -115,10 +115,6 @@ export class GorillionaireTradeClient {
                         console.error("Error executing GET_PRICE action:", actionError);
                     }
 
-                    console.log(
-                        `GORILLIOTRADE - Next action processing scheduled in 15 minutes`
-                    );
-
                     await new Promise(
                         (resolve) => setTimeout(resolve, 60 * 1000)
                     );
