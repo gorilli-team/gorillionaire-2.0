@@ -92,24 +92,83 @@ export default {
                     ...priceData,
                     timestamp,
                 }, { expires: CACHE_TTL });
+
+                console.log('PRICE DATA', priceData);
                 
                 // Getting the array
-                const priceEvolution = await runtime.cacheManager.getAndKeep<number[]>(PRICE_EVOLUTION);
+                const percentChange1h = await runtime.cacheManager.getAndKeep<number[]>('percentChange1h');
 
-                console.log('priceEvolution', priceEvolution);
+                if (!percentChange1h) {
+                    const percentChange1h = []; // Initialize it if undefined
+                    percentChange1h.push(priceData?.percentChange1h); 
+                    console.log("PERCENT CHANGE 1H", percentChange1h);
 
-                if (!priceEvolution) {
-                    const newPriceEvolution = []; // Initialize it if undefined
-                    newPriceEvolution.push(priceData?.percentChange24h); 
-
-                    await runtime.cacheManager.set(PRICE_EVOLUTION,
-                        newPriceEvolution,
+                    await runtime.cacheManager.set('percentChange1h',
+                        percentChange1h,
                     { expires: CACHE_TTL });
                 } else {
-                    priceEvolution.push(priceData?.percentChange24h); // Now priceEvolution is always an array
+                    percentChange1h.push(priceData?.percentChange1h);
+                    console.log("PERCENT CHANGE 1H", percentChange1h);
                     
-                    await runtime.cacheManager.set(PRICE_EVOLUTION,
-                        priceEvolution,
+                    await runtime.cacheManager.set('percentChange1h',
+                        percentChange1h,
+                    { expires: CACHE_TTL });     
+                }
+
+                const percentChange24h = await runtime.cacheManager.getAndKeep<number[]>('percentChange24h');
+
+                if (!percentChange24h) {
+                    const percentChange24h = []; // Initialize it if undefined
+                    percentChange24h.push(priceData?.percentChange24h); 
+                    console.log("PERCENT CHANGE 24H", percentChange24h);
+
+                    await runtime.cacheManager.set('percentChange24h',
+                        percentChange24h,
+                    { expires: CACHE_TTL });
+                } else {
+                    percentChange24h.push(priceData?.percentChange24h);
+                    console.log("PERCENT CHANGE 24H", percentChange24h);
+
+                    await runtime.cacheManager.set('percentChange24h',
+                        percentChange24h,
+                    { expires: CACHE_TTL });     
+                }
+
+                const volumeChange24h = await runtime.cacheManager.getAndKeep<number[]>('volumeChange24h');
+
+                if (!volumeChange24h) {
+                    const volumeChange24h = []; // Initialize it if undefined
+                    volumeChange24h.push(priceData?.volumeChange24h); 
+                    console.log("VOLUME CHANGE 24H", volumeChange24h);
+
+                    await runtime.cacheManager.set('volumeChange24h',
+                        volumeChange24h,
+                    { expires: CACHE_TTL });
+                } else {
+                    volumeChange24h.push(priceData?.volumeChange24h);
+                    console.log("VOLUME CHANGE 24H", volumeChange24h);
+                    
+                    await runtime.cacheManager.set('volumeChange24h',
+                        volumeChange24h,
+                    { expires: CACHE_TTL });     
+                }
+
+                const volume24h = await runtime.cacheManager.getAndKeep<number[]>('volume24h');
+
+                if (!volume24h) {
+                    const volume24h = []; // Initialize it if undefined
+                    volume24h.push(priceData?.volume24h); 
+                    console.log("VOLUME 24H", volume24h);
+
+                    await runtime.cacheManager.set('volume24h',
+                        volume24h,
+                    { expires: CACHE_TTL });
+                } else {
+                    volume24h.push(priceData?.volume24h);
+                    console.log("VOLUME 24H", volume24h);
+                    
+                    await runtime.cacheManager.set('volume24h',
+                        volume24h,
                     { expires: CACHE_TTL });     
                 }
                 

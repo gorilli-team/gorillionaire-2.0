@@ -9,6 +9,8 @@ export interface PriceData {
     price: number;
     marketCap: number;
     volume24h: number;
+    volumeChange24h: number;
+    percentChange1h: number;
     percentChange24h: number;
 }
 
@@ -20,6 +22,8 @@ export interface ApiResponse {
                     price: number;
                     market_cap: number;
                     volume_24h: number;
+                    volume_change_24h: number;
+                    percent_change_1h: number;
                     percent_change_24h: number;
                 };
             };

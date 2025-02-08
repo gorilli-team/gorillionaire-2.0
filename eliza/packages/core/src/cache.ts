@@ -117,19 +117,13 @@ export class CacheManager<CacheAdapter extends ICacheAdapter = ICacheAdapter>
 
     async getAndKeep<T = unknown>(key: string): Promise<T | undefined> {
         const data = await this.adapter.get(key);
-
-        console.log('=== GET AND KEEP data...')
-
         if (data) {
             const { value } = JSON.parse(data) as {
                 value: T;
                 expires: number;
             };
-
-            console.log('=== GET AND KEEP data... => RETURNS', value);
             return value;
         }
-
         return undefined;
     }
 
@@ -176,8 +170,6 @@ export class CacheManager<CacheAdapter extends ICacheAdapter = ICacheAdapter>
     
 
     async set<T>(key: string, value: T, opts?: CacheOptions): Promise<void> {
-
-        console.log('=== SET data', key)
 
         return this.adapter.set(
             key,
