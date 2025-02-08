@@ -42,7 +42,7 @@ router.get("/tweets", async (req, res) => {
     const documents = await collection
       .find({
         key: {
-          $regex: /(twitter\/tweets\/|coinmarketcap:getprice)/,
+          $regex: /^twitter\/tweets\/.*/,
         },
       })
       .sort({ createdAt: -1 }) // -1 for descending order
