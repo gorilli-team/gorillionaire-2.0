@@ -50,7 +50,7 @@ const VaultStrategy: React.FC<VaultStrategyProps> = ({ tokens }) => {
             ))}
           </Pie>
           <Tooltip
-            formatter={(value: any, name: any) => `${name}`}
+            formatter={(value: number | string, name: string) => `${name}`}
           />
         </PieChart>
       </div>

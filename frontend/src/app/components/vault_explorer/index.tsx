@@ -26,7 +26,7 @@ const formatHash = (hash: string): string => {
     return `${hash.slice(0, 10)}...${hash.slice(-4)}`;
 };
 
-const VaultExplorer: React.FC<{ transactions: any[], vaultAddress: string }> = ({ transactions, vaultAddress }) => {
+const VaultExplorer: React.FC<{ transactions: Transaction[], vaultAddress: string }> = ({ transactions, vaultAddress }) => {
     const [sortedTransactions, setSortedTransactions] = useState<Transaction[]>([]);
   
     useEffect(() => {
@@ -36,14 +36,14 @@ const VaultExplorer: React.FC<{ transactions: any[], vaultAddress: string }> = (
         .map((tx) => ({
           hash: tx.hash,
           method: tx.to.toLowerCase() === vaultAddress.toLowerCase() ? ("Deposit" as const) : ("Withdraw" as const),
-          block: tx.blockNumber,
-          age: formatTimestamp(tx.timeStamp),
+          blockNumber: tx.blockNumber,
+          timeStamp: formatTimestamp(tx.timeStamp),
           from: tx.from,
           to: tx.to,
         //   amount: tx.value,
         //   txnFee: formatTxnFee(tx.gasUsed, tx.gasPrice)
         }))
-        .sort((a, b) => parseInt(b.block) - parseInt(a.block));
+        .sort((a, b) => parseInt(b.blockNumber) - parseInt(a.blockNumber));
     
       setSortedTransactions(formattedTransactions);
     }, [transactions, vaultAddress]);
@@ -76,8 +76,8 @@ const VaultExplorer: React.FC<{ transactions: any[], vaultAddress: string }> = (
                     {tx.method}
                   </span>
                 </td>
-                <td className="border border-gray-300 px-4 py-2">{tx.block}</td>
-                <td className="border border-gray-300 px-4 py-2">{tx.age}</td>
+                <td className="border border-gray-300 px-4 py-2">{tx.blockNumber}</td>
+                <td className="border border-gray-300 px-4 py-2">{tx.timeStamp}</td>
                 {/* <td className="border border-gray-300 px-4 py-2">{tx.amount}</td>
                 <td className="border border-gray-300 px-4 py-2">{tx.txnFee}</td> */}
               </tr>
