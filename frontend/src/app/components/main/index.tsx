@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import React, { useEffect, useState } from "react";
 import { Card } from "../vault_card/index";
 import VaultDetail from "../vault_detail/index";

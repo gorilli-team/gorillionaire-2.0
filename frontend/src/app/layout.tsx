@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import '@coinbase/onchainkit/styles.css'; 
 import './styles/globals.css';
-import { Providers } from './providers'; 
+import { Providers } from './providers';
+import Script from 'next/script';
 
 export const metadata: Metadata = {
   title: "Gorillionaire",
   description: "Gorillionaire is an AI-powered agent that trades meme coins in the cryptocurrency market, learns from Twitter trends, and adjusts its trading strategy accordingly. By analyzing social media sentiment and market data, it aims to predict and capitalize on trends to maximize profit in the ever-changing crypto landscape.",
   icons: {
-    icon: "fav_gorillionaire.ico",
+    icon: "fav_gorillionaire.png",
   },
 };
 
@@ -30,7 +31,11 @@ export default function RootLayout({
           href="https://fonts.googleapis.com" 
           crossOrigin="anonymous" 
         />
-        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+        <Script 
+          src="https://s3.tradingview.com/tv.js" 
+          strategy="beforeInteractive"
+          type="text/javascript"
+        />
       </head>
       <body>
         <Providers>{children}</Providers>
