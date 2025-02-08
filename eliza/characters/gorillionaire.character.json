@@ -1,6 +1,7 @@
 {
     "name": "gorillionaire",
-    "clients": ["discord", "twitter"],
+    "_clients": ["discord", "twitter"],
+    "clients": ["gorillionaire"],
     "modelProvider": "openai",
     "settings": {
         "secrets": {},

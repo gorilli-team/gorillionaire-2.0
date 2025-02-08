@@ -12,6 +12,7 @@ import { SlackClientInterface } from "@elizaos/client-slack";
 import { TelegramClientInterface } from "@elizaos/client-telegram";
 import { TelegramAccountClientInterface } from "@elizaos/client-telegram-account";
 import { TwitterClientInterface } from "@elizaos/client-twitter";
+import { GorillionaireClientInterface } from "@elizaos/client-gorillionaire";
 import { AlexaClientInterface } from "@elizaos/client-alexa";
 import { MongoDBDatabaseAdapter } from "@elizaos/adapter-mongodb";
 import { DevaClientInterface } from "@elizaos/client-deva";
@@ -831,6 +832,13 @@ export async function initializeClients(
         const twitterClient = await TwitterClientInterface.start(runtime);
         if (twitterClient) {
             clients.twitter = twitterClient;
+        }
+    }
+
+    if (clientTypes.includes(Clients.GORILLIONAIRE)) {
+        const gorillionaireClient = await GorillionaireClientInterface.start(runtime);
+        if (gorillionaireClient) {
+            clients.gorillionaire = gorillionaireClient;
         }
     }
 
