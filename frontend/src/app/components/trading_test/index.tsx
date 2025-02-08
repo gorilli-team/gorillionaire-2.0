@@ -1,229 +1,153 @@
-import { useState } from 'react';
-import { useAccount, useWriteContract } from 'wagmi';
-import { getAddress } from 'viem';
+import React, { useState } from 'react';
+import { ethers, Log } from 'ethers';
 
-const VAULT_ADDRESS = getAddress("0xC6827ce6d60A13a20A86dCac8c9e6D4F84497345");
-
-const vaultAbi = [
-  {
-    name: 'executeTrade',
-    type: 'function',
-    stateMutability: 'nonpayable',
-    inputs: [
-      { name: 'token', type: 'address' },
-      { name: 'amountIn', type: 'uint256' },
-      { name: 'minAmountOut', type: 'uint256' },
-      { name: 'deadline', type: 'uint256' }
-    ],
-    outputs: []
-  },
-  {
-    name: 'exitTrade',
-    type: 'function',
-    stateMutability: 'nonpayable',
-    inputs: [
-      { name: 'token', type: 'address' },
-      { name: 'amountIn', type: 'uint256' },
-      { name: 'minAmountOut', type: 'uint256' },
-      { name: 'deadline', type: 'uint256' }
-    ],
-    outputs: []
-  },
-  {
-    name: 'setAIAgent',
-    type: 'function',
-    stateMutability: 'nonpayable',
-    inputs: [
-      { name: 'agent', type: 'address' }
-    ],
-    outputs: []
+// Type definitions for window.ethereum
+declare global {
+  interface Window {
+    ethereum?: {
+      request: (args: { method: string; params?: any[] }) => Promise<any>;
+      chainId?: string;
+    };
   }
-] as const;
+}
 
-const isValidAddress = (address: string): boolean => {
-  try {
-    if (!address) return false;
-    getAddress(address);
-    return true;
-  } catch {
-    return false;
-  }
-};
+// Minimum ABI required to interact with the contract
+const VAULT_ABI = [
+  "function setAIAgent(address _newAgent) external",
+  "event AIAgentUpdated(address indexed oldAgent, address indexed newAgent)"
+];
 
-const isValidAmount = (amount: string): boolean => {
-  try {
-    if (!amount) return false;
-    BigInt(amount);
-    return true;
-  } catch {
-    return false;
-  }
-};
+// Base Mainnet Chain ID
+const BASE_CHAIN_ID = "0x2105"; // 8453 in hex
 
-export default function TradingTest() {
-  const { address } = useAccount();
-  const { writeContract, data: hash, error, isPending } = useWriteContract();
-
-  const [tokenAddress, setTokenAddress] = useState('');
-  const [amountIn, setAmountIn] = useState('');
-  const [minAmountOut, setMinAmountOut] = useState('');
+const TradingAgentSetup = () => {
+  const [vaultAddress, setVaultAddress] = useState('');
   const [agentAddress, setAgentAddress] = useState('');
-  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [status, setStatus] = useState('');
 
-  const handleError = (error: Error) => {
-    if (error.message.includes('user rejected')) {
-      setErrorMessage('Transaction rejected by user');
-    } else if (error.message.includes('insufficient funds')) {
-      setErrorMessage('Insufficient funds for transaction');
-    } else if (error.message.includes('execution reverted')) {
-      setErrorMessage('Transaction reverted. You might not have the required permissions.');
-    } else {
-      setErrorMessage(`Error: ${error.message}`);
+  const checkAndSwitchNetwork = async (): Promise<boolean> => {
+    if (!window.ethereum) return false;
+
+    try {
+      const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+      if (chainId !== BASE_CHAIN_ID) {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: BASE_CHAIN_ID }],
+        });
+      }
+      return true;
+    } catch (error) {
+      console.error('Network switch error:', error);
+      setStatus('Error switching network. Please make sure you are on Base Mainnet');
+      return false;
     }
   };
 
-  const executeContractMethod = async (methodName: 'executeTrade' | 'exitTrade' | 'setAIAgent') => {
-    if (!address) {
-      setErrorMessage('Wallet not connected');
-      return;
-    }
-
-    // Reset error message at the start of new execution
-    setErrorMessage('');
-
-    const deadline = BigInt(Math.floor(Date.now() / 1000) + 60 * 20); // 20 minutes
-
+  const handleSetAgent = async () => {
     try {
-      if (methodName === 'setAIAgent') {
-        if (!isValidAddress(agentAddress)) {
-          setErrorMessage('Invalid AI agent address');
-          return;
-        }
-
-        const checksummedAgentAddress = getAddress(agentAddress);
-        writeContract({
-          address: VAULT_ADDRESS,
-          abi: vaultAbi,
-          functionName: methodName,
-          args: [checksummedAgentAddress]
-        });
-      } else {
-        // Validazione per executeTrade e exitTrade
-        if (!isValidAddress(tokenAddress)) {
-          setErrorMessage('Invalid token address');
-          return;
-        }
-        if (!isValidAmount(amountIn) || !isValidAmount(minAmountOut)) {
-          setErrorMessage('Invalid amount');
-          return;
-        }
-
-        const checksummedTokenAddress = getAddress(tokenAddress);
-        writeContract({
-          address: VAULT_ADDRESS,
-          abi: vaultAbi,
-          functionName: methodName,
-          args: [
-            checksummedTokenAddress,
-            BigInt(amountIn),
-            BigInt(minAmountOut),
-            deadline
-          ]
-        });
+      if (!window.ethereum) {
+        setStatus('MetaMask is not installed');
+        return;
       }
-    } catch (err) {
-      console.error('Contract execution error:', err);
-      handleError(err as Error);
+
+      // Address validation
+      if (!ethers.isAddress(vaultAddress) || !ethers.isAddress(agentAddress)) {
+        setStatus('Invalid addresses');
+        return;
+      }
+
+      // Check and switch to correct network
+      const isCorrectNetwork = await checkAndSwitchNetwork();
+      if (!isCorrectNetwork) return;
+
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      
+      // Create contract instance
+      const vaultContract = new ethers.Contract(vaultAddress, VAULT_ABI, signer);
+
+      // Send transaction
+      const tx = await vaultContract.setAIAgent(agentAddress);
+      setStatus('Transaction sent...');
+
+      // Wait for confirmation
+      const receipt = await tx.wait();
+      
+      // Verify event
+      const event = receipt?.logs.find((log: Log) => {
+        try {
+          const parsed = vaultContract.interface.parseLog(log);
+          return parsed?.name === 'AIAgentUpdated';
+        } catch {
+          return false;
+        }
+      });
+
+      if (event) {
+        setStatus('Agent set successfully! 🎉');
+      }
+
+    } catch (switchError: unknown) {
+      if (switchError instanceof Error) {
+        // Handle specific MetaMask errors
+        if ('code' in switchError && switchError.code === 4902) {
+          setStatus('Base Mainnet not configured in MetaMask');
+        } else {
+          console.error('Error:', switchError);
+          setStatus(switchError.message || 'Error setting the agent');
+        }
+      }
     }
   };
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md space-y-6">
-      <h2 className="text-2xl font-bold mb-4">Trading Test Interface</h2>
+    <div className="p-6 max-w-xl mx-auto bg-white rounded-xl shadow-md">
+      <h2 className="text-xl font-bold mb-4">Set Trading Agent</h2>
       
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-1">Token Address</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Vault Address
+          </label>
           <input
             type="text"
-            value={tokenAddress}
-            onChange={(e) => setTokenAddress(e.target.value)}
-            className="w-full p-2 border rounded"
+            value={vaultAddress}
+            onChange={(e) => setVaultAddress(e.target.value)}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             placeholder="0x..."
           />
         </div>
-        
+
         <div>
-          <label className="block text-sm font-medium mb-1">Amount In</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Agent Address
+          </label>
           <input
             type="text"
-            value={amountIn}
-            onChange={(e) => setAmountIn(e.target.value)}
-            className="w-full p-2 border rounded"
-            placeholder="Amount"
-          />
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium mb-1">Min Amount Out</label>
-          <input
-            type="text"
-            value={minAmountOut}
-            onChange={(e) => setMinAmountOut(e.target.value)}
-            className="w-full p-2 border rounded"
-            placeholder="Minimum amount to receive"
+            value={agentAddress}
+            onChange={(e) => setAgentAddress(e.target.value)}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            placeholder="0x..."
           />
         </div>
 
-        <div className="flex gap-4">
-          <button
-            onClick={() => executeContractMethod('executeTrade')}
-            disabled={isPending}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300"
-          >
-            {isPending ? 'Executing...' : 'Execute Trade'}
-          </button>
-          <button
-            onClick={() => executeContractMethod('exitTrade')}
-            disabled={isPending}
-            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-green-300"
-          >
-            {isPending ? 'Exiting...' : 'Exit Trade'}
-          </button>
-        </div>
+        <button
+          onClick={handleSetAgent}
+          className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        >
+          Set Agent
+        </button>
 
-        <div className="border-t pt-4 mt-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">AI Agent Address</label>
-            <input
-              type="text"
-              value={agentAddress}
-              onChange={(e) => setAgentAddress(e.target.value)}
-              className="w-full p-2 border rounded"
-              placeholder="0x..."
-            />
-          </div>
-          <button
-            onClick={() => executeContractMethod('setAIAgent')}
-            disabled={isPending}
-            className="mt-2 px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 disabled:bg-purple-300"
-          >
-            {isPending ? 'Setting...' : 'Set AI Agent'}
-          </button>
-        </div>
-
-        {hash && (
-          <div className="mt-4 p-3 rounded bg-green-100 text-green-700">
-            Transaction sent! Hash: {hash}
-          </div>
-        )}
-        
-        {errorMessage && (
-          <div className="mt-4 p-3 rounded bg-red-100 text-red-700">
-            {errorMessage}
+        {status && (
+          <div className="mt-4 p-2 rounded bg-gray-100">
+            <p className="text-sm break-words overflow-hidden">{status}</p>
           </div>
         )}
       </div>
     </div>
   );
-}
+};
+
+export default TradingAgentSetup;
