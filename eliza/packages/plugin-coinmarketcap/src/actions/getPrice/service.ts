@@ -58,6 +58,8 @@ export const createPriceService = (apiKey: string) => {
                 price: quoteData.price,
                 marketCap: quoteData.market_cap,
                 volume24h: quoteData.volume_24h,
+                volumeChange24h: quoteData.volume_change_24h,
+                percentChange1h: quoteData.percent_change_1h,
                 percentChange24h: quoteData.percent_change_24h,
             };
         } catch (error) {
