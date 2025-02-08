@@ -20,6 +20,7 @@
 	"license": "ISC",
 	"dependencies": {
 		"citty": "0.1.6",
+		"create-eliza-app": "file:",
 		"giget": "1.2.3"
 	},
 	"devDependencies": {

@@ -15,6 +15,7 @@
     "license": "ISC",
     "description": "",
     "dependencies": {
+        "@coinbase-samples/advanced-sdk-ts": "file:",
         "jsonwebtoken": "^9.0.2",
         "node-fetch": "^2.6.1"
     },
