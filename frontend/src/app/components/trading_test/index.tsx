@@ -199,14 +199,14 @@ const TradingAgentSetup = () => {
       const tx = isExit 
         ? await vaultContract.exitTrade(
             tokenAddress,
-            ethers.parseUnits(amountIn, 18),
-            ethers.parseUnits(minAmountOut, 18),
+            ethers.parseUnits(amountIn, 6),
+            ethers.parseUnits(minAmountOut, 6),
             deadline
           )
         : await vaultContract.executeTrade(
             tokenAddress,
-            ethers.parseUnits(amountIn, 18),
-            ethers.parseUnits(minAmountOut, 18),
+            ethers.parseUnits(amountIn, 6),
+            ethers.parseUnits(minAmountOut, 6), 
             deadline
           );
 
