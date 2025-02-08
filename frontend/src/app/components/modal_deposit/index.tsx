@@ -26,11 +26,6 @@ export const ModalDeposit: React.FC<ModalDepositProps> = ({
 
   const handleDepositSubmit = () => {
     if (depositAmount && !isNaN(Number(depositAmount))) {
-      // Convert amount to USDC decimals safely
-      const [integerPart, decimalPart = ''] = depositAmount.split('.');
-      const paddedDecimal = decimalPart.padEnd(6, '0').slice(0, 6);
-      const fullAmount = `${integerPart}${paddedDecimal}`;
-      
       onDeposit(Number(depositAmount));
       setDepositAmount("");
       onClose();

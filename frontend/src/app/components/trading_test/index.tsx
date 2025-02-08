@@ -5,7 +5,7 @@ import { useAccount } from 'wagmi';
 declare global {
   interface Window {
     ethereum?: {
-      request: (args: { method: string; params?: any[] }) => Promise<any>;
+      request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
       chainId?: string;
     };
   }
@@ -19,7 +19,7 @@ const VAULT_ABI = [
   "event TradeExecuted(address indexed tokenIn, address indexed tokenOut, uint256 amountIn, uint256 amountOut)",
   "function totalAssets() external view returns (uint256)",
   "function maxTradingAllocation() external view returns (uint256)",
-  "function aiAgent() external view returns (address)" // Added getter for AI agent
+  "function aiAgent() external view returns (address)"
 ];
 
 const BASE_CHAIN_ID = "0x2105";
@@ -36,7 +36,6 @@ const TradingAgentSetup = () => {
   const [amountIn, setAmountIn] = useState('');
   const [minAmountOut, setMinAmountOut] = useState('');
   const [tradeStatus, setTradeStatus] = useState('');
-  const [maxTradeAmount, setMaxTradeAmount] = useState('');
 
   const account = useAccount();
   const [showSetAgent, setShowSetAgent] = useState(false);
@@ -144,14 +143,13 @@ const TradingAgentSetup = () => {
     if (!vaultAddress || !window.ethereum) return;
     
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum as any);
+      const provider = new ethers.BrowserProvider(window.ethereum);
       const vaultContract = new ethers.Contract(vaultAddress, VAULT_ABI, provider);
       
       const totalAssets = await vaultContract.totalAssets();
       const maxAllocation = await vaultContract.maxTradingAllocation();
       
       const maxAmount = (totalAssets * BigInt(maxAllocation)) / BigInt(10000);
-      setMaxTradeAmount(ethers.formatUnits(maxAmount, 6));
       setTradeStatus(`Maximum tradeable amount: ${ethers.formatUnits(maxAmount, 6)} USDC`);
     } catch (error) {
       console.error('Error checking max trade amount:', error);
@@ -166,13 +164,11 @@ const TradingAgentSetup = () => {
         return;
       }
 
-      // Verify vault address is set
       if (!vaultAddress) {
         setTradeStatus('Please enter a vault address');
         return;
       }
 
-      // Check if agent is set
       const hasAgent = await checkCurrentAgent(vaultAddress);
       if (!hasAgent) {
         setTradeStatus('Trading agent not set. Please set an agent before trading.');
