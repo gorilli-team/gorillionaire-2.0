@@ -16,6 +16,9 @@ import { getPriceTemplate } from "./template";
 import type { GetPriceContent } from "./types";
 import { isGetPriceContent } from "./validation";
 
+const CACHE_KEY = 'coinmarketcap:getprice';
+const CACHE_TTL = 2 * 30 * 24 * 60 * 60; // 2 months in seconds
+
 export default {
     name: "GET_PRICE",
     similes: [
@@ -83,9 +86,15 @@ export default {
                     `Price retrieved successfully! ${content.symbol}: ${priceData.price} ${content.currency.toUpperCase()}`
                 );
 
+                const timestamp = new Date().toISOString();
+                await runtime.cacheManager.set(CACHE_KEY, {
+                    ...priceData,
+                    timestamp,
+                }, { expires: CACHE_TTL });
+
                 if (callback) {
                     callback({
-                        text: `The current price of ${content.symbol} at ${new Date().toISOString()} is ${priceData.price} ${content.currency.toUpperCase()}`,
+                        text: `The current price of ${content.symbol} at ${timestamp} is ${priceData.price} ${content.currency.toUpperCase()}`,
                         content: {
                             symbol: content.symbol,
                             currency: content.currency,
