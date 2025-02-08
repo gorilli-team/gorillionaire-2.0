@@ -34,11 +34,49 @@ async function startServer() {
       collections.map((c) => c.name)
     );
 
-    app.listen(PORT, () => console.log(`Server running on port: ${PORT} 🚀`));
+    const server = app.listen(PORT, () =>
+      console.log(`Server running on port: ${PORT} 🚀`)
+    );
+
+    // Error handling for the server
+    server.on("error", (error) => {
+      console.error("Server error:", error);
+      restartServer();
+    });
+
+    // Handle unexpected errors
+    process.on("uncaughtException", (error) => {
+      console.error("Uncaught Exception:", error);
+      restartServer();
+    });
+
+    process.on("unhandledRejection", (error) => {
+      console.error("Unhandled Rejection:", error);
+      restartServer();
+    });
   } catch (error) {
     console.error("Failed to connect to MongoDB:", error);
-    process.exit(1);
+    restartServer();
   }
+}
+
+function restartServer() {
+  console.log("Attempting to restart server...");
+
+  // Close existing connections
+  mongoose.connection.close(() => {
+    console.log("MongoDB connection closed.");
+
+    // Wait a bit before restarting
+    setTimeout(() => {
+      console.log("Restarting server...");
+      startServer().catch((error) => {
+        console.error("Failed to restart server:", error);
+        // If restart fails, wait longer and try again
+        setTimeout(restartServer, 10000);
+      });
+    }, 5000);
+  });
 }
 
 startServer();
