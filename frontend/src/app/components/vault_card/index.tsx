@@ -1,7 +1,6 @@
 import React from "react";
 import { useAccount } from "wagmi";
 import { WalletDefault } from "@coinbase/onchainkit/wallet";
-import Image from 'next/image';
 
 interface CardProps {
   title: string;
@@ -44,7 +43,7 @@ export const Card: React.FC<CardProps> = ({
           <span className="text-gray-800">{tvl}</span>
         </div>
         <div className="flex items-center justify-center bg-gray-300 p-2 rounded-lg w-1/3">
-          <Image
+          <img
             src={chainImage}
             alt={chainName}
             className="h-4 w-4 rounded-full mr-2"

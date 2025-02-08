@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Image from 'next/image';
 
 interface ModalDepositProps {
   isOpen: boolean;
@@ -47,7 +46,7 @@ export const ModalDeposit: React.FC<ModalDepositProps> = ({
 
             <div className="flex items-center mb-4">
               <span className="mr-2 text-sm">Token:</span>
-              <Image
+              <img
                 src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png?v=040"
                 alt="ETH"
                 className="h-6 w-6"

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface Transaction {
   hash: string;
   method: "Deposit" | "Withdraw";
@@ -25,8 +26,6 @@ export interface TradingViewWidgetOptions {
 
 declare global {
   interface Window {
-    TradingView: {
-      widget: (options: TradingViewWidgetOptions) => void;
-    };
+    TradingView: any;
   }
 }

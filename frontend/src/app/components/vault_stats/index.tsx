@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from "react";
 import SentimentChart from "../sentiment_chart";
-import Image from 'next/image';
 
 interface VaultStatsProps {
   vaultName: string;
@@ -20,7 +19,7 @@ const VaultStats: React.FC<VaultStatsProps> = ({ vaultName }) => {
 
     useEffect(() => {
       if (chartContainerRef.current) {
-          window.TradingView.widget({
+          new window.TradingView.widget({
               autosize: true,
               symbol: "BINANCE:ETHUSDT",
               interval: "60",
@@ -50,7 +49,7 @@ const VaultStats: React.FC<VaultStatsProps> = ({ vaultName }) => {
         <div className="flex justify-between pb-2">
           <strong>Chain:</strong>
           <div className="flex">
-            <Image className="w-6 h-6" src="/base.jpg" alt="img-base" />
+            <img className="w-6 h-6" src="/base.jpg" alt="img-base" />
             <span className="ps-1">Base</span>
           </div>
         </div>

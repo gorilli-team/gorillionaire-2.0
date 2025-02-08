@@ -1,6 +1,5 @@
 import React from "react";
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
-import Image from 'next/image';
 
 interface Token {
   name: string;
@@ -22,7 +21,7 @@ const VaultStrategy: React.FC<VaultStrategyProps> = ({ tokens }) => {
         {tokens.map((token) => (
           <div key={token.name} className="flex justify-between items-center p-2 bg-white border border-gray-200 rounded-lg mb-2">
             <div className="flex items-center">
-              <Image src={token.logo} alt={token.name} className="w-6 h-6 mr-2" />
+              <img src={token.logo} alt={token.name} className="w-6 h-6 mr-2" />
               <span>{token.name}</span>
             </div>
             <div className="flex items-center">

@@ -5,7 +5,6 @@ import { Card } from "../vault_card/index";
 import VaultDetail from "../vault_detail/index";
 import { ModalDeposit } from "../modal_deposit";
 import FeedNews from "../feed_news/index";
-import Image from 'next/image';
 import styles from "./index.module.css";
 import {
   useAccount,
@@ -155,7 +154,7 @@ export default function Main({
           <div className="p-6 pt-4 text-gray-800">
             <div className="text-xl font-bold text-gray-800 mb-4">Welcome back!</div>
             <div className="flex items-center bg-white shadow-md rounded-2xl p-4 mb-6">
-              <Image
+              <img
                 src="/user.jpg"
                 alt="User Profile"
                 className="h-12 w-12 rounded-full mr-4"

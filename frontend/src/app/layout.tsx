@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: "Gorillionaire",
   description: "Gorillionaire is an AI-powered agent that trades meme coins in the cryptocurrency market, learns from Twitter trends, and adjusts its trading strategy accordingly. By analyzing social media sentiment and market data, it aims to predict and capitalize on trends to maximize profit in the ever-changing crypto landscape.",
   icons: {
-    icon: "fav_gorillionaire.ico",
+    icon: "fav_gorillionaire.png",
   },
 };
 
@@ -33,7 +33,7 @@ export default function RootLayout({
         />
         <Script 
           src="https://s3.tradingview.com/tv.js" 
-          strategy="afterInteractive"
+          strategy="beforeInteractive"
           type="text/javascript"
         />
       </head>
