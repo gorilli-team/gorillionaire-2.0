@@ -12,23 +12,23 @@ contract HelperConfig is Script {
     NetworkConfig public activeNetworkConfig;
 
     constructor() {
-        if (block.chainid == 84532) {
-            activeNetworkConfig = getBaseSepoliaConfig();
+        if (block.chainid == 8453) {
+            activeNetworkConfig = getBaseConfig();
         } else {
             activeNetworkConfig = getOrCreateAnvilEthConfig();
         }
     }
 
-    function getBaseSepoliaConfig() public view returns (NetworkConfig memory) {
-        NetworkConfig memory baseSepoliaNetworkConfig = NetworkConfig({
-            usdcContractAddress: 0x036CbD53842c5426634e7929541eC2318f3dCF7e
+    function getBaseConfig() public view returns (NetworkConfig memory) {
+        NetworkConfig memory baseNetworkConfig = NetworkConfig({
+            usdcContractAddress: 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
         });
 
         console.log(
-            "Base Sepolia network config:",
-            baseSepoliaNetworkConfig.usdcContractAddress
+            "Base network config:",
+            baseNetworkConfig.usdcContractAddress
         );
-        return baseSepoliaNetworkConfig;
+        return baseNetworkConfig;
     }
 
     function getOrCreateAnvilEthConfig() public returns (NetworkConfig memory) {
@@ -37,7 +37,7 @@ contract HelperConfig is Script {
         }
         vm.startBroadcast();
         NetworkConfig memory anvilEthNetworkConfig = NetworkConfig({
-            usdcContractAddress: 0x036CbD53842c5426634e7929541eC2318f3dCF7e
+            usdcContractAddress: 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
         });
         vm.stopBroadcast();
         console.log(

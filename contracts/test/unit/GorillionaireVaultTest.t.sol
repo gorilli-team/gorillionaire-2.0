@@ -11,7 +11,7 @@ contract GorillionaireVaultTest is Test {
     GorillionaireToken token;
     GorillionaireVault vault;
     address constant UNISWAP_ROUTER =
-        0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
+        0x4752ba5DBc23f44D87826276BF6Fd6b1C372aD24;
 
     address bob = makeAddr("bob");
     address alice = makeAddr("alice");
