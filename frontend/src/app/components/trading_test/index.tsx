@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ethers, Log } from 'ethers';
+import { useAccount } from 'wagmi';
 
-// Type definitions for window.ethereum
 declare global {
   interface Window {
     ethereum?: {
@@ -11,7 +11,6 @@ declare global {
   }
 }
 
-// Minimum ABI required to interact with the contract
 const VAULT_ABI = [
   "function setAIAgent(address _newAgent) external",
   "event AIAgentUpdated(address indexed oldAgent, address indexed newAgent)",
@@ -19,17 +18,18 @@ const VAULT_ABI = [
   "function exitTrade(address tokenIn, uint256 amountIn, uint256 minAmountOut, uint256 deadline) external",
   "event TradeExecuted(address indexed tokenIn, address indexed tokenOut, uint256 amountIn, uint256 amountOut)",
   "function totalAssets() external view returns (uint256)",
-  "function maxTradingAllocation() external view returns (uint256)"
+  "function maxTradingAllocation() external view returns (uint256)",
+  "function aiAgent() external view returns (address)" // Added getter for AI agent
 ];
 
-// Base Mainnet Chain ID
-const BASE_CHAIN_ID = "0x2105"; // 8453 in hex
+const BASE_CHAIN_ID = "0x2105";
 
 const TradingAgentSetup = () => {
   // States for agent setup
   const [vaultAddress, setVaultAddress] = useState('');
   const [agentAddress, setAgentAddress] = useState('');
   const [status, setStatus] = useState('');
+  const [currentAgent, setCurrentAgent] = useState<string | null>(null);
 
   // States for trading operations
   const [tokenAddress, setTokenAddress] = useState('');
@@ -37,6 +37,37 @@ const TradingAgentSetup = () => {
   const [minAmountOut, setMinAmountOut] = useState('');
   const [tradeStatus, setTradeStatus] = useState('');
   const [maxTradeAmount, setMaxTradeAmount] = useState('');
+
+  const account = useAccount();
+  const [showSetAgent, setShowSetAgent] = useState(false);
+
+  useEffect(() => {
+    const checkOwnership = async () => {
+      if (!account.isConnected) return;
+      const ownerAddress = process.env.NEXT_PUBLIC_DEPLOYED_CONTRACT_WALLET_ADDRESS;
+      setShowSetAgent(account.address?.toLowerCase() === ownerAddress?.toLowerCase());
+    };
+
+    checkOwnership();
+  }, [account.isConnected, account.address]);
+
+  const checkCurrentAgent = async (vaultContractAddress: string): Promise<boolean> => {
+    if (!window.ethereum || !vaultContractAddress) return false;
+
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const vaultContract = new ethers.Contract(vaultContractAddress, VAULT_ABI, provider);
+      
+      const agent = await vaultContract.aiAgent();
+      setCurrentAgent(agent);
+      
+      // Check if agent is set (address is not zero)
+      return agent !== "0x0000000000000000000000000000000000000000";
+    } catch (error) {
+      console.error('Error checking current agent:', error);
+      return false;
+    }
+  };
 
   const checkAndSwitchNetwork = async (): Promise<boolean> => {
     if (!window.ethereum) return false;
@@ -64,13 +95,11 @@ const TradingAgentSetup = () => {
         return;
       }
 
-      // Address validation
       if (!ethers.isAddress(vaultAddress) || !ethers.isAddress(agentAddress)) {
         setStatus('Invalid addresses');
         return;
       }
 
-      // Check and switch to correct network
       const isCorrectNetwork = await checkAndSwitchNetwork();
       if (!isCorrectNetwork) return;
 
@@ -78,17 +107,13 @@ const TradingAgentSetup = () => {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       
-      // Create contract instance
       const vaultContract = new ethers.Contract(vaultAddress, VAULT_ABI, signer);
 
-      // Send transaction
       const tx = await vaultContract.setAIAgent(agentAddress);
       setStatus('Transaction sent...');
 
-      // Wait for confirmation
       const receipt = await tx.wait();
       
-      // Verify event
       const event = receipt?.logs.find((log: Log) => {
         try {
           const parsed = vaultContract.interface.parseLog(log);
@@ -100,11 +125,11 @@ const TradingAgentSetup = () => {
 
       if (event) {
         setStatus('Agent set successfully! 🎉');
+        setCurrentAgent(agentAddress);
       }
 
     } catch (switchError: unknown) {
       if (switchError instanceof Error) {
-        // Handle specific MetaMask errors
         if ('code' in switchError && switchError.code === 4902) {
           setStatus('Base Mainnet not configured in MetaMask');
         } else {
@@ -125,8 +150,6 @@ const TradingAgentSetup = () => {
       const totalAssets = await vaultContract.totalAssets();
       const maxAllocation = await vaultContract.maxTradingAllocation();
       
-      console.log('Total Assets:', ethers.formatUnits(totalAssets, 6), 'USDC');
-      
       const maxAmount = (totalAssets * BigInt(maxAllocation)) / BigInt(10000);
       setMaxTradeAmount(ethers.formatUnits(maxAmount, 6));
       setTradeStatus(`Maximum tradeable amount: ${ethers.formatUnits(maxAmount, 6)} USDC`);
@@ -143,19 +166,29 @@ const TradingAgentSetup = () => {
         return;
       }
 
-      // Address validation
+      // Verify vault address is set
+      if (!vaultAddress) {
+        setTradeStatus('Please enter a vault address');
+        return;
+      }
+
+      // Check if agent is set
+      const hasAgent = await checkCurrentAgent(vaultAddress);
+      if (!hasAgent) {
+        setTradeStatus('Trading agent not set. Please set an agent before trading.');
+        return;
+      }
+
       if (!ethers.isAddress(tokenAddress)) {
         setTradeStatus('Please insert a valid BRETT token address');
         return;
       }
 
-      // Amount validation
       if (!amountIn || !minAmountOut) {
         setTradeStatus('Invalid amounts');
         return;
       }
 
-      // Check and switch to correct network
       const isCorrectNetwork = await checkAndSwitchNetwork();
       if (!isCorrectNetwork) return;
 
@@ -163,13 +196,10 @@ const TradingAgentSetup = () => {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       
-      // Create contract instance
       const vaultContract = new ethers.Contract(vaultAddress, VAULT_ABI, signer);
 
-      // Calculate deadline (30 minutes from now)
       const deadline = Math.floor(Date.now() / 1000) + 1800;
 
-      // Prepare transaction
       const tx = isExit 
         ? await vaultContract.exitTrade(
             tokenAddress,
@@ -186,10 +216,8 @@ const TradingAgentSetup = () => {
 
       setTradeStatus('Transaction sent...');
 
-      // Wait for confirmation
       const receipt = await tx.wait();
       
-      // Verify event
       const event = receipt?.logs.find((log: Log) => {
         try {
           const parsed = vaultContract.interface.parseLog(log);
@@ -213,123 +241,154 @@ const TradingAgentSetup = () => {
 
   return (
     <div className='flex w-full p-2 gap-2'>
+      {showSetAgent && (
         <div className="p-6 w-1/2 bg-white rounded-xl shadow-md">
-            <h2 className="text-xl font-bold mb-4">Set Trading Agent</h2>
-            
-            <div className="space-y-4">
-                <div>
-                <label className="block text-sm font-medium text-gray-700">
-                    Vault Address
-                </label>
-                <input
-                    type="text"
-                    value={vaultAddress}
-                    onChange={(e) => setVaultAddress(e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="0x..."
-                />
-                </div>
-
-                <div>
-                <label className="block text-sm font-medium text-gray-700">
-                    Agent Address
-                </label>
-                <input
-                    type="text"
-                    value={agentAddress}
-                    onChange={(e) => setAgentAddress(e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="0x..."
-                />
-                </div>
-
-                <button
-                onClick={handleSetAgent}
-                className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                >
-                Set Agent
-                </button>
-
-                {status && (
-                <div className="mt-4 p-2 rounded bg-gray-100">
-                    <p className="text-sm break-words overflow-hidden">{status}</p>
-                </div>
-                )}
+          <h2 className="text-xl font-bold mb-4">Set Trading Agent</h2>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Vault Address
+              </label>
+              <input
+                type="text"
+                value={vaultAddress}
+                onChange={(e) => setVaultAddress(e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                placeholder="0x..."
+              />
             </div>
-        </div>
-        <div className='p-6 w-1/2 bg-white rounded-xl shadow-md'>
-            <h2 className="text-xl font-bold mb-4">Trading Operations</h2>
-            
-            <div className="space-y-4">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                        Token Address (BRETT)
-                    </label>
-                    <input
-                        type="text"
-                        value={tokenAddress}
-                        onChange={(e) => setTokenAddress(e.target.value)}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                        placeholder="0x..."
-                    />
-                </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                        Amount In
-                    </label>
-                    <input
-                        type="text"
-                        value={amountIn}
-                        onChange={(e) => setAmountIn(e.target.value)}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                        placeholder="Amount"
-                    />
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                        Minimum Amount Out
-                    </label>
-                    <input
-                        type="text"
-                        value={minAmountOut}
-                        onChange={(e) => setMinAmountOut(e.target.value)}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                        placeholder="Min amount to receive"
-                    />
-                </div>
-
-                <button
-                    onClick={checkMaxTradeAmount}
-                    className="w-full bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-                >
-                    Check Max Trade Amount
-                </button>
-
-                <div className="flex gap-4">
-                    <button
-                        onClick={() => handleTrade(false)}
-                        className="flex-1 bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-                    >
-                        USDC → BRETT
-                    </button>
-
-                    <button
-                        onClick={() => handleTrade(true)}
-                        className="flex-1 bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                    >
-                        BRETT → USDC
-                    </button>
-                </div>
-
-                {tradeStatus && (
-                    <div className="mt-4 p-2 rounded bg-gray-100">
-                        <p className="text-sm break-words overflow-hidden">{tradeStatus}</p>
-                    </div>
-                )}
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Agent Address
+              </label>
+              <input
+                type="text"
+                value={agentAddress}
+                onChange={(e) => setAgentAddress(e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                placeholder="0x..."
+              />
             </div>
+
+            <button
+              onClick={handleSetAgent}
+              className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              Set Agent
+            </button>
+
+            {status && (
+              <div className="mt-4 p-2 rounded bg-gray-100">
+                <p className="text-sm break-words overflow-hidden">{status}</p>
+              </div>
+            )}
+          </div>
         </div>
+      )}
+      <div className={`p-6 ${showSetAgent ? 'w-1/2' : 'w-full'} bg-white rounded-xl shadow-md`}>
+        <h2 className="text-xl font-bold mb-4">Trading Operations</h2>
+        
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Vault Address
+            </label>
+            <input
+              type="text"
+              value={vaultAddress}
+              onChange={(e) => setVaultAddress(e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              placeholder="0x..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Token Address (BRETT)
+            </label>
+            <input
+              type="text"
+              value={tokenAddress}
+              onChange={(e) => setTokenAddress(e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              placeholder="0x..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Amount In
+            </label>
+            <input
+              type="text"
+              value={amountIn}
+              onChange={(e) => setAmountIn(e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              placeholder="Amount"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Minimum Amount Out
+            </label>
+            <input
+              type="text"
+              value={minAmountOut}
+              onChange={(e) => setMinAmountOut(e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              placeholder="Min amount to receive"
+            />
+          </div>
+
+          <button
+            onClick={checkMaxTradeAmount}
+            className="w-full bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+          >
+            Check Max Trade Amount
+          </button>
+
+          <button
+            onClick={() => checkCurrentAgent(vaultAddress)}
+            className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            Show Agent Address
+          </button>
+
+          <div className="mt-4 p-2 rounded bg-blue-100">
+            <p className="text-sm font-medium text-blue-800 break-words overflow-hidden">
+              {currentAgent 
+                ? `Current Agent: ${currentAgent}`
+                : "No agent set for this vault"
+              }
+            </p>
+          </div>
+
+          <div className="flex gap-4">
+            <button
+              onClick={() => handleTrade(false)}
+              className="flex-1 bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+            >
+              USDC → BRETT
+            </button>
+
+            <button
+              onClick={() => handleTrade(true)}
+              className="flex-1 bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            >
+              BRETT → USDC
+            </button>
+          </div>
+
+          {tradeStatus && (
+            <div className="mt-4 p-2 rounded bg-gray-100">
+              <p className="text-sm break-words overflow-hidden">{tradeStatus}</p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
