@@ -30,9 +30,9 @@ const SentimentChart: React.FC<SentimentChartProps> = ({ data }) => {
       </ResponsiveContainer>
 
       <div className="mt-4 text-sm text-gray-300 text-center">
-        <p><span className="text-red-400">🟥 SELL! ("Rug incoming!")</span> → Sentiment &lt; -10</p>
-        <p><span className="text-yellow-400">🟡 HOLD? ("Wen Lambo?")</span> → Sentiment -10 to 10</p>
-        <p><span className="text-green-400">🟢 BUY!! ("To the moon! 🚀")</span> → Sentiment &gt; 10</p>
+        <p><span className="text-red-400">🟥 SELL! (&quot;Rug incoming!&quot;)</span> → Sentiment &lt; -10</p>
+        <p><span className="text-yellow-400">🟡 HOLD? (&quot;Wen Lambo?&quot;)</span> → Sentiment -10 to 10</p>
+        <p><span className="text-green-400">🟢 BUY!! (&quot;To the moon! 🚀&quot;)</span> → Sentiment &gt; 10</p>
       </div>
     </div>
   );

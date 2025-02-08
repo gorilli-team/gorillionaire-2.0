@@ -1,3 +1,4 @@
+import Image from 'next/image';
 interface Depositor {
     investor: string;
     deposits: number;
@@ -24,7 +25,7 @@ interface Depositor {
             {depositors.map((depositor, index) => (
               <tr key={index}>
                 <td className="border-b border-l border-gray-300 px-4 py-2 flex items-center gap-2">
-                  <img
+                  <Image
                     src={depositor.image}
                     alt="Investor Avatar"
                     className="w-8 h-8 rounded-full"

@@ -1,5 +1,6 @@
 import React from "react";
 import { useAccount } from "wagmi";
+import Image from 'next/image';
 
 interface SidebarProps {
   selectedPage: string;
@@ -29,7 +30,7 @@ export default function Sidebar({
         className="h-16 text-xl font-bold flex items-center ps-4 cursor-pointer"
         onClick={handleGorillionaireClick}
       >
-        <img className="w-12 h-12 rounded-full" src="/gorillionaire.jpg" alt="logo-gorillionaire" />
+        <Image className="w-12 h-12 rounded-full" src="/gorillionaire.jpg" alt="logo-gorillionaire" />
         <span className="ps-2">Gorillionaire</span>
       </div>
       <nav className="flex-1 p-4">

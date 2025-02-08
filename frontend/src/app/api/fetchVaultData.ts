@@ -59,18 +59,18 @@ export const fetchVaultDepositors = async (): Promise<
     const depositorsMap: Record<string, { deposits: number; withdraws: number }> = {};
 
     transactions.forEach((tx) => {
-      const from = tx.from?.toLowerCase();
-      const to = tx.to?.toLowerCase();
+      const from = tx.from?.toLowerCase()?.trim();
+      const to = tx.to?.toLowerCase()?.trim();
       const vault = vaultAddress.toLowerCase();
 
-      if (from) {
+      if (from && from !== vault) {
         if (!depositorsMap[from]) {
           depositorsMap[from] = { deposits: 0, withdraws: 0 };
         }
         depositorsMap[from].deposits += 1;
       }
 
-      if (to) {
+      if (to && to !== vault) {
         if (!depositorsMap[to]) {
           depositorsMap[to] = { deposits: 0, withdraws: 0 };
         }

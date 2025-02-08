@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import '@coinbase/onchainkit/styles.css'; 
 import './styles/globals.css';
-import { Providers } from './providers'; 
+import { Providers } from './providers';
+import Script from 'next/script';
 
 export const metadata: Metadata = {
   title: "Gorillionaire",
@@ -30,7 +31,11 @@ export default function RootLayout({
           href="https://fonts.googleapis.com" 
           crossOrigin="anonymous" 
         />
-        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+        <Script 
+          src="https://s3.tradingview.com/tv.js" 
+          strategy="afterInteractive"
+          type="text/javascript"
+        />
       </head>
       <body>
         <Providers>{children}</Providers>

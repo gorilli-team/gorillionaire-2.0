@@ -1,6 +1,7 @@
 import React from "react";
 import { Card } from "../vault_card/index";
 import styles from "./index.module.css";
+import Image from 'next/image';
 
 interface FeedNewsProps {
     imageUrl: string;
@@ -48,7 +49,7 @@ const FeedNews: React.FC<FeedNewsProps> = ({
 
   return (
     <div className={`${styles.feedNews} pt-6 p-2 flex items-start gap-4 w-[600px]`}>
-      <img src={imageUrl} alt="Profile" className="w-10 h-10 rounded-full" />
+      <Image src={imageUrl} alt="Profile" className="w-10 h-10 rounded-full" />
       <div className="flex-1">
         <div className="flex items-center justify-between">
           <span className="font-semibold text-gray-800">Gorillionaire</span>
