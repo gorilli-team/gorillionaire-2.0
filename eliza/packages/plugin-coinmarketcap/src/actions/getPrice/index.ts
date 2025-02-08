@@ -15,6 +15,7 @@ import { createPriceService } from "./service";
 import { getPriceTemplate } from "./template";
 import type { GetPriceContent } from "./types";
 import { isGetPriceContent } from "./validation";
+import { getTradingSignal } from "../../getTradingSignal";
 
 const CACHE_KEY = 'coinmarketcap:getprice';
 const PRICE_EVOLUTION = 'priceEvolution';
@@ -95,16 +96,15 @@ export default {
 
                 console.log('PRICE DATA', priceData);
                 
-                // Getting the array
                 const percentChange1h = await runtime.cacheManager.getAndKeep<number[]>('percentChange1h');
 
                 if (!percentChange1h) {
-                    const percentChange1h = []; // Initialize it if undefined
-                    percentChange1h.push(priceData?.percentChange1h); 
-                    console.log("PERCENT CHANGE 1H", percentChange1h);
-
+                    const newPercentChange1h = []; // Initialize it if undefined
+                    newPercentChange1h.push(priceData?.percentChange1h); 
+                    console.log("PERCENT CHANGE 1H", newPercentChange1h);
+                
                     await runtime.cacheManager.set('percentChange1h',
-                        percentChange1h,
+                        newPercentChange1h,
                     { expires: CACHE_TTL });
                 } else {
                     percentChange1h.push(priceData?.percentChange1h);
@@ -114,35 +114,35 @@ export default {
                         percentChange1h,
                     { expires: CACHE_TTL });     
                 }
-
+                
                 const percentChange24h = await runtime.cacheManager.getAndKeep<number[]>('percentChange24h');
-
+                
                 if (!percentChange24h) {
-                    const percentChange24h = []; // Initialize it if undefined
-                    percentChange24h.push(priceData?.percentChange24h); 
-                    console.log("PERCENT CHANGE 24H", percentChange24h);
-
+                    const newPercentChange24h = []; // Initialize it if undefined
+                    newPercentChange24h.push(priceData?.percentChange24h); 
+                    console.log("PERCENT CHANGE 24H", newPercentChange24h);
+                
                     await runtime.cacheManager.set('percentChange24h',
-                        percentChange24h,
+                        newPercentChange24h,
                     { expires: CACHE_TTL });
                 } else {
                     percentChange24h.push(priceData?.percentChange24h);
                     console.log("PERCENT CHANGE 24H", percentChange24h);
-
+                
                     await runtime.cacheManager.set('percentChange24h',
                         percentChange24h,
                     { expires: CACHE_TTL });     
                 }
-
+                
                 const volumeChange24h = await runtime.cacheManager.getAndKeep<number[]>('volumeChange24h');
-
+                
                 if (!volumeChange24h) {
-                    const volumeChange24h = []; // Initialize it if undefined
-                    volumeChange24h.push(priceData?.volumeChange24h); 
-                    console.log("VOLUME CHANGE 24H", volumeChange24h);
-
+                    const newVolumeChange24h = []; // Initialize it if undefined
+                    newVolumeChange24h.push(priceData?.volumeChange24h); 
+                    console.log("VOLUME CHANGE 24H", newVolumeChange24h);
+                
                     await runtime.cacheManager.set('volumeChange24h',
-                        volumeChange24h,
+                        newVolumeChange24h,
                     { expires: CACHE_TTL });
                 } else {
                     volumeChange24h.push(priceData?.volumeChange24h);
@@ -152,16 +152,16 @@ export default {
                         volumeChange24h,
                     { expires: CACHE_TTL });     
                 }
-
+                
                 const volume24h = await runtime.cacheManager.getAndKeep<number[]>('volume24h');
-
+                
                 if (!volume24h) {
-                    const volume24h = []; // Initialize it if undefined
-                    volume24h.push(priceData?.volume24h); 
-                    console.log("VOLUME 24H", volume24h);
-
+                    const newVolume24h = []; // Initialize it if undefined
+                    newVolume24h.push(priceData?.volume24h); 
+                    console.log("VOLUME 24H", newVolume24h);
+                
                     await runtime.cacheManager.set('volume24h',
-                        volume24h,
+                        newVolume24h,
                     { expires: CACHE_TTL });
                 } else {
                     volume24h.push(priceData?.volume24h);
@@ -172,9 +172,33 @@ export default {
                     { expires: CACHE_TTL });     
                 }
                 
+                // Get the current arrays for the trading signal
+                const currentPercentChange1h = await runtime.cacheManager.getAndKeep<number[]>('percentChange1h') || [];
+                const currentPercentChange24h = await runtime.cacheManager.getAndKeep<number[]>('percentChange24h') || [];
+                const currentVolume24h = await runtime.cacheManager.getAndKeep<number[]>('volume24h') || [];
+                const currentVolumeChange24h = await runtime.cacheManager.getAndKeep<number[]>('volumeChange24h') || [];
+                
+                const MINIMUM_DATA_POINTS = 5; // MINIMUM DATA to run trading signal
+
+                if (currentPercentChange1h.length >= MINIMUM_DATA_POINTS &&
+                    currentPercentChange24h.length >= MINIMUM_DATA_POINTS &&
+                    currentVolume24h.length >= MINIMUM_DATA_POINTS &&
+                    currentVolumeChange24h.length >= MINIMUM_DATA_POINTS) {
+    
+                    const signal = await getTradingSignal(
+                        currentPercentChange1h,
+                        currentPercentChange24h,
+                        currentVolume24h,
+                        currentVolumeChange24h
+                    );
+                    console.log('Trading Signal:', signal);
+                } else {
+                    console.log('Not enough data points for trading signal calculation');
+                }
+                
                 if (callback) {
                     callback({
-                        text: `The current price of ${content.symbol} at ${timestamp} is ${priceData.price} ${content.currency.toUpperCase()}`,
+                        text: `The current price of ${content.symbol} is ${priceData.price} ${content.currency.toUpperCase()}`,
                         content: {
                             symbol: content.symbol,
                             currency: content.currency,
