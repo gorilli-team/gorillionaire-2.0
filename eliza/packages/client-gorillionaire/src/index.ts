@@ -2,7 +2,7 @@ import { type Client, elizaLogger, type IAgentRuntime } from "@elizaos/core";
 import { ClientBase } from "./base.ts";
 import { validateTwitterConfig, type TwitterConfig } from "./environment.ts";
 import { GorillionaireInteractionClient } from "./interactions.ts";
-import { TwitterPostClient } from "./post.ts";
+import { GorillionairePostClient } from "./post.ts";
 import { TwitterSearchClient } from "./search.ts";
 
 /**
@@ -15,7 +15,7 @@ import { TwitterSearchClient } from "./search.ts";
  */
 class GorillionaireManager {
     client: ClientBase;
-    //post: TwitterPostClient;
+    post: GorillionairePostClient;
     //search: TwitterSearchClient;
     interaction: GorillionaireInteractionClient;
 
@@ -25,6 +25,9 @@ class GorillionaireManager {
 
         // Pass twitterConfig to the base client
         this.client = new ClientBase(runtime, twitterConfig);
+
+        // Posting logic
+        this.post = new GorillionairePostClient(this.client, runtime);
 
         //Mentions and interactions
         this.interaction = new GorillionaireInteractionClient(this.client, runtime);
@@ -47,6 +50,10 @@ export const GorillionaireClientInterface: Client = {
         // Initialize login/session
         await manager.client.init();
         console.log('GORILLI -> AFTER MANAGER CLIENT INIT');
+
+        // Start the posting loop
+        await manager.post.start();
+        console.log('GORILLI -> AFTER POST LOOP START');
 
         // Start interactions (mentions, replies)
         await manager.interaction.start();
