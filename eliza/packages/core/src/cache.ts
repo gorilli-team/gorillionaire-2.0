@@ -97,8 +97,6 @@ export class CacheManager<CacheAdapter extends ICacheAdapter = ICacheAdapter>
     async get<T = unknown>(key: string): Promise<T | undefined> {
         const data = await this.adapter.get(key);
 
-        console.log('=== GET data', data)
-
         if (data) {
             const { value, expires } = JSON.parse(data) as {
                 value: T;

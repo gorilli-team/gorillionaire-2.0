@@ -18,7 +18,6 @@ import { isGetPriceContent } from "./validation";
 import { getTradingSignal } from "../../getTradingSignal";
 
 const CACHE_KEY = 'coinmarketcap:getprice';
-const PRICE_EVOLUTION = 'priceEvolution';
 const CACHE_TTL = 2 * 30 * 24 * 60 * 60; // 2 months in seconds
 
 export default {

@@ -4,6 +4,7 @@ import { validateTwitterConfig, type TwitterConfig } from "./environment.ts";
 import { GorillionaireInteractionClient } from "./interactions.ts";
 import { GorillionairePostClient } from "./post.ts";
 import { TwitterSearchClient } from "./search.ts";
+import { GorillionaireTradeClient } from "./trade.ts";
 
 /**
  * A manager that orchestrates all specialized Twitter logic:
@@ -18,6 +19,7 @@ class GorillionaireManager {
     post: GorillionairePostClient;
     //search: TwitterSearchClient;
     interaction: GorillionaireInteractionClient;
+    trade: GorillionaireTradeClient;
 
     constructor(runtime: IAgentRuntime, twitterConfig: TwitterConfig) {
 
@@ -31,6 +33,9 @@ class GorillionaireManager {
 
         //Mentions and interactions
         this.interaction = new GorillionaireInteractionClient(this.client, runtime);
+
+        //Trading activities
+        this.trade = new GorillionaireTradeClient(this.client, runtime);
 
         console.log("--- YO");
     }
@@ -58,6 +63,10 @@ export const GorillionaireClientInterface: Client = {
         // Start interactions (mentions, replies)
         await manager.interaction.start();
         console.log('GORILLI -> AFTER MANAGER INTERACTION START');
+
+        // Start trading checks
+        await manager.trade.start();
+        console.log('GORILLI -> AFTER TRADE START');
 
         return manager;
     },
