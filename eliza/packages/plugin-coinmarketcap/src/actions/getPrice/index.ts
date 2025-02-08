@@ -17,6 +17,7 @@ import type { GetPriceContent } from "./types";
 import { isGetPriceContent } from "./validation";
 
 const CACHE_KEY = 'coinmarketcap:getprice';
+const PRICE_EVOLUTION = 'priceEvolution';
 const CACHE_TTL = 2 * 30 * 24 * 60 * 60; // 2 months in seconds
 
 export default {
@@ -87,11 +88,31 @@ export default {
                 );
 
                 const timestamp = new Date().toISOString();
-                await runtime.cacheManager.set(CACHE_KEY, {
+                await runtime.cacheManager.set(`${CACHE_KEY}/${timestamp}`, {
                     ...priceData,
                     timestamp,
                 }, { expires: CACHE_TTL });
+                
+                // Getting the array
+                const priceEvolution = await runtime.cacheManager.getAndKeep<number[]>(PRICE_EVOLUTION);
 
+                console.log('priceEvolution', priceEvolution);
+
+                if (!priceEvolution) {
+                    const newPriceEvolution = []; // Initialize it if undefined
+                    newPriceEvolution.push(priceData?.percentChange24h); 
+
+                    await runtime.cacheManager.set(PRICE_EVOLUTION,
+                        newPriceEvolution,
+                    { expires: CACHE_TTL });
+                } else {
+                    priceEvolution.push(priceData?.percentChange24h); // Now priceEvolution is always an array
+                    
+                    await runtime.cacheManager.set(PRICE_EVOLUTION,
+                        priceEvolution,
+                    { expires: CACHE_TTL });     
+                }
+                
                 if (callback) {
                     callback({
                         text: `The current price of ${content.symbol} at ${timestamp} is ${priceData.price} ${content.currency.toUpperCase()}`,

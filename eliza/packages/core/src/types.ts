@@ -1242,8 +1242,10 @@ export enum CacheStore {
 
 export interface ICacheManager {
     get<T = unknown>(key: string): Promise<T | undefined>;
+    getAndKeep<T = unknown>(key: string): Promise<T | undefined>;
     set<T>(key: string, value: T, options?: CacheOptions): Promise<void>;
     delete(key: string): Promise<void>;
+    getAllMatching<T = unknown>(pattern: RegExp, mainCacheKey: string): Promise<T[] | undefined>;
 }
 
 export abstract class Service {
