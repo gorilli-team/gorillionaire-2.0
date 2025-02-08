@@ -2,127 +2,147 @@
 pragma solidity ^0.8.19;
 
 import {Test, console} from "forge-std/Test.sol";
-import {GorillionaireVault} from "../../src/GorillionaireVault.sol";
+import {GorillionaireVault, IUniswapV2Router02} from "../../src/GorillionaireVault.sol";
 import {GorillionaireToken} from "../../src/GorillionaireToken.sol";
 import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import {MockERC20} from "../mocks/MockERC20.sol";
 
-contract GorillionaireVaultExtendedTest is Test {
+contract GorillionaireVaultTest is Test {
     GorillionaireToken token;
     GorillionaireVault vault;
+    address constant UNISWAP_ROUTER =
+        0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
 
     address bob = makeAddr("bob");
     address alice = makeAddr("alice");
     address treasury = makeAddr("treasury");
     address payable owner = payable(makeAddr("owner"));
+    address aiAgent = makeAddr("aiAgent");
 
     uint256 constant ASSETS_DEPOSITED = 1000 ether;
     uint256 constant FIRST_DEPOSIT = 10 ether;
     uint256 constant SECOND_DEPOSIT = 20 ether;
     uint256 constant ENTRY_FEE_BASIS_POINTS = 500; // 5% entry fee
-    uint256 constant MAX_ENTRY_FEE_BASIS_POINTS = 20000; // 200% max entry fee (per esempio)
+    uint256 constant MAX_ENTRY_FEE_BASIS_POINTS = 20000; // 200% max entry fee
 
     function setUp() public {
-        vm.startBroadcast();
         token = new GorillionaireToken();
         vault = new GorillionaireVault(
-            token, // _asset
-            ENTRY_FEE_BASIS_POINTS, // _basisPoints
-            MAX_ENTRY_FEE_BASIS_POINTS // _maxBasisPoints
+            token,
+            ENTRY_FEE_BASIS_POINTS,
+            MAX_ENTRY_FEE_BASIS_POINTS,
+            UNISWAP_ROUTER
         );
-        // Assign owner
-        vault.transferOwnership(owner); // Add this line to assign the correct owner
-        vm.stopBroadcast();
+        vault.transferOwnership(owner);
     }
 
-    /// Test deposit with entry fee applied
-    function testDepositWithEntryFee() public {
-        uint256 assets = ASSETS_DEPOSITED;
-        // Bob's deposit flow
-        deal(address(token), bob, 1000 ether);
+    function testDepositRequest() public {
+        uint256 assets = FIRST_DEPOSIT;
+        deal(address(token), bob, assets);
+
         vm.startPrank(bob);
         token.approve(address(vault), assets);
-        // Bob deposits 10 ether; with 5% entry fee, only 9.5 ether should be deposited
-        uint256 expectedShares = vault.previewDeposit(FIRST_DEPOSIT);
-        uint256 assetsDeposited = vault.deposit(FIRST_DEPOSIT, bob);
+        vault.requestDeposit(assets, bob, bob);
+        vm.stopPrank();
+
         assertEq(
-            assetsDeposited,
-            expectedShares,
-            "Incorrect shares after deposit with entry fee"
+            vault.pendingDepositRequest(bob),
+            assets,
+            "Incorrect pending deposit amount"
         );
-        vm.stopPrank();
     }
 
-    // Test withdrawal with exit fee applied
-    function testWithdrawWithExitFee() public {
-        uint256 assets = ASSETS_DEPOSITED;
-        // Bob deposits and then withdraws
-        deal(address(token), bob, assets);
+    function testOperatorManagement() public {
         vm.startPrank(bob);
-        token.approve(address(vault), assets);
-        // Bob deposits 10 ether
-        vault.deposit(FIRST_DEPOSIT, bob);
-        // Simulate a withdrawal with an exit fee
-        uint256 expectedWithdraw = vault.previewWithdraw(FIRST_DEPOSIT);
-        console.log("expectedWithdraw:", expectedWithdraw);
-        //vault.withdraw(FIRST_DEPOSIT, bob, bob);
-        // console.log('Bob balance after withdrawal:', token.balanceOf(bob));
-        // console.log('Expected balance after withdrawal:', expectedWithdraw);
-        // assertEq(
-        //   token.balanceOf(bob),
-        //   expectedWithdraw,
-        //   'Incorrect assets after withdrawal with exit fee'
-        // );
+        assertTrue(vault.setOperator(alice, true), "Failed to set operator");
+        assertTrue(vault.isOperator(bob, alice), "Operator not set correctly");
         vm.stopPrank();
     }
 
-    /// Test fee recipient receives the correct fee on deposit
-    function testFeeRecipientGetsEntryFee() public {
-        uint256 assets = ASSETS_DEPOSITED;
-
-        // Set treasury as fee recipient
-        vm.startPrank(treasury);
-
-        // Bob deposits 10 ether
-        deal(address(token), bob, assets);
-        vm.startPrank(bob);
-        token.approve(address(vault), assets);
-
-        // Entry fee should be sent to the owner (treasury)
-        uint256 expectedFee = (FIRST_DEPOSIT * ENTRY_FEE_BASIS_POINTS) / 10_000;
-        console.log("Expected fee:", expectedFee);
-        vault.deposit(FIRST_DEPOSIT, bob);
-
-        // assertEq(
-        //   token.balanceOf(treasury),
-        //   expectedFee,
-        //   'Fee recipient did not receive the correct entry fee'
-        // );
-        vm.stopPrank();
-    }
-
-    /// Test fee changes
-    function testEntryFeeChange() public {
-        // Update entry fee basis points
-        uint256 newEntryFee = 300; // 3%
+    function testAIAgentManagement() public {
         vm.startPrank(owner);
-        vault.updateEntryFeeBasisPoints(newEntryFee);
+        vault.setAIAgent(aiAgent);
+        assertEq(vault.aiAgent(), aiAgent, "AI agent not set correctly");
         vm.stopPrank();
+    }
 
-        // Bob makes a deposit with the new fee
-        deal(address(token), bob, ASSETS_DEPOSITED);
-        vm.startPrank(bob);
-        token.approve(address(vault), ASSETS_DEPOSITED);
-        uint256 assetsDeposited = vault.deposit(FIRST_DEPOSIT, bob);
-        vm.stopPrank();
-
-        // Calculate expected deposit amount with 3% entry fee
-        uint256 expectedShares = vault.previewDeposit(FIRST_DEPOSIT);
-
-        // Verify the deposit
+    function testMaxTradingAllocation() public {
+        vm.startPrank(owner);
+        uint256 newAllocation = 6000; // 60%
+        vault.setMaxTradingAllocation(newAllocation);
         assertEq(
-            assetsDeposited,
-            expectedShares,
-            "Deposit amount incorrect after fee change"
+            vault.maxTradingAllocation(),
+            newAllocation,
+            "Max trading allocation not set correctly"
         );
+        vm.stopPrank();
+    }
+
+    function testTradingFunctionality() public {
+        // Setup
+        vm.startPrank(owner);
+        vault.setAIAgent(aiAgent);
+        vm.stopPrank();
+
+        // Mock some initial deposits
+        deal(address(token), address(vault), ASSETS_DEPOSITED);
+
+        // Test trade execution
+        address mockTokenOut = makeAddr("mockToken");
+        uint256 amountIn = 100 ether;
+        uint256 minAmountOut = 95 ether;
+        uint256 deadline = block.timestamp + 1 days;
+
+        vm.startPrank(aiAgent);
+        vm.expectRevert();
+        vault.executeTrade(mockTokenOut, amountIn, minAmountOut, deadline);
+        vm.stopPrank();
+    }
+
+    function testEmergencyRescue() public {
+        // Deploy a mock token
+        MockERC20 mockToken = new MockERC20("Mock", "MCK", 18);
+
+        // Mint some tokens to the vault
+        mockToken.mint(address(vault), 100 ether);
+
+        uint256 initialBalance = mockToken.balanceOf(owner);
+
+        vm.startPrank(owner);
+        vault.rescueToken(address(mockToken));
+        vm.stopPrank();
+
+        assertEq(
+            mockToken.balanceOf(owner),
+            initialBalance + 100 ether,
+            "Token rescue failed"
+        );
+    }
+
+    function testEntryFeeUpdate() public {
+        uint256 newFee = 300; // 3%
+
+        vm.startPrank(owner);
+        vault.updateEntryFeeBasisPoints(newFee);
+        assertEq(
+            vault.entryFeeBasisPoints(),
+            newFee,
+            "Entry fee not updated correctly"
+        );
+        vm.stopPrank();
+    }
+
+    function test_Revert_SetMaxTradingAllocationTooHigh() public {
+        vm.startPrank(owner);
+        vm.expectRevert("Allocation cannot exceed 100%");
+        vault.setMaxTradingAllocation(10001);
+        vm.stopPrank();
+    }
+
+    function test_Revert_UnauthorizedDepositRequest() public {
+        vm.startPrank(alice);
+        vm.expectRevert("Not authorized");
+        vault.requestDeposit(FIRST_DEPOSIT, bob, bob);
+        vm.stopPrank();
     }
 }

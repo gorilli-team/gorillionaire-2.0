@@ -5,14 +5,40 @@ pragma solidity ^0.8.20;
 import {ERC4626, Math, IERC20, ERC20, SafeERC20} from "openzeppelin-contracts/contracts/token/ERC20/extensions/ERC4626.sol";
 import {Ownable} from "openzeppelin-contracts/contracts/access/Ownable.sol";
 
+interface IUniswapV2Router02 {
+    function swapExactTokensForTokens(
+        uint amountIn,
+        uint amountOutMin,
+        address[] calldata path,
+        address to,
+        uint deadline
+    ) external returns (uint[] memory amounts);
+
+    function getAmountsOut(
+        uint amountIn,
+        address[] calldata path
+    ) external view returns (uint[] memory amounts);
+}
+
 contract GorillionaireVault is ERC4626, Ownable {
     using Math for uint256;
+    using SafeERC20 for IERC20;
 
     mapping(address => uint256) public pendingDepositRequest;
     mapping(address => uint256) public claimableDepositRequest;
     mapping(address controller => mapping(address operator => bool))
         public isOperator;
 
+    // Trading functionality state variables
+    address public aiAgent;
+    IUniswapV2Router02 public immutable uniswapRouter;
+    uint256 public maxTradingAllocation;
+
+    uint256 private constant _BASIS_POINT_SCALE = 1e4;
+    uint256 public entryFeeBasisPoints;
+    uint256 public immutable maxEntryFeeBasisPoints;
+
+    // Events
     event DepositRequest(
         address controller,
         address owner,
@@ -28,6 +54,18 @@ contract GorillionaireVault is ERC4626, Ownable {
         uint256 assets
     );
     event OperatorSet(address owner, address operator, bool approved);
+    event EntryFeeUpdated(uint256 oldFee, uint256 newFee);
+    event AIAgentUpdated(address indexed oldAgent, address indexed newAgent);
+    event TradeExecuted(
+        address indexed tokenIn,
+        address indexed tokenOut,
+        uint256 amountIn,
+        uint256 amountOut
+    );
+    event MaxTradingAllocationUpdated(
+        uint256 oldAllocation,
+        uint256 newAllocation
+    );
 
     modifier canMakeRequests(address owner) {
         require(
@@ -37,6 +75,28 @@ contract GorillionaireVault is ERC4626, Ownable {
         _;
     }
 
+    modifier onlyAIAgent() {
+        require(msg.sender == aiAgent, "Only AI agent can execute trades");
+        _;
+    }
+
+    constructor(
+        IERC20 _asset,
+        uint256 _basisPoints,
+        uint256 _maxBasisPoints,
+        address _uniswapRouter
+    )
+        Ownable(msg.sender)
+        ERC4626(_asset)
+        ERC20("Gorillionaire Vault Token", "vGOR")
+    {
+        entryFeeBasisPoints = _basisPoints;
+        maxEntryFeeBasisPoints = _maxBasisPoints;
+        uniswapRouter = IUniswapV2Router02(_uniswapRouter);
+        maxTradingAllocation = 5000; // Default 50% of total assets can be used for trading
+    }
+
+    // Deposit and Redeem functions
     function requestDeposit(
         uint256 assets,
         address controller,
@@ -71,6 +131,7 @@ contract GorillionaireVault is ERC4626, Ownable {
         return requestId;
     }
 
+    // Operator management
     function setOperator(
         address operator,
         bool approved
@@ -80,26 +141,92 @@ contract GorillionaireVault is ERC4626, Ownable {
         return true;
     }
 
-    uint256 private constant _BASIS_POINT_SCALE = 1e4;
-
-    uint256 public entryFeeBasisPoints;
-    uint256 public immutable maxEntryFeeBasisPoints;
-
-    event EntryFeeUpdated(uint256 oldFee, uint256 newFee);
-
-    constructor(
-        IERC20 _asset,
-        uint256 _basisPoints,
-        uint256 _maxBasisPoints
-    )
-        Ownable(msg.sender)
-        ERC4626(_asset)
-        ERC20("Gorillionaire Vault Token", "vGOR")
-    {
-        entryFeeBasisPoints = _basisPoints;
-        maxEntryFeeBasisPoints = _maxBasisPoints;
+    // AI Agent management functions
+    function setAIAgent(address _newAgent) external onlyOwner {
+        require(_newAgent != address(0), "Invalid agent address");
+        emit AIAgentUpdated(aiAgent, _newAgent);
+        aiAgent = _newAgent;
     }
 
+    function setMaxTradingAllocation(
+        uint256 _newAllocation
+    ) external onlyOwner {
+        require(_newAllocation <= 10000, "Allocation cannot exceed 100%");
+        emit MaxTradingAllocationUpdated(maxTradingAllocation, _newAllocation);
+        maxTradingAllocation = _newAllocation;
+    }
+
+    function executeTrade(
+        address tokenOut,
+        uint256 amountIn,
+        uint256 minAmountOut,
+        uint256 deadline
+    ) external onlyAIAgent {
+        require(tokenOut != address(0), "Invalid token address");
+
+        // Calculate maximum tradeable amount
+        uint256 maxTradeAmount = (totalAssets() * maxTradingAllocation) / 10000;
+        require(
+            amountIn <= maxTradeAmount,
+            "Amount exceeds trading allocation"
+        );
+
+        // Get the asset token and approve router
+        IERC20 assetToken = IERC20(asset());
+        assetToken.safeIncreaseAllowance(address(uniswapRouter), amountIn);
+
+        // Setup path
+        address[] memory path = new address[](2);
+        path[0] = asset();
+        path[1] = tokenOut;
+
+        // Execute swap
+        uint[] memory amounts = uniswapRouter.swapExactTokensForTokens(
+            amountIn,
+            minAmountOut,
+            path,
+            address(this),
+            deadline
+        );
+
+        emit TradeExecuted(asset(), tokenOut, amounts[0], amounts[1]);
+    }
+
+    function exitTrade(
+        address tokenIn,
+        uint256 amountIn,
+        uint256 minAmountOut,
+        uint256 deadline
+    ) external onlyAIAgent {
+        require(tokenIn != address(0), "Invalid token address");
+
+        IERC20 token = IERC20(tokenIn);
+        require(
+            token.balanceOf(address(this)) >= amountIn,
+            "Insufficient balance"
+        );
+
+        // Approve router
+        token.safeIncreaseAllowance(address(uniswapRouter), amountIn);
+
+        // Setup path
+        address[] memory path = new address[](2);
+        path[0] = tokenIn;
+        path[1] = asset();
+
+        // Execute swap back to vault asset
+        uint[] memory amounts = uniswapRouter.swapExactTokensForTokens(
+            amountIn,
+            minAmountOut,
+            path,
+            address(this),
+            deadline
+        );
+
+        emit TradeExecuted(tokenIn, asset(), amounts[0], amounts[1]);
+    }
+
+    // Fee management
     function updateEntryFeeBasisPoints(
         uint256 newBasisPoints
     ) external onlyOwner {
@@ -108,6 +235,7 @@ contract GorillionaireVault is ERC4626, Ownable {
         entryFeeBasisPoints = newBasisPoints;
     }
 
+    // Preview functions
     function previewDeposit(
         uint256 assets
     ) public view virtual override returns (uint256) {
@@ -136,6 +264,7 @@ contract GorillionaireVault is ERC4626, Ownable {
         return assets - _feeOnTotal(assets, _exitFeeBasisPoints());
     }
 
+    // Internal functions
     function _deposit(
         address caller,
         address receiver,
@@ -174,7 +303,7 @@ contract GorillionaireVault is ERC4626, Ownable {
     }
 
     function _exitFeeBasisPoints() internal view virtual returns (uint256) {
-        return 100; // 1% exit fee, adjust this as needed
+        return 100; // 1% exit fee
     }
 
     function _entryFeeRecipient() internal view virtual returns (address) {
@@ -182,7 +311,7 @@ contract GorillionaireVault is ERC4626, Ownable {
     }
 
     function _exitFeeRecipient() internal view virtual returns (address) {
-        return address(0); // Set this to the treasury address or another recipient
+        return address(0); // Set this to the treasury address
     }
 
     function _feeOnRaw(
@@ -203,5 +332,12 @@ contract GorillionaireVault is ERC4626, Ownable {
         uint256 denominator = feeBasisPoints + _BASIS_POINT_SCALE;
         uint256 result = numerator / denominator;
         return result + (numerator % denominator != 0 ? 1 : 0);
+    }
+
+    // Emergency function
+    function rescueToken(address token) external onlyOwner {
+        require(token != asset(), "Cannot rescue vault asset");
+        uint256 balance = IERC20(token).balanceOf(address(this));
+        IERC20(token).safeTransfer(owner(), balance);
     }
 }
