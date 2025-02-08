@@ -36,20 +36,21 @@ class GorillionaireManager {
 export const GorillionaireClientInterface: Client = {
     async start(runtime: IAgentRuntime) {
 
-        // console.log('--- RUNTIME', runtime);
-
+        console.log('GORILLI -> STARTING CLIENT INTERFACE');
         const twitterConfig: TwitterConfig =
             await validateTwitterConfig(runtime);
-
-        elizaLogger.log("Gorillionaire client started");
+        console.log('GORILLI -> AFTER TWITTER CONFIG');
 
         const manager = new GorillionaireManager(runtime, twitterConfig);
+        console.log('GORILLI -> AFTER MANAGER');
 
         // Initialize login/session
         await manager.client.init();
+        console.log('GORILLI -> AFTER MANAGER CLIENT INIT');
 
         // Start interactions (mentions, replies)
         await manager.interaction.start();
+        console.log('GORILLI -> AFTER MANAGER INTERACTION START');
 
         return manager;
     },
