@@ -116,7 +116,7 @@ export class GorillionaireTradeClient {
                     }
 
                     await new Promise(
-                        (resolve) => setTimeout(resolve, 60 * 1000)
+                        (resolve) => setTimeout(resolve, 15 * 60 * 1000)
                     );
                 
                 } catch (error) {
