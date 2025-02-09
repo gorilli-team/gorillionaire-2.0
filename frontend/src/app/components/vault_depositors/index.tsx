@@ -7,6 +7,9 @@ interface TokenHolder {
     hash: string;
   };
   value: string;
+  token?: {
+    total_supply: string;
+  };
 }
 
 interface Depositor {
@@ -43,6 +46,19 @@ const VaultDepositors: React.FC<VaultDepositorsProps> = ({ depositors }) => {
     return formattedValue.toFixed(6);
   };
 
+  // Calculate percentage of total supply
+  const calculatePercentage = (holderValue: string, totalSupply?: string) => {
+    if (!totalSupply) return '0%';
+    
+    const holderValueNum = parseFloat(holderValue);
+    const totalSupplyNum = parseFloat(totalSupply);
+    
+    if (totalSupplyNum === 0) return '0%';
+    
+    const percentage = (holderValueNum / totalSupplyNum) * 100;
+    return `${percentage.toFixed(2)}%`;
+  };
+
   return (
     <div className="p-4">
       <table className="min-w-full border-collapse border border-gray-300">
@@ -74,7 +90,7 @@ const VaultDepositors: React.FC<VaultDepositorsProps> = ({ depositors }) => {
                   {formatValue(holder.value)}
                 </td>
                 <td className="border border-gray-300 px-4 py-2 text-right">
-                  100%
+                  {calculatePercentage(holder.value, holder.token?.total_supply)}
                 </td>
               </tr>
             );

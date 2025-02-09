@@ -54,7 +54,7 @@ const VaultDetail: React.FC<VaultDetailProps> = ({ vaultName, onDeposit, onWithd
   const renderTabContent = () => {
     switch (activeTab) {
       case "Stats":
-        return <VaultStats vaultName={vaultName} />;
+        return <VaultStats />;
       case "Depositors":
         return <VaultDepositors depositors={depositors} />;
       case "Strategy":
