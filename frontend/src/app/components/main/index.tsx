@@ -199,7 +199,7 @@ export default function Main({
               imageUrl="/gorillionaire.jpg"
               timestamp={new Date().toISOString()}
               content="Yo degens! Just sold some PENGU and bought WOW. Time to ride the meme coin wave! 🌊🚀 WAGMI!"
-              vaultName="Vault Test 1"
+              vaultName="Gorillionaire Vault Token"
               onDepositClick={handleDepositClick}
               onCardClick={setSelectedVault}
               onWithdrawClick={handleWithdrawClick}
@@ -232,13 +232,13 @@ export default function Main({
             <h2 className="text-xl font-bold text-gray-800 mb-4">Your Investments</h2>
             <div className="w-[34%] gap-2">
               <Card 
-                title="Vault Test 1"
+                title="Gorillionaire Vault Token"
                 apy="3.5%"
                 tvl="$138.8k"
                 chainName="Base"
                 chainImage="/base.jpg"
-                onDeposit={() => handleDepositClick("Vault Test 1")}
-                onCardClick={() => handleCardClick("Vault Test 1")}
+                onDeposit={() => handleDepositClick("Gorillionaire Vault Token")}
+                onCardClick={() => handleCardClick("Gorillionaire Vault Token")}
                 onWithdraw={handleWithdrawClick}
               />
             </div>
@@ -247,8 +247,8 @@ export default function Main({
       case "Vault":
         return (
           <VaultDetail
-            vaultName="Vault Test 1"
-            onDeposit={() => handleDepositClick("Vault Test 1")}
+            vaultName="Gorillionaire Vault Token"
+            onDeposit={() => handleDepositClick("Gorillionaire Vault Token")}
             onWithdraw={handleWithdrawClick}
           />
         );

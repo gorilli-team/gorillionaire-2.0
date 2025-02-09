@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
+import { fetchVaultTokens } from "../../api/fetchVaultData";
 
 interface Token {
   name: string;
@@ -13,7 +14,22 @@ interface VaultStrategyProps {
 }
 
 const VaultStrategy: React.FC<VaultStrategyProps> = ({ tokens }) => {
+  const [tokenData, setTokenData] = useState<any>(null);
   const total = tokens.reduce((sum, token) => sum + token.value, 0);
+
+  useEffect(() => {
+    const getTokenData = async () => {
+      try {
+        const data = await fetchVaultTokens();
+        console.log("Token Data:", data);
+        setTokenData(data);
+      } catch (error) {
+        console.error("Error fetching token data:", error);
+      }
+    };
+
+    getTokenData();
+  }, []);
 
   return (
     <div className="flex justify-between items-center p-4 bg-white rounded-lg">

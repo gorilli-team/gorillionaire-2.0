@@ -3,13 +3,7 @@ import { Transaction } from "../types";
 
 export const fetchVaultAddress = async () => {
   try {
-    /*
-    const response = await fetch("ELIZA_URL_API");
-    const data = await response.json();
-    const vaultAddress = data.vaultAddress;
-    */
-
-    const vaultAddress = "0x5B1C72fEC49EfdDBc12E57fe1837D27B1356f8ed"; 
+    const vaultAddress = "0xC6827ce6d60A13a20A86dCac8c9e6D0F84497345"; 
 
     setAppState("vaultAddress", vaultAddress);
 
@@ -28,7 +22,7 @@ export const fetchVaultTransactions = async () => {
   }
 
   const BLOCKSCOUT_API_KEY = process.env.NEXT_PUBLIC_BLOCKSCOUT_API_KEY;
-  const url = `https://base-sepolia.blockscout.com/api?module=account&action=txlist&address=${vaultAddress}&startblock=0&endblock=99999999&sort=desc&apikey=${BLOCKSCOUT_API_KEY}`;
+  const url = `https://base.blockscout.com/api?module=account&action=txlist&address=${vaultAddress}&startblock=0&endblock=99999999&sort=desc&apikey=${BLOCKSCOUT_API_KEY}`;
 
   try {
     const response = await fetch(url);
@@ -40,7 +34,6 @@ export const fetchVaultTransactions = async () => {
     return [];
   }
 };
-
 
 export const fetchVaultDepositors = async (): Promise<
   { investor: string; deposits: number; withdraws: number; image: string }[]
@@ -89,5 +82,69 @@ export const fetchVaultDepositors = async (): Promise<
   } catch (error) {
     console.error("Error fetching vault depositors:", error);
     return [];
+  }
+};
+
+export const fetchVaultInfo = async () => {
+  const vaultAddress = "0xC6827ce6d60A13a20A86dCac8c9e6D0F84497345";
+  const BLOCKSCOUT_API_KEY = process.env.NEXT_PUBLIC_BLOCKSCOUT_API_KEY;
+  
+  const url = `https://base.blockscout.com/api/v2/addresses/${vaultAddress}?apikey=${BLOCKSCOUT_API_KEY}`;
+
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${BLOCKSCOUT_API_KEY}`
+      }
+    });
+    const data = await response.json();
+    console.log("Raw vault data:", data);
+    return data;
+  } catch (error) {
+    console.error("Error fetching vault info:", error);
+    return null;
+  }
+};
+
+export const fetchVaultTokens = async () => {
+  const vaultAddress = "0xC6827ce6d60A13a20A86dCac8c9e6D0F84497345";
+  const BLOCKSCOUT_API_KEY = process.env.NEXT_PUBLIC_BLOCKSCOUT_API_KEY;
+  
+  const url = `https://base.blockscout.com/api/v2/addresses/${vaultAddress}/tokens?apikey=${BLOCKSCOUT_API_KEY}`;
+
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${BLOCKSCOUT_API_KEY}`
+      }
+    });
+    const data = await response.json();
+    console.log("Vault tokens:", data);
+    return data;
+  } catch (error) {
+    console.error("Error fetching vault tokens:", error);
+    return null;
+  }
+};
+
+export const fetchCreationTransaction = async (txHash: string) => {
+  const BLOCKSCOUT_API_KEY = process.env.NEXT_PUBLIC_BLOCKSCOUT_API_KEY;
+  const url = `https://base.blockscout.com/api/v2/transactions/${txHash}?apikey=${BLOCKSCOUT_API_KEY}`;
+
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${BLOCKSCOUT_API_KEY}`
+      }
+    });
+    const data = await response.json();
+    console.log("Creation transaction:", data);
+    return data;
+  } catch (error) {
+    console.error("Error fetching creation transaction:", error);
+    return null;
   }
 };
