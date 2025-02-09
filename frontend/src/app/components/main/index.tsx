@@ -10,7 +10,7 @@ import FeedSignalComponent from "../feed_components/feedSignalComponent";
 import TweetComponent from "../feed_components/tweetComponent";
 import PriceComponent from "../feed_components/priceComponent";
 import styles from "./index.module.css";
-import { fetchFeedData, fetchPricesData, fetchTweetsData } from "@/app/api/fetchFeedData";
+import { fetchFeedData, fetchPricesData, fetchTweetsData, fetchTokenData } from "@/app/api/fetchFeedData";
 import { ethers } from 'ethers';
 import {
   useAccount,
@@ -135,6 +135,9 @@ export default function Main({
       const feedData = await fetchFeedData();
       const tweetsData = await fetchTweetsData();
       const pricesData = await fetchPricesData();
+      const tokenData = await fetchTokenData();
+
+      console.log("token dati prices", tokenData);
 
       if (feedData && feedData.data.length > 0) {
         const parsedFeedData = JSON.parse(feedData.data[0].value);
@@ -257,8 +260,6 @@ export default function Main({
           <div className="w-full flex flex-col justify-center items-center p-4 text-gray-800">
             <FeedNews 
               imageUrl="/gorillionaire.jpg"
-              timestamp={new Date().toISOString()}
-              content="Yo degens! Just sold some PENGU and bought WOW. Time to ride the meme coin wave! 🌊🚀 WAGMI!"
               vaultName="Gorillionaire Vault Token"
               onDepositClick={handleDepositClick}
               onCardClick={setSelectedVault}
@@ -302,8 +303,6 @@ export default function Main({
             <div className="w-[34%] gap-2">
               <Card 
                 title="Gorillionaire Vault Token"
-                apy="3.5%"
-                tvl="$138.8k"
                 chainName="Base"
                 chainImage="/base.jpg"
                 onDeposit={() => handleDepositClick("Gorillionaire Vault Token")}
