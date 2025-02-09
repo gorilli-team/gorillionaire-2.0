@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { fetchVaultInfo, fetchVaultTransactions, fetchCreationTransaction } from "../../api/fetchVaultData";
+import { fetchTokenData } from "@/app/api/fetchFeedData";
+import TokenChart from "../token_chart";
 
 interface TokenInfo {
   symbol: string;
@@ -17,23 +19,26 @@ interface CreationData {
   timestamp?: string;
 }
 
+interface TokenData {
+  count: number;
+  data: Array<{
+    _id: string;
+    agentId: string;
+    key: string;
+    createdAt: string;
+    expiresAt: string;
+    value: string;
+  }>;
+}
+
 const VaultStats: React.FC = () => {
     const [vaultData, setVaultData] = useState<VaultInfo | null>(null);
     const [transactionCount, setTransactionCount] = useState<number>(0);
     const [creationData, setCreationData] = useState<CreationData | null>(null);
+    const [tokenData, setTokenData] = useState<TokenData | null>(null);
     
-    // const sentimentData = [
-    //     { date: "Feb 05", sentiment: 10 },
-    //     { date: "Feb 06", sentiment: -5 },
-    //     { date: "Feb 07", sentiment: -20 },
-    //     { date: "Feb 08", sentiment: 8 },
-    //     { date: "Feb 09", sentiment: 25 },
-    //     { date: "Feb 10", sentiment: -12 },
-    // ];
-
-    // Fetch vault data
     useEffect(() => {
-      const getVaultData = async () => {
+      const fetchData = async () => {
         try {
           const data = await fetchVaultInfo();
           setVaultData(data);
@@ -46,15 +51,41 @@ const VaultStats: React.FC = () => {
           const transactions = await fetchVaultTransactions();
           setTransactionCount(transactions.length);
           
+          const tokenResponse = await fetchTokenData();
+          setTokenData(tokenResponse);
+          
         } catch (error) {
-          console.error("Error fetching vault data:", error);
+          console.error("Error fetching data:", error);
         }
       };
 
-      getVaultData();
+      fetchData();
     }, []);
 
-    if (!vaultData) return <div>Loading...</div>;
+    if (!vaultData || !tokenData) return <div>Loading...</div>;
+
+    const getTitleForKey = (key: string) => {
+      switch(key) {
+        case 'volume24h':
+          return '24h Volume';
+        case 'volumeChange24h':
+          return '24h Volume Change';
+        case 'percentChange24h':
+          return '24h Percent Change';
+        case 'percentChange1h':
+          return '1h Percent Change';
+        default:
+          return key;
+      }
+    };
+
+    // Order of charts
+    const chartOrder = ['percentChange1h', 'percentChange24h', 'volume24h', 'volumeChange24h'];
+    
+    // Order the data according to chartOrder
+    const orderedChartData = chartOrder
+      .map(key => tokenData.data.find(item => item.key === key))
+      .filter(item => item !== undefined);
 
     return (
         <div className="p-4">
@@ -103,6 +134,18 @@ const VaultStats: React.FC = () => {
                     <strong>Total transactions:</strong>
                     <span>{transactionCount}</span>
                 </div>
+            </div>
+
+            <h3 className="text-md font-semibold mb-2">Token Statistics</h3>
+            <div className="grid grid-cols-2 gap-4">
+                {orderedChartData.map((item) => (
+                    <TokenChart
+                        key={item._id}
+                        data={item}
+                        title={getTitleForKey(item.key)}
+                        type={item.key === 'volume24h' ? 'volume' : 'percentage'}
+                    />
+                ))}
             </div>
         </div>
     );
