@@ -5,7 +5,9 @@ import { Card } from "../vault_card/index";
 import VaultDetail from "../vault_detail/index";
 import { ModalDeposit } from "../modal_deposit";
 import FeedNews from "../feed_news/index";
+import TradingTest from "../trading_test";
 import styles from "./index.module.css";
+import { fetchFeedData } from "@/app/api/fetchFeedData";
 import {
   useAccount,
   useReadContract,
@@ -76,32 +78,39 @@ export default function Main({
     }
   }, [allowanceData]);
 
-  const handleDeposit = (amount: number) => {
-    console.log(`Depositing ${amount} USDC`);
-    const amountParsed = BigInt(amount * Math.pow(10, 6));
-    if (!address) {
-      console.log("no wallet connected");
-      return;
-    }
-    if (allowance < amountParsed) {
-      console.log("Less allowance, approving token");
-      writeContract({
-        address: USDC_ADDRESS,
-        abi: erc20abi,
-        functionName: "approve",
-        args: [VAULT_ADDRESS, amountParsed],
-      });
-    } else {
-      writeContract({
-        address: VAULT_ADDRESS,
-        abi: vaultAbi,
-        functionName: "deposit",
-        args: [amountParsed, address],
-      });
-    }
+const handleDeposit = (amount: number) => {
+  console.log(`Depositing ${amount} USDC`);
+  
+  // Convert amount to USDC decimals safely
+  const amountStr = amount.toString();
+  const [integerPart, decimalPart = ''] = amountStr.split('.');
+  const paddedDecimal = decimalPart.padEnd(6, '0').slice(0, 6);
+  const amountParsed = BigInt(integerPart + paddedDecimal);
 
-    setIsModalOpen(false);
-  };
+  if (!address) {
+    console.log("no wallet connected");
+    return;
+  }
+
+  if (allowance < amountParsed) {
+    console.log("Less allowance, approving token");
+    writeContract({
+      address: USDC_ADDRESS,
+      abi: erc20abi,
+      functionName: "approve",
+      args: [VAULT_ADDRESS, amountParsed],
+    });
+  } else {
+    writeContract({
+      address: VAULT_ADDRESS,
+      abi: vaultAbi,
+      functionName: "deposit",
+      args: [amountParsed, address],
+    });
+  }
+
+  setIsModalOpen(false);
+};
 
   const handleCardClick = (vaultName: string) => {
     setSelectedVault(vaultName);
@@ -120,6 +129,12 @@ export default function Main({
   const handleWithdrawClick = () => {
     console.log("Withdraw clicked");
   };
+
+  const handleFetchFeed = async () => {
+    const data = await fetchFeedData();
+    console.log("Fetched feed data:", data);
+  };
+  
 
   const renderContent = () => {
     if (selectedVault) {
@@ -147,6 +162,12 @@ export default function Main({
               onWithdrawClick={handleWithdrawClick}
               setSelectedPage={setSelectedPage}
             />
+            <button 
+            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+            onClick={handleFetchFeed}
+          >
+            Aggiorna Feed
+          </button>
           </div>
         );
       case "My Account":
@@ -187,7 +208,11 @@ export default function Main({
                 onDeposit={() => handleDepositClick("Vault Test 1")}
                 onWithdraw={handleWithdrawClick}
             />
-        );      
+        );
+      case "TestTrading":
+        return (
+          <TradingTest />
+        );    
       default:
         return <div className="p-4 text-gray-800">Select a page</div>;
     }
