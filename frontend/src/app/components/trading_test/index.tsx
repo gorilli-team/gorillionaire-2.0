@@ -236,9 +236,9 @@ const TradingAgentSetup = () => {
   };
 
   return (
-    <div className='flex w-full p-2 gap-2'>
+    <div className='flex w-full p-2 py-4 gap-4 justify-center'>
       {showSetAgent && (
-        <div className="p-6 w-1/2 bg-white rounded-xl shadow-md">
+        <div className="p-6 w-[600px] max-w-[600px] bg-white rounded-xl shadow-md">
           <h2 className="text-xl font-bold mb-4">Set Trading Agent</h2>
           
           <div className="space-y-4">
@@ -283,7 +283,7 @@ const TradingAgentSetup = () => {
           </div>
         </div>
       )}
-      <div className={`p-6 ${showSetAgent ? 'w-1/2' : 'w-full'} bg-white rounded-xl shadow-md`}>
+      <div className={`p-6 ${showSetAgent ? 'w-[600px] max-w-[600px]' : 'w-full'} bg-white rounded-xl shadow-md`}>
         <h2 className="text-xl font-bold mb-4">Trading Operations</h2>
         
         <div className="space-y-4">
