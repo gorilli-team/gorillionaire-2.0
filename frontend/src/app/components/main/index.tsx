@@ -32,6 +32,37 @@ import { WalletDefault } from "@coinbase/onchainkit/wallet";
 import { vaultAbi } from "../../../../public/abi/vaultabi";
 import { erc20abi } from "../../../../public/abi/erc20abi";
 
+interface FeedSignal {
+  signal: string;
+  confidence: number;
+  metrics: {
+    volatility1h: number;
+    volatility24h: number;
+    volumeTrend: string;
+    avg1hChange: number;
+    avg24hChange: number;
+  };
+}
+
+interface Tweet {
+  id: string;
+  name: string;
+  username: string;
+  text: string;
+  createdAt: string;
+  permanentUrl: string;
+}
+
+interface PriceData {
+  price: number;
+  marketCap: number;
+  volume24h: number;
+  volumeChange24h: number;
+  percentChange1h: number;
+  percentChange24h: number;
+  timestamp: string;
+}
+
 const VAULT_ADDRESS = "0xC6827ce6d60A13a20A86dCac8c9e6D0F84497345" as `0x${string}`;
 const USDC_ADDRESS = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 
@@ -52,9 +83,9 @@ export default function Main({
   const { data: hash, writeContract } = useWriteContract();
   const account = useAccount();
 
-  const [feedSignal, setFeedSignal] = useState<any>(null);
-  const [tweets, setTweets] = useState<any[]>([]);
-  const [priceData, setPriceData] = useState<any>(null);
+  const [feedSignal, setFeedSignal] = useState<FeedSignal | null>(null);
+  const [tweets, setTweets] = useState<Tweet[]>([]);
+  const [priceData, setPriceData] = useState<PriceData | null>(null);
 
   useEffect(() => {
     console.log("useAccount() Data:", account);
@@ -113,7 +144,7 @@ export default function Main({
       if (tweetsData && tweetsData.data.length > 0) {
         const parsedTweets = tweetsData.data
           .slice(0, 10)
-          .map((item: any) => JSON.parse(item.value).value);
+          .map((item: { value: string }) => JSON.parse(item.value).value as Tweet);
         setTweets(parsedTweets);
       }
 
