@@ -6,8 +6,11 @@ import { ModalDeposit } from "../modal_deposit";
 import { ModalWithdraw } from "../modal_withdraw";
 import FeedNews from "../feed_news/index";
 import TradingTest from "../trading_test";
+import FeedSignalComponent from "../feed_components/feedSignalComponent";
+import TweetComponent from "../feed_components/tweetComponent";
+import PriceComponent from "../feed_components/priceComponent";
 import styles from "./index.module.css";
-import { fetchFeedData } from "@/app/api/fetchFeedData";
+import { fetchFeedData, fetchPricesData, fetchTweetsData } from "@/app/api/fetchFeedData";
 import { ethers } from 'ethers';
 import {
   useAccount,
@@ -48,6 +51,10 @@ export default function Main({
   const { address } = useAccount();
   const { data: hash, writeContract } = useWriteContract();
   const account = useAccount();
+
+  const [feedSignal, setFeedSignal] = useState<any>(null);
+  const [tweets, setTweets] = useState<any[]>([]);
+  const [priceData, setPriceData] = useState<any>(null);
 
   useEffect(() => {
     console.log("useAccount() Data:", account);
@@ -91,6 +98,33 @@ export default function Main({
   const [allowance, setAllowance] = useState(BigInt(0));
   const [maxWithdrawAmount, setMaxWithdrawAmount] = useState<bigint>(BigInt(0));
   const [selectedVaultForDeposit, setSelectedVaultForDeposit] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      const feedData = await fetchFeedData();
+      const tweetsData = await fetchTweetsData();
+      const pricesData = await fetchPricesData();
+
+      if (feedData && feedData.data.length > 0) {
+        const parsedFeedData = JSON.parse(feedData.data[0].value);
+        setFeedSignal(parsedFeedData.value);
+      }
+
+      if (tweetsData && tweetsData.data.length > 0) {
+        const parsedTweets = tweetsData.data
+          .slice(0, 10)
+          .map((item: any) => JSON.parse(item.value).value);
+        setTweets(parsedTweets);
+      }
+
+      if (pricesData && pricesData.data.length > 0) {
+        const parsedPricesData = JSON.parse(pricesData.data[0].value);
+        setPriceData(parsedPricesData.value);
+      }
+    };
+
+    fetchInitialData();
+  }, []);
 
   useEffect(() => {
     if (allowanceData) {
@@ -175,11 +209,6 @@ export default function Main({
     setIsWithdrawModalOpen(true);
   };
 
-  const handleFetchFeed = async () => {
-    const data = await fetchFeedData();
-    console.log("Fetched feed data:", data);
-  };
-
   const renderContent = () => {
     if (selectedVault) {
       return (
@@ -205,14 +234,23 @@ export default function Main({
               onWithdrawClick={handleWithdrawClick}
               setSelectedPage={setSelectedPage}
             />
-            <button 
-              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-              onClick={handleFetchFeed}
-            >
-              Aggiorna Feed
-            </button>
-          </div>
+              
+              {feedSignal && (
+                <FeedSignalComponent signal={feedSignal} />
+              )}
+              
+              <div className="space-y-2">
+                {tweets.map((tweet, index) => (
+                  <TweetComponent key={index} tweet={tweet} />
+                ))}
+              </div>
+              
+              {priceData && (
+                <PriceComponent price={priceData} />
+              )}
+            </div>
         );
+
       case "My Account":
         return (
           <div className="p-6 pt-4 text-gray-800">
