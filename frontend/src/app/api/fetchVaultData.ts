@@ -121,7 +121,7 @@ export const fetchVaultTokens = async () => {
       }
     });
     const data = await response.json();
-    console.log("Vault tokens:", data);
+    console.log("Vault tokens list:", data);
     return data;
   } catch (error) {
     console.error("Error fetching vault tokens:", error);
@@ -145,6 +145,28 @@ export const fetchCreationTransaction = async (txHash: string) => {
     return data;
   } catch (error) {
     console.error("Error fetching creation transaction:", error);
+    return null;
+  }
+};
+
+export const fetchVaultTokenHolders = async () => {
+  const vaultAddress = "0xC6827ce6d60A13a20A86dCac8c9e6D0F84497345";
+  const BLOCKSCOUT_API_KEY = process.env.NEXT_PUBLIC_BLOCKSCOUT_API_KEY;
+  
+  const url = `https://base.blockscout.com/api/v2/tokens/${vaultAddress}/holders?apikey=${BLOCKSCOUT_API_KEY}`;
+
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${BLOCKSCOUT_API_KEY}`
+      }
+    });
+    const data = await response.json();
+    console.log("Vault token holders:", data);
+    return data;
+  } catch (error) {
+    console.error("Error fetching vault token holders:", error);
     return null;
   }
 };
