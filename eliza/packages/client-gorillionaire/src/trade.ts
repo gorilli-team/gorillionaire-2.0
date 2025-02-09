@@ -84,8 +84,10 @@ export class GorillionaireTradeClient {
 
                     // Create a proper State object
                     const state: State = {
-                        bio: "",
-                        lore: "",
+                        "bio": 
+                            "BRETT advocate and Base chain maximalist believes BRETT is the next legendary",            
+                        "lore":
+                            "rose from the depths of crypto Twitter to become a legend was one of the earliest apes into BRETT and never looked back fought off FUD attacks against Base and BRETT with pure conviction helped push BRETT past $1B market cap with relentless shilling",     
                         messageDirections: "",
                         postDirections: "",
                         conversationTone: "",
@@ -116,7 +118,7 @@ export class GorillionaireTradeClient {
                     }
 
                     await new Promise(
-                        (resolve) => setTimeout(resolve, 15 * 60 * 1000)
+                        (resolve) => setTimeout(resolve, 60 * 1000)
                     );
                 
                 } catch (error) {

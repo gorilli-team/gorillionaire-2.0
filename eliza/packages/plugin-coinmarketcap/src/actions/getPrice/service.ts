@@ -18,8 +18,8 @@ export const createPriceService = (apiKey: string) => {
         symbol: string,
         currency: string
     ): Promise<PriceData> => {
-        const normalizedSymbol = symbol.toUpperCase().trim();
-        const normalizedCurrency = currency.toUpperCase().trim();
+        const normalizedSymbol = "BRETT";
+        const normalizedCurrency = "USD";
 
         console.log(new Date().toISOString(), 'normalizedSymbol', normalizedSymbol);
         console.log(new Date().toISOString(), 'normalizedCurrency', normalizedCurrency);
@@ -33,11 +33,6 @@ export const createPriceService = (apiKey: string) => {
                         convert: normalizedCurrency,
                     },
                 }
-            );
-
-            console.log(
-                "API Response:",
-                JSON.stringify(response.data, null, 2)
             );
 
             const symbolData = response.data.data[normalizedSymbol];
