@@ -250,7 +250,7 @@ const TradingAgentSetup = () => {
                 type="text"
                 value={vaultAddress}
                 onChange={(e) => setVaultAddress(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm outline-none"
                 placeholder="0x..."
               />
             </div>
@@ -263,7 +263,7 @@ const TradingAgentSetup = () => {
                 type="text"
                 value={agentAddress}
                 onChange={(e) => setAgentAddress(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm outline-none"
                 placeholder="0x..."
               />
             </div>
@@ -295,7 +295,7 @@ const TradingAgentSetup = () => {
               type="text"
               value={vaultAddress}
               onChange={(e) => setVaultAddress(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm outline-none"
               placeholder="0x..."
             />
           </div>
@@ -308,7 +308,7 @@ const TradingAgentSetup = () => {
               type="text"
               value={tokenAddress}
               onChange={(e) => setTokenAddress(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm outline-none"
               placeholder="0x..."
             />
           </div>
@@ -321,7 +321,7 @@ const TradingAgentSetup = () => {
               type="text"
               value={amountIn}
               onChange={(e) => setAmountIn(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm outline-none"
               placeholder="Amount"
             />
           </div>
@@ -334,7 +334,7 @@ const TradingAgentSetup = () => {
               type="text"
               value={minAmountOut}
               onChange={(e) => setMinAmountOut(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm outline-none"
               placeholder="Min amount to receive"
             />
           </div>
