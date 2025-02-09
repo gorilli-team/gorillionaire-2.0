@@ -1,5 +1,21 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
+import { fetchVaultTokens } from "../../api/fetchVaultData";
+
+interface TokenData {
+  token: {
+    name: string;
+    symbol: string;
+    icon_url?: string;
+    decimals: string;
+    exchange_rate: string;
+  };
+  value: string;
+}
+
+interface VaultData {
+  items: TokenData[];
+}
 
 interface Token {
   name: string;
@@ -8,12 +24,48 @@ interface Token {
   logo: string;
 }
 
-interface VaultStrategyProps {
-  tokens: Token[];
-}
-
-const VaultStrategy: React.FC<VaultStrategyProps> = ({ tokens }) => {
+const VaultStrategy: React.FC = () => {
+  const [tokens, setTokens] = useState<Token[]>([]);
   const total = tokens.reduce((sum, token) => sum + token.value, 0);
+
+  const colors = ["#00C49F", "#FF6384", "#8A2BE2", "#FFA500", "#4169E1"];
+
+  useEffect(() => {
+    const getTokenData = async () => {
+      try {
+        const data: VaultData = await fetchVaultTokens();
+        const filteredTokens = data.items.filter(item => 
+          ['USDC', 'BRETT'].includes(item.token.symbol)
+        );
+  
+        const formattedTokens = filteredTokens.map((item, index) => {
+          // Convert value based on token decimals
+          const decimals = parseInt(item.token.decimals);
+          const tokenValue = parseFloat(item.value) / Math.pow(10, decimals);
+          
+          // Calculate value using exchange rate
+          const value = tokenValue * parseFloat(item.token.exchange_rate);
+
+          return {
+            name: `${item.token.name} (${item.token.symbol})`,
+            value: value,
+            color: colors[index % colors.length],
+            logo: item.token.icon_url || "/placeholder-coin.png"
+          };
+        });
+        
+        setTokens(formattedTokens);
+      } catch (error) {
+        console.error("Error fetching token data:", error);
+      }
+    };
+  
+    getTokenData();
+  }, []);
+
+  if (tokens.length === 0) {
+    return <div className="p-4">Loading...</div>;
+  }
 
   return (
     <div className="flex justify-between items-center p-4 bg-white rounded-lg">
@@ -26,7 +78,7 @@ const VaultStrategy: React.FC<VaultStrategyProps> = ({ tokens }) => {
             </div>
             <div className="flex items-center">
               <span className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: token.color }}></span>
-              <span className="font-bold">${token.value.toLocaleString()}</span>
+              <span className="font-bold">${token.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}</span>
               <span className="ml-2 text-gray-500">({((token.value / total) * 100).toFixed(2)}%)</span>
             </div>
           </div>
@@ -42,21 +94,18 @@ const VaultStrategy: React.FC<VaultStrategyProps> = ({ tokens }) => {
             cx="50%"
             cy="50%"
             outerRadius={80}
-
             fill="#8884d8"
           >
             {tokens.map((token, index) => (
               <Cell key={`cell-${index}`} fill={token.color} />
             ))}
           </Pie>
-          <Tooltip
-            formatter={(value: number | string, name: string) => `${name}`}
-          />
+          <Tooltip />
         </PieChart>
       </div>
 
       <div className="w-1/3 flex justify-center items-center">
-        <div className="text-lg font-bold text-gray-700">${total.toLocaleString()}</div>
+        <div className="text-lg font-bold text-gray-700">${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}</div>
       </div>
     </div>
   );

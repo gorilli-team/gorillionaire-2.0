@@ -1,13 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-
 import React, { useEffect, useState } from "react";
 import { Card } from "../vault_card/index";
 import VaultDetail from "../vault_detail/index";
 import { ModalDeposit } from "../modal_deposit";
+import { ModalWithdraw } from "../modal_withdraw";
 import FeedNews from "../feed_news/index";
 import TradingTest from "../trading_test";
+import FeedSignalComponent from "../feed_components/feedSignalComponent";
+import TweetComponent from "../feed_components/tweetComponent";
+import PriceComponent from "../feed_components/priceComponent";
 import styles from "./index.module.css";
-import { fetchFeedData } from "@/app/api/fetchFeedData";
+import { fetchFeedData, fetchPricesData, fetchTweetsData, fetchTokenData } from "@/app/api/fetchFeedData";
+import { ethers } from 'ethers';
 import {
   useAccount,
   useReadContract,
@@ -28,8 +32,38 @@ import { WalletDefault } from "@coinbase/onchainkit/wallet";
 import { vaultAbi } from "../../../../public/abi/vaultabi";
 import { erc20abi } from "../../../../public/abi/erc20abi";
 
-const VAULT_ADDRESS =
-  "0xC6827ce6d60A13a20A86dCac8c9e6D0F84497345" as `0x${string}`;
+interface FeedSignal {
+  signal: string;
+  confidence: number;
+  metrics: {
+    volatility1h: number;
+    volatility24h: number;
+    volumeTrend: string;
+    avg1hChange: number;
+    avg24hChange: number;
+  };
+}
+
+interface Tweet {
+  id: string;
+  name: string;
+  username: string;
+  text: string;
+  createdAt: string;
+  permanentUrl: string;
+}
+
+interface PriceData {
+  price: number;
+  marketCap: number;
+  volume24h: number;
+  volumeChange24h: number;
+  percentChange1h: number;
+  percentChange24h: number;
+  timestamp: string;
+}
+
+const VAULT_ADDRESS = "0xC6827ce6d60A13a20A86dCac8c9e6D0F84497345" as `0x${string}`;
 const USDC_ADDRESS = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 
 interface MainProps {
@@ -47,13 +81,15 @@ export default function Main({
 }: MainProps) {
   const { address } = useAccount();
   const { data: hash, writeContract } = useWriteContract();
-
   const account = useAccount();
+
+  const [feedSignal, setFeedSignal] = useState<FeedSignal | null>(null);
+  const [tweets, setTweets] = useState<Tweet[]>([]);
+  const [priceData, setPriceData] = useState<PriceData | null>(null);
 
   useEffect(() => {
     console.log("useAccount() Data:", account);
   }, [account]);
-
 
   const {
     data: allowanceData,
@@ -66,11 +102,63 @@ export default function Main({
     args: [address || "0x0", VAULT_ADDRESS],
   });
 
+  const {
+    data: userBalance,
+    isError: balanceIsError,
+    isPending: balanceIsPending,
+  } = useReadContract({
+    abi: vaultAbi,
+    address: VAULT_ADDRESS,
+    functionName: "balanceOf",
+    args: [address || "0x0"],
+  });
+
+  const {
+    data: maxWithdraw,
+    isError: maxWithdrawIsError,
+    isPending: maxWithdrawIsPending,
+  } = useReadContract({
+    abi: vaultAbi,
+    address: VAULT_ADDRESS,
+    functionName: "maxWithdraw",
+    args: [address || "0x0"],
+  });
+
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
   const [allowance, setAllowance] = useState(BigInt(0));
-  const [selectedVaultForDeposit, setSelectedVaultForDeposit] = useState<
-    string | null
-  >(null);
+  const [maxWithdrawAmount, setMaxWithdrawAmount] = useState<bigint>(BigInt(0));
+  const [selectedVaultForDeposit, setSelectedVaultForDeposit] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      const feedData = await fetchFeedData();
+      const tweetsData = await fetchTweetsData();
+      const pricesData = await fetchPricesData();
+      const tokenData = await fetchTokenData();
+
+      console.log("token dati prices", tokenData);
+
+      if (feedData && feedData.data.length > 0) {
+        const parsedFeedData = JSON.parse(feedData.data[0].value);
+        setFeedSignal(parsedFeedData.value);
+      }
+
+      if (tweetsData && tweetsData.data.length > 0) {
+        const parsedTweets = tweetsData.data
+          .slice(0, 10)
+          .map((item: { value: string }) => JSON.parse(item.value).value as Tweet);
+        setTweets(parsedTweets);
+      }
+
+      if (pricesData && pricesData.data.length > 0) {
+        const parsedPricesData = JSON.parse(pricesData.data[0].value);
+        setPriceData(parsedPricesData.value);
+      }
+    };
+
+    fetchInitialData();
+  }, []);
 
   useEffect(() => {
     if (allowanceData) {
@@ -78,48 +166,73 @@ export default function Main({
     }
   }, [allowanceData]);
 
-const handleDeposit = (amount: number) => {
-  console.log(`Depositing ${amount} USDC`);
-  
-  // Convert amount to USDC decimals safely
-  const amountStr = amount.toString();
-  const [integerPart, decimalPart = ''] = amountStr.split('.');
-  const paddedDecimal = decimalPart.padEnd(6, '0').slice(0, 6);
-  const amountParsed = BigInt(integerPart + paddedDecimal);
+  useEffect(() => {
+    if (maxWithdraw && typeof maxWithdraw === 'bigint') {
+      setMaxWithdrawAmount(maxWithdraw);
+    }
+  }, [maxWithdraw]);
 
-  if (!address) {
-    console.log("no wallet connected");
-    return;
-  }
+  const handleDeposit = (amount: number) => {
+    console.log(`Depositing ${amount} USDC`);
+    
+    const amountStr = amount.toString();
+    const [integerPart, decimalPart = ''] = amountStr.split('.');
+    const paddedDecimal = decimalPart.padEnd(6, '0').slice(0, 6);
+    const amountParsed = BigInt(integerPart + paddedDecimal);
 
-  if (allowance < amountParsed) {
-    console.log("Less allowance, approving token");
-    writeContract({
-      address: USDC_ADDRESS,
-      abi: erc20abi,
-      functionName: "approve",
-      args: [VAULT_ADDRESS, amountParsed],
-    });
-  } else {
-    writeContract({
-      address: VAULT_ADDRESS,
-      abi: vaultAbi,
-      functionName: "deposit",
-      args: [amountParsed, address],
-    });
-  }
+    if (!address) {
+      console.log("no wallet connected");
+      return;
+    }
 
-  setIsModalOpen(false);
-};
+    if (allowance < amountParsed) {
+      console.log("Less allowance, approving token");
+      writeContract({
+        address: USDC_ADDRESS,
+        abi: erc20abi,
+        functionName: "approve",
+        args: [VAULT_ADDRESS, amountParsed],
+      });
+    } else {
+      writeContract({
+        address: VAULT_ADDRESS,
+        abi: vaultAbi,
+        functionName: "deposit",
+        args: [amountParsed, address],
+      });
+    }
+
+    setIsModalOpen(false);
+  };
+
+  const handleWithdraw = async (amount: number) => {
+    console.log(`Withdrawing ${amount} USDC`);
+    
+    if (!address) {
+      console.log("no wallet connected");
+      return;
+    }
+
+    try {
+      const amountInUSDC = ethers.parseUnits(amount.toString(), 6);
+      
+      writeContract({
+        address: VAULT_ADDRESS,
+        abi: vaultAbi,
+        functionName: "withdraw",
+        args: [amountInUSDC, address, address],
+      });
+
+      setIsWithdrawModalOpen(false);
+    } catch (error) {
+      console.error("Error in withdrawal:", error);
+    }
+  };
 
   const handleCardClick = (vaultName: string) => {
     setSelectedVault(vaultName);
     setSelectedPage("Vault");
   };
-
-  // const handleBack = () => {
-  //   setSelectedVault(null);
-  // };
 
   const handleDepositClick = (vaultName: string) => {
     setSelectedVaultForDeposit(vaultName);
@@ -127,14 +240,8 @@ const handleDeposit = (amount: number) => {
   };
 
   const handleWithdrawClick = () => {
-    console.log("Withdraw clicked");
+    setIsWithdrawModalOpen(true);
   };
-
-  const handleFetchFeed = async () => {
-    const data = await fetchFeedData();
-    console.log("Fetched feed data:", data);
-  };
-  
 
   const renderContent = () => {
     if (selectedVault) {
@@ -147,29 +254,35 @@ const handleDeposit = (amount: number) => {
       );
     }
   
-  
     switch (selectedPage) {
       case "Feed":
         return (
           <div className="w-full flex flex-col justify-center items-center p-4 text-gray-800">
             <FeedNews 
               imageUrl="/gorillionaire.jpg"
-              timestamp={new Date().toISOString()}
-              content="Yo degens! Just sold some PENGU and bought WOW. Time to ride the meme coin wave! 🌊🚀 WAGMI!"
-              vaultName="Vault Test 1"
+              vaultName="Gorillionaire Vault Token"
               onDepositClick={handleDepositClick}
               onCardClick={setSelectedVault}
               onWithdrawClick={handleWithdrawClick}
               setSelectedPage={setSelectedPage}
             />
-            <button 
-            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-            onClick={handleFetchFeed}
-          >
-            Aggiorna Feed
-          </button>
-          </div>
+              
+              {feedSignal && (
+                <FeedSignalComponent signal={feedSignal} />
+              )}
+              
+              <div className="space-y-2">
+                {tweets.map((tweet, index) => (
+                  <TweetComponent key={index} tweet={tweet} />
+                ))}
+              </div>
+              
+              {priceData && (
+                <PriceComponent price={priceData} />
+              )}
+            </div>
         );
+
       case "My Account":
         return (
           <div className="p-6 pt-4 text-gray-800">
@@ -189,13 +302,11 @@ const handleDeposit = (amount: number) => {
             <h2 className="text-xl font-bold text-gray-800 mb-4">Your Investments</h2>
             <div className="w-[34%] gap-2">
               <Card 
-                title="Vault Test 1"
-                apy="3.5%"
-                tvl="$138.8k"
+                title="Gorillionaire Vault Token"
                 chainName="Base"
                 chainImage="/base.jpg"
-                onDeposit={() => handleDepositClick("Vault Test 1")}
-                onCardClick={() => handleCardClick("Vault Test 1")}
+                onDeposit={() => handleDepositClick("Gorillionaire Vault Token")}
+                onCardClick={() => handleCardClick("Gorillionaire Vault Token")}
                 onWithdraw={handleWithdrawClick}
               />
             </div>
@@ -203,11 +314,11 @@ const handleDeposit = (amount: number) => {
         );
       case "Vault":
         return (
-            <VaultDetail
-                vaultName="Vault Test 1"
-                onDeposit={() => handleDepositClick("Vault Test 1")}
-                onWithdraw={handleWithdrawClick}
-            />
+          <VaultDetail
+            vaultName="Gorillionaire Vault Token"
+            onDeposit={() => handleDepositClick("Gorillionaire Vault Token")}
+            onWithdraw={handleWithdrawClick}
+          />
         );
       case "TestTrading":
         return (
@@ -227,6 +338,13 @@ const handleDeposit = (amount: number) => {
         onClose={() => setIsModalOpen(false)}
         onDeposit={handleDeposit}
         allowance={allowance}
+      />
+
+      <ModalWithdraw
+        isOpen={isWithdrawModalOpen}
+        onClose={() => setIsWithdrawModalOpen(false)}
+        onWithdraw={handleWithdraw}
+        maxAmount={maxWithdrawAmount}
       />
     </main>
   );

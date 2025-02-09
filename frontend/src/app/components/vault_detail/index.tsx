@@ -6,7 +6,7 @@ import VaultStrategy from "../vault_strategy";
 import VaultExplorer from "../vault_explorer";
 import { Transaction } from "../../types";
 import { getAppState } from "../../store/appStore";
-import { fetchVaultAddress, fetchVaultTransactions, fetchVaultDepositors } from "../../api/fetchVaultData";
+import { fetchVaultAddress, fetchVaultTransactions, fetchVaultDepositors} from "../../api/fetchVaultData";
 
 interface VaultDetailProps {
   vaultName: string;
@@ -50,22 +50,15 @@ const VaultDetail: React.FC<VaultDetailProps> = ({ vaultName, onDeposit, onWithd
       loadDepositors();
     }
   }, [vaultAddress]);
-
-  const strategyTokens = [
-    { name: "Compound", value: 49357.35, color: "#00C49F", logo: "/gorillionaire.jpg" },
-    { name: "Uniswap", value: 31212.68, color: "#FF6384", logo: "/gorillionaire.jpg" },
-    { name: "AAVE", value: 28991.33, color: "#8A2BE2", logo: "/gorillionaire.jpg" },
-    { name: "Cream Finance", value: 28736.42, color: "#FFA500", logo: "/gorillionaire.jpg" }
-  ];
   
   const renderTabContent = () => {
     switch (activeTab) {
       case "Stats":
-        return <VaultStats vaultName={vaultName} />;
+        return <VaultStats />;
       case "Depositors":
         return <VaultDepositors depositors={depositors} />;
       case "Strategy":
-        return <VaultStrategy tokens={strategyTokens} />;
+        return <VaultStrategy/>;
       case "Explorer":
         return <VaultExplorer vaultAddress={vaultAddress} transactions={transactions} />;
       default:

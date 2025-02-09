@@ -4,8 +4,6 @@ import { WalletDefault } from "@coinbase/onchainkit/wallet";
 
 interface CardProps {
   title: string;
-  apy: string;
-  tvl: string;
   chainName: string;
   chainImage: string;
   onDeposit: () => void;
@@ -15,8 +13,6 @@ interface CardProps {
 
 export const Card: React.FC<CardProps> = ({
   title,
-  apy,
-  tvl,
   chainName,
   chainImage,
   onDeposit,
@@ -35,12 +31,12 @@ export const Card: React.FC<CardProps> = ({
       </div>
       <div className="flex gap-2 mt-2">
         <div className="flex items-center justify-center bg-gray-300 p-2 rounded-lg w-1/3">
-          <span className="text-gray-600 pr-2">30D APY:</span>
-          <span className="text-gray-800">{apy}</span>
+          <img src="/usdc.jpg" alt="USDC" className="h-4 w-4 mr-2" />
+          <span className="text-gray-800">USDC</span>
         </div>
         <div className="flex items-center justify-center bg-gray-300 p-2 rounded-lg w-1/3">
-          <span className="text-gray-600 pr-2">TVL:</span>
-          <span className="text-gray-800">{tvl}</span>
+          <img src="/brett.jpg" alt="BRETT" className="h-4 w-4 mr-2" />
+          <span className="text-gray-800">BRETT</span>
         </div>
         <div className="flex items-center justify-center bg-gray-300 p-2 rounded-lg w-1/3">
           <img

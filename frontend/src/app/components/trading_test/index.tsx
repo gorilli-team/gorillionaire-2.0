@@ -30,6 +30,7 @@ const TradingAgentSetup = () => {
   const [agentAddress, setAgentAddress] = useState('');
   const [status, setStatus] = useState('');
   const [currentAgent, setCurrentAgent] = useState<string | null>(null);
+  const [tradeMode, setTradeMode] = useState('buy');
 
   // States for trading operations
   const [tokenAddress, setTokenAddress] = useState('');
@@ -199,7 +200,7 @@ const TradingAgentSetup = () => {
       const tx = isExit 
         ? await vaultContract.exitTrade(
             tokenAddress,
-            ethers.parseUnits(amountIn, 6),
+            ethers.parseUnits(amountIn, 18),
             ethers.parseUnits(minAmountOut, 6),
             deadline
           )
@@ -236,9 +237,9 @@ const TradingAgentSetup = () => {
   };
 
   return (
-    <div className='flex w-full p-2 gap-2'>
+    <div className='flex w-full p-2 py-4 gap-4 justify-center'>
       {showSetAgent && (
-        <div className="p-6 w-1/2 bg-white rounded-xl shadow-md">
+        <div className="p-6 w-[600px] max-w-[600px] bg-white rounded-xl shadow-md">
           <h2 className="text-xl font-bold mb-4">Set Trading Agent</h2>
           
           <div className="space-y-4">
@@ -250,7 +251,7 @@ const TradingAgentSetup = () => {
                 type="text"
                 value={vaultAddress}
                 onChange={(e) => setVaultAddress(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm outline-none"
                 placeholder="0x..."
               />
             </div>
@@ -263,7 +264,7 @@ const TradingAgentSetup = () => {
                 type="text"
                 value={agentAddress}
                 onChange={(e) => setAgentAddress(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm outline-none"
                 placeholder="0x..."
               />
             </div>
@@ -283,8 +284,32 @@ const TradingAgentSetup = () => {
           </div>
         </div>
       )}
-      <div className={`p-6 ${showSetAgent ? 'w-1/2' : 'w-full'} bg-white rounded-xl shadow-md`}>
+     <div className={`p-6 ${showSetAgent ? 'w-[600px] max-w-[600px]' : 'w-full'} bg-white rounded-xl shadow-md`}>
         <h2 className="text-xl font-bold mb-4">Trading Operations</h2>
+        
+        <div className="flex gap-4 mb-6">
+          <button
+            onClick={() => setTradeMode('buy')}
+            className={`flex-1 py-3 px-4 rounded-md text-lg font-medium ${
+              tradeMode === 'buy' 
+                ? 'bg-green-100 text-green-700 border-2 border-green-500' 
+                : 'bg-gray-50 text-gray-600 border-2 border-transparent'
+            }`}
+          >
+            Buy BRETT
+          </button>
+
+          <button
+            onClick={() => setTradeMode('sell')}
+            className={`flex-1 py-3 px-4 rounded-md text-lg font-medium ${
+              tradeMode === 'sell' 
+                ? 'bg-red-100 text-red-700 border-2 border-red-500' 
+                : 'bg-gray-50 text-gray-600 border-2 border-transparent'
+            }`}
+          >
+            Sell BRETT
+          </button>
+        </div>
         
         <div className="space-y-4">
           <div>
@@ -295,7 +320,7 @@ const TradingAgentSetup = () => {
               type="text"
               value={vaultAddress}
               onChange={(e) => setVaultAddress(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm outline-none"
               placeholder="0x..."
             />
           </div>
@@ -308,7 +333,7 @@ const TradingAgentSetup = () => {
               type="text"
               value={tokenAddress}
               onChange={(e) => setTokenAddress(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm outline-none"
               placeholder="0x..."
             />
           </div>
@@ -321,7 +346,7 @@ const TradingAgentSetup = () => {
               type="text"
               value={amountIn}
               onChange={(e) => setAmountIn(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm outline-none"
               placeholder="Amount"
             />
           </div>
@@ -334,49 +359,36 @@ const TradingAgentSetup = () => {
               type="text"
               value={minAmountOut}
               onChange={(e) => setMinAmountOut(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm outline-none"
               placeholder="Min amount to receive"
             />
           </div>
 
           <button
+            onClick={() => handleTrade(tradeMode === 'sell')}
+            className={`w-full py-3 px-4 rounded-md text-white ${
+              tradeMode === 'buy' 
+                ? 'bg-green-500 hover:bg-green-600' 
+                : 'bg-red-500 hover:bg-red-600'
+            } outline-none`}
+          >
+            {tradeMode === 'buy' ? 'Buy BRETT' : 'Sell BRETT'}
+          </button>
+
+          <button
             onClick={checkMaxTradeAmount}
-            className="w-full bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+            className="w-full bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 outline-none"
           >
             Check Max Trade Amount
           </button>
 
-          <button
-            onClick={() => checkCurrentAgent(vaultAddress)}
-            className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
-            Show Agent Address
-          </button>
-
-          <div className="mt-4 p-2 rounded bg-blue-100">
-            <p className="text-sm font-medium text-blue-800 break-words overflow-hidden">
-              {currentAgent 
-                ? `Current Agent: ${currentAgent}`
-                : "No agent set for this vault"
-              }
-            </p>
-          </div>
-
-          <div className="flex gap-4">
-            <button
-              onClick={() => handleTrade(false)}
-              className="flex-1 bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-            >
-              USDC → BRETT
-            </button>
-
-            <button
-              onClick={() => handleTrade(true)}
-              className="flex-1 bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-            >
-              BRETT → USDC
-            </button>
-          </div>
+          {currentAgent && (
+            <div className="mt-4 p-2 rounded bg-blue-100">
+              <p className="text-sm font-medium text-blue-800 break-words overflow-hidden">
+                Current Agent: {currentAgent}
+              </p>
+            </div>
+          )}
 
           {tradeStatus && (
             <div className="mt-4 p-2 rounded bg-gray-100">
