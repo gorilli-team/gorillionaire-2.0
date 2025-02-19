@@ -2,7 +2,7 @@ import {
     type IAgentRuntime,
     type Memory,
     type Content,
-    type State
+    type State,
 } from "@elizaos/core";
 import type { ClientBase } from "./base.ts";
 import { coinmarketcapPlugin } from "@elizaos/plugin-coinmarketcap";
@@ -12,7 +12,7 @@ import { stringToUuid } from "@elizaos/core";
 export class GorillionaireTradeClient {
     client: ClientBase;
     runtime: IAgentRuntime;
-    
+
     private stopProcessingActions = false;
 
     constructor(client: ClientBase, runtime: IAgentRuntime) {
@@ -33,15 +33,17 @@ export class GorillionaireTradeClient {
         const processActionsLoop = async () => {
             while (!this.stopProcessingActions) {
                 try {
-                    const coinmarketcap = await this.runtime.plugins.find(plugin => plugin.name === "coinmarketcap");
-                    
+                    const coinmarketcap = await this.runtime.plugins.find(
+                        (plugin) => plugin.name === "coinmarketcap"
+                    );
+
                     if (!coinmarketcap) {
                         throw new Error("Coinmarketcap plugin not found");
                     }
 
                     // Find the GET_PRICE action
                     const getPriceAction = coinmarketcap.actions.find(
-                        action => action.name === "GET_PRICE"
+                        (action) => action.name === "GET_PRICE"
                     );
 
                     if (!getPriceAction) {
@@ -52,14 +54,16 @@ export class GorillionaireTradeClient {
                     const content: Content = {
                         text: "Get price for BRETT",
                         source: "trade",
-                        attachments: [{
-                            id: stringToUuid(`price-request-${Date.now()}`),
-                            url: "",
-                            title: "Price Request",
-                            source: "trade",
-                            description: "Request for cryptocurrency price",
-                            text: "Get price for BRETT",
-                        }]
+                        attachments: [
+                            {
+                                id: stringToUuid(`price-request-${Date.now()}`),
+                                url: "",
+                                title: "Price Request",
+                                source: "trade",
+                                description: "Request for cryptocurrency price",
+                                text: "Get price for BRETT",
+                            },
+                        ],
                     };
 
                     const userId = stringToUuid(
@@ -84,10 +88,8 @@ export class GorillionaireTradeClient {
 
                     // Create a proper State object
                     const state: State = {
-                        "bio": 
-                            "BRETT advocate and Base chain maximalist believes BRETT is the next legendary",            
-                        "lore":
-                            "rose from the depths of crypto Twitter to become a legend was one of the earliest apes into BRETT and never looked back fought off FUD attacks against Base and BRETT with pure conviction helped push BRETT past $1B market cap with relentless shilling",     
+                        bio: "BRETT advocate and Base chain maximalist believes BRETT is the next legendary",
+                        lore: "rose from the depths of crypto Twitter to become a legend was one of the earliest apes into BRETT and never looked back fought off FUD attacks against Base and BRETT with pure conviction helped push BRETT past $1B market cap with relentless shilling",
                         messageDirections: "",
                         postDirections: "",
                         conversationTone: "",
@@ -97,7 +99,7 @@ export class GorillionaireTradeClient {
                         roomId,
                         actors: "",
                         recentMessages: "",
-                        recentMessagesData: []
+                        recentMessagesData: [],
                     };
 
                     // Call the GET_PRICE action with all required parameters
@@ -108,34 +110,30 @@ export class GorillionaireTradeClient {
                             state,
                             {
                                 symbol: "BRETT",
-                                currency: "USD"
+                                currency: "USD",
                             }
                         );
 
                         console.log("Price result:", priceResult);
                     } catch (actionError) {
-                        console.error("Error executing GET_PRICE action:", actionError);
+                        console.error(
+                            "Error executing GET_PRICE action:",
+                            actionError
+                        );
                     }
 
-                    await new Promise(
-                        (resolve) => setTimeout(resolve, 60 * 1000)
+                    await new Promise((resolve) =>
+                        setTimeout(resolve, 30 * 60 * 1000)
                     );
-                
                 } catch (error) {
-                    console.error(
-                        "Error in action processing loop:",
-                        error
-                    );
+                    console.error("Error in action processing loop:", error);
                     await new Promise((resolve) => setTimeout(resolve, 30000));
                 }
             }
         };
 
         processActionsLoop().catch((error) => {
-            console.error(
-                "Fatal error in process actions loop:",
-                error
-            );
+            console.error("Fatal error in process actions loop:", error);
         });
     }
 
