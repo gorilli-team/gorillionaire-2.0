@@ -15,6 +15,18 @@ interface FeedSignalProps {
 }
 
 const FeedSignalComponent: React.FC<FeedSignalProps> = ({ signal }) => {
+    // Add check for missing metrics properties
+    const hasAllMetrics = signal.metrics && 
+      typeof signal.metrics.volatility1h === 'number' &&
+      typeof signal.metrics.volatility24h === 'number' &&
+      typeof signal.metrics.volumeTrend === 'string' &&
+      typeof signal.metrics.avg1hChange === 'number' &&
+      typeof signal.metrics.avg24hChange === 'number';
+
+    if (!hasAllMetrics) {
+      return null;
+    }
+
     return (
       <div className="pt-6 p-2 flex items-start gap-4 w-[600px]">
         <img src="/gorillionaire.jpg" alt="Profile" className="w-10 h-10 rounded-full" />
@@ -37,8 +49,8 @@ const FeedSignalComponent: React.FC<FeedSignalProps> = ({ signal }) => {
                 <p>Volatility (1h): <span className="font-medium">{signal.metrics?.volatility1h.toFixed(4)}</span></p>
                 <p>Volatility (24h): <span className="font-medium">{signal.metrics?.volatility24h.toFixed(4)}</span></p>
                 <p>Volume Trend: <span className="font-medium text-purple-600">{signal.metrics?.volumeTrend}</span></p>
-                <p>Avg 1h Change: <span className={`font-medium ${signal.metrics?.avg1hChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>{signal.metrics.avg1hChange.toFixed(2)}%</span></p>
-                <p>Avg 24h Change: <span className={`font-medium ${signal.metrics?.avg24hChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>{signal.metrics.avg24hChange.toFixed(2)}%</span></p>
+                <p>Avg 1h Change: <span className={`font-medium ${signal.metrics?.avg1hChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>{signal.metrics?.avg1hChange.toFixed(2)}%</span></p>
+                <p>Avg 24h Change: <span className={`font-medium ${signal.metrics?.avg24hChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>{signal.metrics?.avg24hChange.toFixed(2)}%</span></p>
               </div>
             </div>
           </div>
