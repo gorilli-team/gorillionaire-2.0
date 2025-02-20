@@ -34,11 +34,11 @@ const FeedSignalComponent: React.FC<FeedSignalProps> = ({ signal }) => {
                 <span className="text-lg font-bold">Confidence: <span className="text-green-600">{signal.confidence}%</span></span>
               </div>
               <div className="grid grid-cols-2 gap-2 text-sm">
-                <p>Volatility (1h): <span className="font-medium">{signal.metrics.volatility1h.toFixed(4)}</span></p>
-                <p>Volatility (24h): <span className="font-medium">{signal.metrics.volatility24h.toFixed(4)}</span></p>
-                <p>Volume Trend: <span className="font-medium text-purple-600">{signal.metrics.volumeTrend}</span></p>
-                <p>Avg 1h Change: <span className={`font-medium ${signal.metrics.avg1hChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>{signal.metrics.avg1hChange.toFixed(2)}%</span></p>
-                <p>Avg 24h Change: <span className={`font-medium ${signal.metrics.avg24hChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>{signal.metrics.avg24hChange.toFixed(2)}%</span></p>
+                <p>Volatility (1h): <span className="font-medium">{signal.metrics?.volatility1h.toFixed(4)}</span></p>
+                <p>Volatility (24h): <span className="font-medium">{signal.metrics?.volatility24h.toFixed(4)}</span></p>
+                <p>Volume Trend: <span className="font-medium text-purple-600">{signal.metrics?.volumeTrend}</span></p>
+                <p>Avg 1h Change: <span className={`font-medium ${signal.metrics?.avg1hChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>{signal.metrics.avg1hChange.toFixed(2)}%</span></p>
+                <p>Avg 24h Change: <span className={`font-medium ${signal.metrics?.avg24hChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>{signal.metrics.avg24hChange.toFixed(2)}%</span></p>
               </div>
             </div>
           </div>
