@@ -122,8 +122,9 @@ export class GorillionaireTradeClient {
                         );
                     }
 
+                    // Wait for 1 hour before next execution
                     await new Promise((resolve) =>
-                        setTimeout(resolve, 30 * 60 * 1000)
+                        setTimeout(resolve, 60 * 60 * 1000)
                     );
                 } catch (error) {
                     console.error("Error in action processing loop:", error);
