@@ -5,7 +5,7 @@ import { queryBlockChainData } from "./actions/queryData";
 export const chainbasePlugin: Plugin = {
     name: "chainbase",
     description: "Chainbase Plugin for Eliza",
-    actions: [retrieveTokenBalance, queryBlockChainData],
+    actions: [],
     providers: [],
     services: [],
 };

@@ -1,0 +1,14 @@
+type Moyaki_Approval {
+  id: ID!
+  owner: String!
+  spender: String!
+  value: BigInt!
+}
+
+type Moyaki_Transfer {
+  id: ID!
+  from: String!
+  to: String!
+  value: BigInt!
+}
+

@@ -133,9 +133,9 @@ export class GorillionaireTradeClient {
             }
         };
 
-        processActionsLoop().catch((error) => {
-            console.error("Fatal error in process actions loop:", error);
-        });
+        // processActionsLoop().catch((error) => {
+        //     console.error("Fatal error in process actions loop:", error);
+        // });
     }
 
     async stop() {
