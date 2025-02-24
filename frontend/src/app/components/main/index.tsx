@@ -31,6 +31,7 @@ import {
 import { WalletDefault } from "@coinbase/onchainkit/wallet";
 import { vaultAbi } from "../../../../public/abi/vaultabi";
 import { erc20abi } from "../../../../public/abi/erc20abi";
+import Tokens from "../tokens";
 
 interface FeedSignal {
   signal: string;
@@ -258,16 +259,17 @@ export default function Main({
       case "Feed":
         return (
           <div className="w-full flex flex-col justify-center items-center p-4 text-gray-800">
-            <FeedNews 
+            <Tokens/>
+            {/* <FeedNews 
               imageUrl="/gorillionaire.jpg"
               vaultName="Gorillionaire Vault Token"
               onDepositClick={handleDepositClick}
               onCardClick={setSelectedVault}
               onWithdrawClick={handleWithdrawClick}
               setSelectedPage={setSelectedPage}
-            />
+            /> */}
               
-              {feedSignal && (
+              {/* {feedSignal && (
                 <FeedSignalComponent signal={feedSignal} />
               )}
               
@@ -275,11 +277,11 @@ export default function Main({
                 {tweets.map((tweet, index) => (
                   <TweetComponent key={index} tweet={tweet} />
                 ))}
-              </div>
+              </div> */}
               
-              {priceData && (
+              {/* {priceData && (
                 <PriceComponent price={priceData} />
-              )}
+              )} */}
             </div>
         );
 
