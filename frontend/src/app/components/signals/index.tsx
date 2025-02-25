@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 
+type TradingLabel = "DEGEN" | "AGGRESSIVE" | "MODERATE" | "CONSERVATIVE";
+
 const Signals = () => {
   // Token data from the provided list
   const initialTokens = [
@@ -95,6 +97,25 @@ const Signals = () => {
       : Math.random() * 0.6 + 0.1;
     const priceChange = (Math.random() * 20 - 10).toFixed(2); // -10% to +10%
 
+    // Determine trading label based on metrics
+    const aggregateScore = (
+      Number(liquidityScore) * 0.3 +
+      Number(volumeScore) * 0.3 +
+      Math.abs(Number(priceChange)) * 0.4
+    ).toFixed(2);
+
+    // Assign trading label
+    let tradingLabel = null;
+    if (parseFloat(aggregateScore) > 5) {
+      tradingLabel = "DEGEN";
+    } else if (parseFloat(aggregateScore) > 2) {
+      tradingLabel = "AGGRESSIVE";
+    } else if (parseFloat(aggregateScore) > 1) {
+      tradingLabel = "MODERATE";
+    } else if (parseFloat(aggregateScore) > 0.6) {
+      tradingLabel = "CONSERVATIVE";
+    }
+
     return {
       ...token,
       metrics: {
@@ -109,12 +130,15 @@ const Signals = () => {
       explorerUrl: `https://testnet.monadexplorer.com/address/${
         token.address || "0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701"
       }`,
+      tradingLabel: tradingLabel,
+      signalScore: (parseFloat(aggregateScore) * 3).toFixed(2), // Multiplied by 3 to make scores more like in the screenshot
     };
   });
 
   // State to store tokens and track blinking ones
   const [tokens, setTokens] = useState(processedTokens);
   const [blinkingTokens, setBlinkingTokens] = useState(new Set());
+  const [filterLabel, setFilterLabel] = useState("ALL");
 
   // Function to update token data and trigger blinking effect
   useEffect(() => {
@@ -141,17 +165,41 @@ const Signals = () => {
       setTokens((prevTokens) => {
         return prevTokens.map((token) => {
           if (updatedTokenIds.has(token.id)) {
+            const newPriceChange = (Math.random() * 20 - 7).toFixed(2); // Bias towards positive
+            const newVolumeScore = (
+              parseFloat(token.metrics.volume) +
+              (Math.random() * 0.2 - 0.1)
+            ).toFixed(2);
+
+            // Recalculate signal score and trading label
+            const newAggregateScore = (
+              parseFloat(token.metrics.liquidity) * 0.3 +
+              parseFloat(newVolumeScore) * 0.3 +
+              Math.abs(parseFloat(newPriceChange)) * 0.4
+            ).toFixed(2);
+
+            // Assign new trading label
+            let newTradingLabel = null;
+            if (parseFloat(newAggregateScore) > 0.75) {
+              newTradingLabel = "DEGEN";
+            } else if (parseFloat(newAggregateScore) > 0.6) {
+              newTradingLabel = "AGGRESSIVE";
+            } else if (parseFloat(newAggregateScore) > 0.45) {
+              newTradingLabel = "MODERATE";
+            } else if (parseFloat(newAggregateScore) > 0.3) {
+              newTradingLabel = "CONSERVATIVE";
+            }
+
             return {
               ...token,
               metrics: {
                 ...token.metrics,
-                priceChange: (Math.random() * 20 - 7).toFixed(2), // Bias towards positive
-                volume: (
-                  parseFloat(token.metrics.volume) +
-                  (Math.random() * 0.2 - 0.1)
-                ).toFixed(2),
+                priceChange: newPriceChange,
+                volume: newVolumeScore,
               },
               isActive: true,
+              tradingLabel: newTradingLabel,
+              signalScore: (parseFloat(newAggregateScore) * 3).toFixed(2), // Multiplied by 3 to make scores more like in the screenshot
             };
           }
           return token;
@@ -170,29 +218,56 @@ const Signals = () => {
     return () => clearInterval(updateInterval);
   }, [tokens]);
 
+  // Filter tokens based on selected label
+  const filteredTokens = tokens.filter(
+    (token) => filterLabel === "ALL" || token.tradingLabel === filterLabel
+  );
+
   // Sort tokens: blink first, then by activity score
-  const sortedTokens = [...tokens].sort((a, b) => {
+  const sortedTokens = [...filteredTokens].sort((a, b) => {
     if (blinkingTokens.has(a.id) && !blinkingTokens.has(b.id)) return -1;
     if (!blinkingTokens.has(a.id) && blinkingTokens.has(b.id)) return 1;
-    return b.activityScore - a.activityScore;
+    return parseFloat(b.signalScore) - parseFloat(a.signalScore);
   });
+
+  // Label color mapping
+  const labelColorMap: Record<TradingLabel, string> = {
+    DEGEN: "bg-purple-600 text-white",
+    AGGRESSIVE: "bg-red-500 text-white",
+    MODERATE: "bg-yellow-500 text-white",
+    CONSERVATIVE: "bg-blue-500 text-white",
+  };
 
   return (
     <div className="w-full min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Token Signals</h1>
-          <div className="text-sm text-gray-500">
-            Showing {tokens.length} tokens • Live updates (5s)
+          <div className="flex items-center">
+            <span className="text-sm text-gray-500 mr-4">
+              Showing {sortedTokens.length} of {tokens.length} tokens • Live
+              updates (5s)
+            </span>
+            <select
+              className="bg-white border border-gray-300 rounded-md px-3 py-1 text-sm"
+              value={filterLabel}
+              onChange={(e) => setFilterLabel(e.target.value)}
+            >
+              <option value="ALL">All Signals</option>
+              <option value="DEGEN">DEGEN</option>
+              <option value="AGGRESSIVE">AGGRESSIVE</option>
+              <option value="MODERATE">MODERATE</option>
+              <option value="CONSERVATIVE">CONSERVATIVE</option>
+            </select>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {sortedTokens.map((token) => (
             <div
               key={token.id}
               className={`
-              aspect-square rounded-lg shadow-md p-3 transition-all duration-300
+              relative rounded-lg shadow-md p-3 transition-all duration-300
               ${
                 blinkingTokens.has(token.id)
                   ? "bg-green-100 animate-pulse border-2 border-green-500"
@@ -208,51 +283,76 @@ const Signals = () => {
             `}
             >
               <div className="flex flex-col h-full">
-                <div className="flex items-center mb-2">
-                  {token.image ? (
-                    <Image
-                      src={token.image}
-                      alt={token.name}
-                      width={32}
-                      height={32}
-                      className="mr-2 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-2">
-                      <span className="font-bold text-xs">{token.symbol}</span>
+                {/* Header Section - Redesigned */}
+                <div className="flex flex-col mb-2">
+                  <div className="flex items-center mb-1">
+                    {token.image ? (
+                      <Image
+                        src={token.image}
+                        alt={token.name}
+                        width={32}
+                        height={32}
+                        className="mr-2 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-2">
+                        <span className="font-bold text-xs">
+                          {token.symbol}
+                        </span>
+                      </div>
+                    )}
+                    <div className="overflow-hidden mr-2">
+                      <p className="font-bold text-sm truncate">{token.name}</p>
+                      <p className="text-xs text-gray-500">{token.symbol}</p>
+                    </div>
+                  </div>
+
+                  {/* Trading Label - Moved to a separate row */}
+                  {token.tradingLabel && (
+                    <div className="flex justify-end">
+                      <div
+                        className={`px-2 py-1 rounded-full text-xs font-bold ${
+                          labelColorMap[token.tradingLabel as TradingLabel]
+                        }`}
+                      >
+                        {token.tradingLabel}
+                      </div>
                     </div>
                   )}
-                  <div className="overflow-hidden">
-                    <p className="font-bold text-sm truncate">{token.name}</p>
-                    <p className="text-xs text-gray-500">{token.symbol}</p>
-                  </div>
                 </div>
 
-                <div className="flex flex-col mt-auto text-xs">
-                  <div className="flex justify-between mt-1">
-                    <span className="text-gray-500">Price</span>
+                {/* Signal score displayed prominently */}
+                <div className="flex justify-between mb-2 bg-gray-100 p-2 rounded">
+                  <span className="text-sm text-gray-700">Signal Score</span>
+                  <span className="text-sm font-bold">{token.signalScore}</span>
+                </div>
+
+                <div className="flex flex-col mt-2 text-sm">
+                  <div className="flex justify-between mb-2">
+                    <span className="text-gray-600">Price</span>
                     <span
                       className={
                         parseFloat(token.metrics.priceChange) > 0
-                          ? "text-green-600"
-                          : "text-red-600"
+                          ? "text-green-600 font-medium"
+                          : "text-red-600 font-medium"
                       }
                     >
+                      {parseFloat(token.metrics.priceChange) > 0 ? "+" : ""}
                       {token.metrics.priceChange}%
                     </span>
                   </div>
 
-                  <div className="flex justify-between mt-1">
-                    <span className="text-gray-500">Volume</span>
+                  <div className="flex justify-between mb-2">
+                    <span className="text-gray-600">Volume</span>
                     <span>{token.metrics.volume}</span>
                   </div>
 
-                  <div className="flex justify-between mt-1">
-                    <span className="text-gray-500">Holders</span>
+                  <div className="flex justify-between mb-2">
+                    <span className="text-gray-600">Holders</span>
                     <span>{token.holders.toLocaleString() || "-"}</span>
                   </div>
 
-                  <div className="mt-2 w-full bg-gray-200 rounded-full h-1">
+                  <div className="w-full bg-gray-200 rounded-full h-1 mb-3">
                     <div
                       className={`h-1 rounded-full ${
                         parseFloat(token.metrics.priceChange) > 0
@@ -273,7 +373,7 @@ const Signals = () => {
                     href={token.explorerUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-2 text-gray-500 hover:text-gray-700 text-center text-xs flex items-center justify-center font-medium"
+                    className="text-gray-500 hover:text-gray-700 text-center text-xs flex items-center justify-center font-medium"
                   >
                     <svg
                       className="w-3 h-3 mr-1"
