@@ -276,13 +276,13 @@ export default function Main({
         );
       case "Signals":
         return (
-          <div className="w-full flex flex-col justify-center items-center p-4 text-gray-800">
+          <div className="w-full flex flex-col justify-center items-center text-gray-800">
             <Signals />
           </div>
         );
       case "Feed":
         return (
-          <div className="w-full flex flex-col justify-center items-center p-4 text-gray-800">
+          <div className="w-full flex flex-col justify-center items-center text-gray-800">
             <FeedNews
               imageUrl="/gorillionaire.jpg"
               vaultName="Gorillionaire Vault Token"
