@@ -1,144 +1,170 @@
-import React, { useState, useEffect } from "react";
+"use client";
+
+import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 
 type TradingLabel = "DEGEN" | "AGGRESSIVE" | "MODERATE" | "CONSERVATIVE";
 
 const Signals = () => {
-  // Token data from the provided list
-  const initialTokens = [
-    {
-      id: 1,
-      name: "Wrapped Monad",
-      symbol: "MON",
-      supply: "93,415,274,755",
-      holders: 103039,
-      age: "17 days ago",
-      address: "0x760A...5701",
-      image:
-        "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/6679b698-a845-412b-504b-23463a3e1900/public",
-      isActive: false,
-    },
-    {
-      id: 2,
-      name: "Tether USD",
-      symbol: "USDT",
-      supply: "27,937",
-      holders: 229794,
-      age: "28 days 6 hrs ago",
-      address: "0x88b8...055D",
-      image:
-        "https://imagedelivery.net/cBNDGgkrsEA-b_ixIp9SkQ/images.png/public",
-      isActive: false,
-    },
-    {
-      id: 3,
-      name: "USD Coin",
-      symbol: "USDC",
-      supply: "87,831",
-      holders: 1042219,
-      age: "28 days 6 hrs ago",
-      address: "0xf817...E5Ea",
-      image: "https://imagedelivery.net/cBNDGgkrsEA-b_ixIp9SkQ/usdc.png/public",
-
-      isActive: false,
-    },
-    {
-      id: 11,
-      name: "Molandak",
-      symbol: "DAK",
-      supply: "296,997",
-      holders: 603708,
-      age: "10 days 20 hrs ago",
-      address: "0x0F0B...c714",
-      image:
-        "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/27759359-9374-4995-341c-b2636a432800/public",
-      isActive: false,
-    },
-    {
-      id: 12,
-      name: "Moyaki",
-      symbol: "YAKI",
-      supply: "288,018",
-      holders: 536061,
-      age: "10 days 20 hrs ago",
-      address: "0xfe14...0C50",
-      image:
-        "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/6679b698-a845-412b-504b-23463a3e1900/public",
-
-      isActive: false,
-    },
-    {
-      id: 13,
-      name: "Chog",
-      symbol: "CHOG",
-      supply: "275,880",
-      holders: 565297,
-      age: "10 days 20 hrs ago",
-      address: "0xE059...4E6B",
-      image:
-        "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/5d1206c2-042c-4edc-9f8b-dcef2e9e8f00/public",
-      isActive: false,
-    },
-  ];
-
-  // Add metrics for tokens
-  const processedTokens = initialTokens.map((token) => {
-    // Calculate activity score based on holders and recency
-    const holdersValue = token.holders || 1;
-    const isNew = token.age.includes("secs") || token.age.includes("min");
-    const isEstablished = holdersValue > 10000;
-
-    // Generate random but semi-realistic metrics
-    const liquidityScore = isEstablished
-      ? Math.random() * 0.5 + 0.5
-      : Math.random() * 0.7 + 0.1;
-    const volumeScore = isEstablished
-      ? Math.random() * 0.4 + 0.6
-      : Math.random() * 0.6 + 0.1;
-    const priceChange = (Math.random() * 20 - 10).toFixed(2); // -10% to +10%
-
-    // Determine trading label based on metrics
-    const aggregateScore = (
-      Number(liquidityScore) * 0.3 +
-      Number(volumeScore) * 0.3 +
-      Math.abs(Number(priceChange)) * 0.4
-    ).toFixed(2);
-
-    // Assign trading label
-    let tradingLabel = null;
-    if (parseFloat(aggregateScore) > 5) {
-      tradingLabel = "DEGEN";
-    } else if (parseFloat(aggregateScore) > 2) {
-      tradingLabel = "AGGRESSIVE";
-    } else if (parseFloat(aggregateScore) > 1) {
-      tradingLabel = "MODERATE";
-    } else if (parseFloat(aggregateScore) > 0.6) {
-      tradingLabel = "CONSERVATIVE";
-    }
-
-    return {
-      ...token,
-      metrics: {
-        liquidity: liquidityScore.toFixed(2),
-        volume: volumeScore.toFixed(2),
-        priceChange: priceChange,
+  // Memoize initialTokens
+  const initialTokens = useMemo(
+    () => [
+      {
+        id: 1,
+        name: "Wrapped Monad",
+        symbol: "MON",
+        supply: "93,415,274,755",
+        holders: 103039,
+        age: "17 days ago",
+        address: "0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701",
+        image:
+          "https://imagedelivery.net/cBNDGgkrsEA-b_ixIp9SkQ/I_t8rg_V_400x400.jpg/public",
+        isActive: false,
       },
-      activityScore: isNew
-        ? 0.9
-        : (Math.min(holdersValue, 1000000) / 1000000) * 0.8 + 0.1,
-      // Add explorer link for each token (would normally come from your data)
-      explorerUrl: `https://testnet.monadexplorer.com/address/${
-        token.address || "0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701"
-      }`,
-      tradingLabel: tradingLabel,
-      signalScore: (parseFloat(aggregateScore) * 3).toFixed(2), // Multiplied by 3 to make scores more like in the screenshot
-    };
-  });
+      {
+        id: 2,
+        name: "Tether USD",
+        symbol: "USDT",
+        supply: "27,937",
+        holders: 229794,
+        age: "28 days 6 hrs ago",
+        address: "0x88b8E2161DEDC77EF4ab7585569D2415a1C1055D",
+        image:
+          "https://imagedelivery.net/cBNDGgkrsEA-b_ixIp9SkQ/images.png/public",
+        isActive: false,
+      },
+      {
+        id: 3,
+        name: "USD Coin",
+        symbol: "USDC",
+        supply: "87,831",
+        holders: 1042219,
+        age: "28 days 6 hrs ago",
+        address: "0xf817257fed379853cDe0fa4F97AB987181B1E5Ea",
+        image:
+          "https://imagedelivery.net/cBNDGgkrsEA-b_ixIp9SkQ/usdc.png/public",
 
-  // State to store tokens and track blinking ones
+        isActive: false,
+      },
+      {
+        id: 11,
+        name: "Molandak",
+        symbol: "DAK",
+        supply: "296,997",
+        holders: 603708,
+        age: "10 days 20 hrs ago",
+        address: "0x0F0B...c714",
+        image:
+          "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/27759359-9374-4995-341c-b2636a432800/public",
+        isActive: false,
+      },
+      {
+        id: 12,
+        name: "Moyaki",
+        symbol: "YAKI",
+        supply: "288,018",
+        holders: 536061,
+        age: "10 days 20 hrs ago",
+        address: "0xfe14...0C50",
+        image:
+          "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/6679b698-a845-412b-504b-23463a3e1900/public",
+
+        isActive: false,
+      },
+      {
+        id: 13,
+        name: "Chog",
+        symbol: "CHOG",
+        supply: "275,880",
+        holders: 565297,
+        age: "10 days 20 hrs ago",
+        address: "0xE059...4E6B",
+        image:
+          "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/5d1206c2-042c-4edc-9f8b-dcef2e9e8f00/public",
+        isActive: false,
+      },
+    ],
+    []
+  ); // Empty dependency array since this data is static
+
+  // Move random calculations into useEffect to only run on client-side
+  const processedTokens = initialTokens.map((token) => ({
+    ...token,
+    metrics: {
+      liquidity: "0.50",
+      volume: "0.50",
+      priceChange: "0.00",
+    },
+    activityScore: 0.1,
+    explorerUrl: `https://testnet.monadexplorer.com/address/${
+      token.address || "0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701"
+    }`,
+    tradingLabel: "MODERATE" as TradingLabel,
+    signalScore: "1.50",
+    isActive: false,
+  }));
+
+  // Initialize tokens state with processed tokens
   const [tokens, setTokens] = useState(processedTokens);
   const [blinkingTokens, setBlinkingTokens] = useState(new Set());
   const [filterLabel, setFilterLabel] = useState("ALL");
+
+  // Process initial metrics on client-side only
+  useEffect(() => {
+    const initialProcessing = initialTokens.map((token) => {
+      // Move all the random calculations here
+      const holdersValue = token.holders || 1;
+      const isNew = token.age.includes("secs") || token.age.includes("min");
+      const isEstablished = holdersValue > 10000;
+
+      const liquidityScore = isEstablished
+        ? Math.random() * 0.5 + 0.5
+        : Math.random() * 0.7 + 0.1;
+      const volumeScore = isEstablished
+        ? Math.random() * 0.4 + 0.6
+        : Math.random() * 0.6 + 0.1;
+      const priceChange = (Math.random() * 20 - 10).toFixed(2);
+
+      // Determine trading label based on metrics
+      const aggregateScore = (
+        Number(liquidityScore) * 0.3 +
+        Number(volumeScore) * 0.3 +
+        Math.abs(Number(priceChange)) * 0.4
+      ).toFixed(2);
+
+      // Assign trading label
+      let tradingLabel: TradingLabel = "MODERATE"; // Default value
+      if (parseFloat(aggregateScore) > 5) {
+        tradingLabel = "DEGEN";
+      } else if (parseFloat(aggregateScore) > 2) {
+        tradingLabel = "AGGRESSIVE";
+      } else if (parseFloat(aggregateScore) > 1) {
+        tradingLabel = "MODERATE";
+      } else if (parseFloat(aggregateScore) > 0.6) {
+        tradingLabel = "CONSERVATIVE";
+      }
+
+      return {
+        ...token,
+        metrics: {
+          liquidity: liquidityScore.toFixed(2),
+          volume: volumeScore.toFixed(2),
+          priceChange: priceChange,
+        },
+        activityScore: isNew
+          ? 0.9
+          : (Math.min(holdersValue, 1000000) / 1000000) * 0.8 + 0.1,
+        explorerUrl: `https://testnet.monadexplorer.com/address/${
+          token.address || "0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701"
+        }`,
+        tradingLabel: tradingLabel,
+        signalScore: (parseFloat(aggregateScore) * 3).toFixed(2), // Multiplied by 3 to make scores more like in the screenshot
+        isActive: false,
+      };
+    });
+
+    setTokens(initialProcessing);
+  }, [initialTokens]);
 
   // Function to update token data and trigger blinking effect
   useEffect(() => {
@@ -179,7 +205,7 @@ const Signals = () => {
             ).toFixed(2);
 
             // Assign new trading label
-            let newTradingLabel = null;
+            let newTradingLabel: TradingLabel = "MODERATE"; // Default value
             if (parseFloat(newAggregateScore) > 0.75) {
               newTradingLabel = "DEGEN";
             } else if (parseFloat(newAggregateScore) > 0.6) {
@@ -262,12 +288,13 @@ const Signals = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div className="flex flex-wrap gap-4 justify-start">
           {sortedTokens.map((token) => (
             <div
               key={token.id}
               className={`
               relative rounded-lg shadow-md p-3 transition-all duration-300
+              w-[280px] // Fixed width for cards
               ${
                 blinkingTokens.has(token.id)
                   ? "bg-green-100 animate-pulse border-2 border-green-500"
