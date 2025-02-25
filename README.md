@@ -4,7 +4,6 @@
 
 ## Features
 
-- **🏦 ERC-4626 Vaults**: Funds stay safe in an allowlisted vault, where the agent can only swap whitelisted tokens—no monkey business.
 - **🧠 Eliza: The Brain**: Eliza thinks, AgentKit acts, Gorillionaire profits.
 - **🔒 Custom Vault Permissions**: The agent only swaps tokens—no unauthorized bets, no funny business.
 - **Profit Maximization**: Designed to analyze price movements and social sentiment to capitalize on meme coin trends, increasing the likelihood of profitable trades.
