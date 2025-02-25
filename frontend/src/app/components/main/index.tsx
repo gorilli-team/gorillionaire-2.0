@@ -39,6 +39,7 @@ import { erc20abi } from "../../../../public/abi/erc20abi";
 import Tokens from "../tokens";
 import Image from "next/image";
 import Signals from "../signals";
+import Agents from "../agents";
 
 interface FeedSignal {
   signal: string;
@@ -278,6 +279,13 @@ export default function Main({
         return (
           <div className="w-full flex flex-col justify-center items-center text-gray-800">
             <Signals />
+          </div>
+        );
+
+      case "Agents":
+        return (
+          <div className="w-full flex flex-col justify-center items-center text-gray-800">
+            <Agents />
           </div>
         );
       case "Feed":
