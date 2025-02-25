@@ -10,8 +10,13 @@ import FeedSignalComponent from "../feed_components/feedSignalComponent";
 import TweetComponent from "../feed_components/tweetComponent";
 import PriceComponent from "../feed_components/priceComponent";
 import styles from "./index.module.css";
-import { fetchFeedData, fetchPricesData, fetchTweetsData, fetchTokenData } from "@/app/api/fetchFeedData";
-import { ethers } from 'ethers';
+import {
+  fetchFeedData,
+  fetchPricesData,
+  fetchTweetsData,
+  fetchTokenData,
+} from "@/app/api/fetchFeedData";
+import { ethers } from "ethers";
 import {
   useAccount,
   useReadContract,
@@ -32,6 +37,8 @@ import { WalletDefault } from "@coinbase/onchainkit/wallet";
 import { vaultAbi } from "../../../../public/abi/vaultabi";
 import { erc20abi } from "../../../../public/abi/erc20abi";
 import Tokens from "../tokens";
+import Image from "next/image";
+import Signals from "../signals";
 
 interface FeedSignal {
   signal: string;
@@ -64,7 +71,8 @@ interface PriceData {
   timestamp: string;
 }
 
-const VAULT_ADDRESS = "0xC6827ce6d60A13a20A86dCac8c9e6D0F84497345" as `0x${string}`;
+const VAULT_ADDRESS =
+  "0xC6827ce6d60A13a20A86dCac8c9e6D0F84497345" as `0x${string}`;
 const USDC_ADDRESS = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 
 interface MainProps {
@@ -78,7 +86,7 @@ export default function Main({
   selectedPage,
   selectedVault,
   setSelectedVault,
-  setSelectedPage
+  setSelectedPage,
 }: MainProps) {
   const { address } = useAccount();
   const { data: hash, writeContract } = useWriteContract();
@@ -129,7 +137,9 @@ export default function Main({
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
   const [allowance, setAllowance] = useState(BigInt(0));
   const [maxWithdrawAmount, setMaxWithdrawAmount] = useState<bigint>(BigInt(0));
-  const [selectedVaultForDeposit, setSelectedVaultForDeposit] = useState<string | null>(null);
+  const [selectedVaultForDeposit, setSelectedVaultForDeposit] = useState<
+    string | null
+  >(null);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -148,7 +158,9 @@ export default function Main({
       if (tweetsData && tweetsData.data.length > 0) {
         const parsedTweets = tweetsData.data
           .slice(0, 10)
-          .map((item: { value: string }) => JSON.parse(item.value).value as Tweet);
+          .map(
+            (item: { value: string }) => JSON.parse(item.value).value as Tweet
+          );
         setTweets(parsedTweets);
       }
 
@@ -168,17 +180,17 @@ export default function Main({
   }, [allowanceData]);
 
   useEffect(() => {
-    if (maxWithdraw && typeof maxWithdraw === 'bigint') {
+    if (maxWithdraw && typeof maxWithdraw === "bigint") {
       setMaxWithdrawAmount(maxWithdraw);
     }
   }, [maxWithdraw]);
 
   const handleDeposit = (amount: number) => {
     console.log(`Depositing ${amount} USDC`);
-    
+
     const amountStr = amount.toString();
-    const [integerPart, decimalPart = ''] = amountStr.split('.');
-    const paddedDecimal = decimalPart.padEnd(6, '0').slice(0, 6);
+    const [integerPart, decimalPart = ""] = amountStr.split(".");
+    const paddedDecimal = decimalPart.padEnd(6, "0").slice(0, 6);
     const amountParsed = BigInt(integerPart + paddedDecimal);
 
     if (!address) {
@@ -208,7 +220,7 @@ export default function Main({
 
   const handleWithdraw = async (amount: number) => {
     console.log(`Withdrawing ${amount} USDC`);
-    
+
     if (!address) {
       console.log("no wallet connected");
       return;
@@ -216,7 +228,7 @@ export default function Main({
 
     try {
       const amountInUSDC = ethers.parseUnits(amount.toString(), 6);
-      
+
       writeContract({
         address: VAULT_ADDRESS,
         abi: vaultAbi,
@@ -254,60 +266,77 @@ export default function Main({
         />
       );
     }
-  
+
     switch (selectedPage) {
+      case "Tokens":
+        return (
+          <div className="w-full flex flex-col justify-center items-center text-gray-800">
+            <Tokens />
+          </div>
+        );
+      case "Signals":
+        return (
+          <div className="w-full flex flex-col justify-center items-center p-4 text-gray-800">
+            <Signals />
+          </div>
+        );
       case "Feed":
         return (
           <div className="w-full flex flex-col justify-center items-center p-4 text-gray-800">
-            <Tokens/>
-            {/* <FeedNews 
+            <FeedNews
               imageUrl="/gorillionaire.jpg"
               vaultName="Gorillionaire Vault Token"
               onDepositClick={handleDepositClick}
               onCardClick={setSelectedVault}
               onWithdrawClick={handleWithdrawClick}
               setSelectedPage={setSelectedPage}
-            /> */}
-              
-              {/* {feedSignal && (
-                <FeedSignalComponent signal={feedSignal} />
-              )}
-              
-              <div className="space-y-2">
-                {tweets.map((tweet, index) => (
-                  <TweetComponent key={index} tweet={tweet} />
-                ))}
-              </div> */}
-              
-              {/* {priceData && (
-                <PriceComponent price={priceData} />
-              )} */}
+            />
+
+            {feedSignal && <FeedSignalComponent signal={feedSignal} />}
+
+            <div className="space-y-2">
+              {tweets.map((tweet, index) => (
+                <TweetComponent key={index} tweet={tweet} />
+              ))}
             </div>
+
+            {priceData && <PriceComponent price={priceData} />}
+          </div>
         );
 
       case "My Account":
         return (
           <div className="p-6 pt-4 text-gray-800">
-            <div className="text-xl font-bold text-gray-800 mb-4">Welcome back!</div>
+            <div className="text-xl font-bold text-gray-800 mb-4">
+              Welcome back!
+            </div>
             <div className="flex items-center bg-white shadow-md rounded-2xl p-4 mb-6">
-              <img
+              <Image
                 src="/user.jpg"
                 alt="User Profile"
-                className="h-12 w-12 rounded-full mr-4"
+                width={48}
+                height={48}
+                className="rounded-full mr-4"
               />
               <div>
-                <h2 className="text-lg font-semibold text-gray-800">Your Wallet</h2>
+                <h2 className="text-lg font-semibold text-gray-800">
+                  Your Wallet
+                </h2>
                 <p className="text-gray-600">{account.address}</p>
               </div>
             </div>
 
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Your Investments</h2>
+            <h2 className="text-xl font-bold text-gray-800 mb-4">
+              Your Investments
+            </h2>
             <div className="w-[34%] gap-2">
-              <Card 
+              <Card
                 title="Gorillionaire Vault Token"
                 chainName="Base"
                 chainImage="/base.jpg"
-                onDeposit={() => handleDepositClick("Gorillionaire Vault Token")}
+                onDeposit={() =>
+                  handleDepositClick("Gorillionaire Vault Token")
+                }
                 onCardClick={() => handleCardClick("Gorillionaire Vault Token")}
                 onWithdraw={handleWithdrawClick}
               />
@@ -323,16 +352,16 @@ export default function Main({
           />
         );
       case "TestTrading":
-        return (
-          <TradingTest />
-        );    
+        return <TradingTest />;
       default:
         return <div className="p-4 text-gray-800">Select a page</div>;
     }
   };
 
   return (
-    <main className={`flex-1 overflow-y-auto bg-gray-200 ${styles.mainContent}`}>
+    <main
+      className={`flex-1 overflow-y-auto bg-gray-200 ${styles.mainContent}`}
+    >
       {renderContent()}
 
       <ModalDeposit

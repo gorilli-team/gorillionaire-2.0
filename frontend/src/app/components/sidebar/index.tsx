@@ -1,5 +1,6 @@
 import React from "react";
 import { useAccount } from "wagmi";
+import Image from "next/image";
 
 interface SidebarProps {
   selectedPage: string;
@@ -29,7 +30,13 @@ export default function Sidebar({
         className="h-16 text-xl font-bold flex items-center ps-4 cursor-pointer"
         onClick={handleGorillionaireClick}
       >
-        <img className="w-12 h-12 rounded-full" src="/gorillionaire.jpg" alt="logo-gorillionaire" />
+        <Image
+          src="/gorillionaire.jpg"
+          alt="logo-gorillionaire"
+          width={48}
+          height={48}
+          className="rounded-full"
+        />
         <span className="ps-2">Gorillionaire</span>
       </div>
       <nav className="flex-1 p-4">
@@ -37,12 +44,23 @@ export default function Sidebar({
           <li>
             <button
               className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
-                selectedPage === "Feed" ? "bg-gray-200" : ""
+                selectedPage === "Tokens" ? "bg-gray-200" : ""
               }`}
-              onClick={() => handlePageChange("Feed")}
+              onClick={() => handlePageChange("Tokens")}
             >
               <i className="fa-regular fa-newspaper pr-2"></i>
-              <span>Feed</span>
+              <span>Tokens</span>
+            </button>
+          </li>
+          <li>
+            <button
+              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
+                selectedPage === "Signals" ? "bg-gray-200" : ""
+              }`}
+              onClick={() => handlePageChange("Signals")}
+            >
+              <i className="fa-solid fa-signal pr-2"></i>
+              <span>Signals</span>
             </button>
           </li>
           <li>
@@ -56,7 +74,7 @@ export default function Sidebar({
               <span>Vault</span>
             </button>
           </li>
-          
+
           {address && (
             <>
               <li>
