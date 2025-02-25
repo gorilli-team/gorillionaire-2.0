@@ -23,14 +23,14 @@ const Agents = () => {
               <p className="font-medium">
                 🤖 High-Frequency Arbitrage on Monad
               </p>
-              <p className="font-medium">🦍 Cross-Chain Alpha Opportunities</p>
+              <p className="font-medium">🦍 Alpha Opportunities</p>
             </div>
             <div className="mt-8 p-4 bg-purple-200 rounded-lg">
               <p className="text-purple-800 font-semibold">
-                "Where Traditional MEV Bots Meet Gorilla Trading Power"
+                Where Traditional MEV Bots Meet Gorilla Trading Power
               </p>
               <p className="text-purple-600 mt-2">
-                Powered by Monad's 10,000 TPS Infrastructure
+                Powered by Monad 10,000 TPS Infrastructure
               </p>
             </div>
           </div>
