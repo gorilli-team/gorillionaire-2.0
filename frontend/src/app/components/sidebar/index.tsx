@@ -44,23 +44,23 @@ export default function Sidebar({
           <li>
             <button
               className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
-                selectedPage === "Tokens" ? "bg-gray-200" : ""
-              }`}
-              onClick={() => handlePageChange("Tokens")}
-            >
-              <i className="fa-regular fa-newspaper pr-2"></i>
-              <span>Tokens</span>
-            </button>
-          </li>
-          <li>
-            <button
-              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
                 selectedPage === "Signals" ? "bg-gray-200" : ""
               }`}
               onClick={() => handlePageChange("Signals")}
             >
               <i className="fa-solid fa-signal pr-2"></i>
               <span>Signals</span>
+            </button>
+          </li>
+          <li>
+            <button
+              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
+                selectedPage === "Tokens" ? "bg-gray-200" : ""
+              }`}
+              onClick={() => handlePageChange("Tokens")}
+            >
+              <i className="fa-regular fa-newspaper pr-2"></i>
+              <span>Tokens</span>
             </button>
           </li>
           <li>

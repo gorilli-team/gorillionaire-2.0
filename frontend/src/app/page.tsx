@@ -6,7 +6,7 @@ import Header from "./components/header/index";
 import Main from "./components/main/index";
 
 export default function AppLayout() {
-  const [selectedPage, setSelectedPage] = useState("Tokens");
+  const [selectedPage, setSelectedPage] = useState("Signals");
   const [selectedVault, setSelectedVault] = useState<string | null>(null);
 
   return (
