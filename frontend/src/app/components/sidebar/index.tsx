@@ -1,27 +1,27 @@
 import React from "react";
 import { useAccount } from "wagmi";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface SidebarProps {
   selectedPage: string;
   setSelectedPage: React.Dispatch<React.SetStateAction<string>>;
-  setSelectedVault: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 export default function Sidebar({
   selectedPage,
   setSelectedPage,
-  setSelectedVault,
 }: SidebarProps) {
   const { address } = useAccount();
+  const router = useRouter();
 
   const handleGorillionaireClick = () => {
-    window.location.reload();
+    router.push("/");
   };
 
   const handlePageChange = (page: string) => {
     setSelectedPage(page);
-    setSelectedVault(null);
+    router.push(`/${page.toLowerCase()}`);
   };
 
   return (
@@ -72,17 +72,6 @@ export default function Sidebar({
             >
               <i className="fa-solid fa-robot pr-2"></i>
               <span>Agents</span>
-            </button>
-          </li>
-          <li>
-            <button
-              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
-                selectedPage === "Vault" ? "bg-gray-200" : ""
-              }`}
-              onClick={() => handlePageChange("Vault")}
-            >
-              <i className="fa-solid fa-shield pr-2"></i>
-              <span>Vault</span>
             </button>
           </li>
 

@@ -458,7 +458,7 @@ const Signals = () => {
                 🎯 Social Signals: The Pulse of Crypto 🎯
               </h2>
               <p className="text-pink-700">
-                Soon you'll be able to track social sentiment, trending
+                Soon you will be able to track social sentiment, trending
                 discussions, and community engagement metrics across Twitter,
                 Discord, and Telegram. Stay ahead of the crowd by catching viral
                 trends before they explode.

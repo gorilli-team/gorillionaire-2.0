@@ -11,11 +11,7 @@ export default function AppLayout() {
 
   return (
     <div className="flex h-screen bg-gray-100 text-gray-800">
-      <Sidebar
-        selectedPage={selectedPage}
-        setSelectedPage={setSelectedPage}
-        setSelectedVault={setSelectedVault}
-      />
+      <Sidebar selectedPage={selectedPage} setSelectedPage={setSelectedPage} />
       <div className="flex-1 flex flex-col">
         <Header />
         <Main
