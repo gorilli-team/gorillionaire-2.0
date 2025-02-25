@@ -288,13 +288,12 @@ const Signals = () => {
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-4 justify-start">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4">
           {sortedTokens.map((token) => (
             <div
               key={token.id}
               className={`
               relative rounded-lg shadow-md p-3 transition-all duration-300
-              w-[280px] // Fixed width for cards
               ${
                 blinkingTokens.has(token.id)
                   ? "bg-green-100 animate-pulse border-2 border-green-500"
