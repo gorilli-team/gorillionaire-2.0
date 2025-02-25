@@ -7,7 +7,9 @@ import { trackedTokens } from "@/app/shared/tokenData";
 type TradingLabel = "DEGEN" | "AGGRESSIVE" | "MODERATE" | "CONSERVATIVE";
 
 const Signals = () => {
-  const [activeTab, setActiveTab] = useState<"tokens" | "pools">("tokens");
+  const [activeTab, setActiveTab] = useState<
+    "tokens" | "pools" | "whales" | "social"
+  >("tokens");
 
   // Remove the useMemo initialTokens definition and use the imported one directly
   const processedTokens = trackedTokens.map((token) => ({
@@ -222,6 +224,32 @@ const Signals = () => {
               >
                 Pool Signals
               </button>
+              <button
+                onClick={() => setActiveTab("whales")}
+                className={`
+                  py-4 px-1 border-b-2 font-medium text-sm
+                  ${
+                    activeTab === "whales"
+                      ? "border-blue-500 text-blue-600"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  }
+                `}
+              >
+                Whale Signals
+              </button>
+              <button
+                onClick={() => setActiveTab("social")}
+                className={`
+                  py-4 px-1 border-b-2 font-medium text-sm
+                  ${
+                    activeTab === "social"
+                      ? "border-blue-500 text-blue-600"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  }
+                `}
+              >
+                Social Signals
+              </button>
             </nav>
           </div>
         </div>
@@ -394,7 +422,7 @@ const Signals = () => {
               ))}
             </div>
           </>
-        ) : (
+        ) : activeTab === "pools" ? (
           // Pools Tab Content
           <div className="flex flex-col items-center justify-center py-20">
             <div className="bg-purple-100 rounded-lg p-8 max-w-2xl text-center">
@@ -408,7 +436,56 @@ const Signals = () => {
               </p>
             </div>
           </div>
-        )}
+        ) : activeTab === "whales" ? (
+          // Whales Tab Content
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="bg-blue-100 rounded-lg p-8 max-w-2xl text-center">
+              <h2 className="text-2xl font-bold text-blue-800 mb-4">
+                🐋 Whale Watching Coming Soon 🐋
+              </h2>
+              <p className="text-blue-700">
+                Track the biggest players in the game. Get notified when whales
+                make moves and stay ahead of market-moving transactions. Coming
+                to your favorite DEX analytics platform soon.
+              </p>
+            </div>
+          </div>
+        ) : activeTab === "social" ? (
+          // Social Signals Tab Content
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="bg-pink-100 rounded-lg p-8 max-w-2xl text-center">
+              <h2 className="text-2xl font-bold text-pink-800 mb-4">
+                🎯 Social Signals: The Pulse of Crypto 🎯
+              </h2>
+              <p className="text-pink-700">
+                Soon you'll be able to track social sentiment, trending
+                discussions, and community engagement metrics across Twitter,
+                Discord, and Telegram. Stay ahead of the crowd by catching viral
+                trends before they explode.
+              </p>
+              <div className="flex justify-center space-x-4 mt-6">
+                <div className="bg-pink-200 rounded-lg p-3">
+                  <span className="block text-pink-800 font-semibold">
+                    Twitter
+                  </span>
+                  <span className="text-pink-600 text-sm">Trending Topics</span>
+                </div>
+                <div className="bg-pink-200 rounded-lg p-3">
+                  <span className="block text-pink-800 font-semibold">
+                    Discord
+                  </span>
+                  <span className="text-pink-600 text-sm">Community Pulse</span>
+                </div>
+                <div className="bg-pink-200 rounded-lg p-3">
+                  <span className="block text-pink-800 font-semibold">
+                    Telegram
+                  </span>
+                  <span className="text-pink-600 text-sm">Group Activity</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : null}
       </div>
     </div>
   );
