@@ -1,94 +1,14 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import { trackedTokens } from "@/app/shared/tokenData";
 
 type TradingLabel = "DEGEN" | "AGGRESSIVE" | "MODERATE" | "CONSERVATIVE";
 
 const Signals = () => {
-  // Memoize initialTokens
-  const initialTokens = useMemo(
-    () => [
-      {
-        id: 1,
-        name: "Wrapped Monad",
-        symbol: "MON",
-        supply: "93,415,274,755",
-        holders: 103039,
-        age: "17 days ago",
-        address: "0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701",
-        image:
-          "https://imagedelivery.net/cBNDGgkrsEA-b_ixIp9SkQ/I_t8rg_V_400x400.jpg/public",
-        isActive: false,
-      },
-      {
-        id: 2,
-        name: "Tether USD",
-        symbol: "USDT",
-        supply: "27,937",
-        holders: 229794,
-        age: "28 days 6 hrs ago",
-        address: "0x88b8E2161DEDC77EF4ab7585569D2415a1C1055D",
-        image:
-          "https://imagedelivery.net/cBNDGgkrsEA-b_ixIp9SkQ/images.png/public",
-        isActive: false,
-      },
-      {
-        id: 3,
-        name: "USD Coin",
-        symbol: "USDC",
-        supply: "87,831",
-        holders: 1042219,
-        age: "28 days 6 hrs ago",
-        address: "0xf817257fed379853cDe0fa4F97AB987181B1E5Ea",
-        image:
-          "https://imagedelivery.net/cBNDGgkrsEA-b_ixIp9SkQ/usdc.png/public",
-
-        isActive: false,
-      },
-      {
-        id: 11,
-        name: "Molandak",
-        symbol: "DAK",
-        supply: "296,997",
-        holders: 603708,
-        age: "10 days 20 hrs ago",
-        address: "0x0F0B...c714",
-        image:
-          "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/27759359-9374-4995-341c-b2636a432800/public",
-        isActive: false,
-      },
-      {
-        id: 12,
-        name: "Moyaki",
-        symbol: "YAKI",
-        supply: "288,018",
-        holders: 536061,
-        age: "10 days 20 hrs ago",
-        address: "0xfe14...0C50",
-        image:
-          "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/6679b698-a845-412b-504b-23463a3e1900/public",
-
-        isActive: false,
-      },
-      {
-        id: 13,
-        name: "Chog",
-        symbol: "CHOG",
-        supply: "275,880",
-        holders: 565297,
-        age: "10 days 20 hrs ago",
-        address: "0xE059...4E6B",
-        image:
-          "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/5d1206c2-042c-4edc-9f8b-dcef2e9e8f00/public",
-        isActive: false,
-      },
-    ],
-    []
-  ); // Empty dependency array since this data is static
-
-  // Move random calculations into useEffect to only run on client-side
-  const processedTokens = initialTokens.map((token) => ({
+  // Remove the useMemo initialTokens definition and use the imported one directly
+  const processedTokens = trackedTokens.map((token) => ({
     ...token,
     metrics: {
       liquidity: "0.50",
@@ -111,7 +31,7 @@ const Signals = () => {
 
   // Process initial metrics on client-side only
   useEffect(() => {
-    const initialProcessing = initialTokens.map((token) => {
+    const initialProcessing = trackedTokens.map((token) => {
       // Move all the random calculations here
       const holdersValue = token.holders || 1;
       const isNew = token.age.includes("secs") || token.age.includes("min");
@@ -164,7 +84,7 @@ const Signals = () => {
     });
 
     setTokens(initialProcessing);
-  }, [initialTokens]);
+  }, []);
 
   // Function to update token data and trigger blinking effect
   useEffect(() => {
@@ -268,7 +188,7 @@ const Signals = () => {
     <div className="w-full min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Token Signals</h1>
+          <h1 className="text-2xl font-bold">Signals</h1>
           <div className="flex items-center">
             <span className="text-sm text-gray-500 mr-4">
               Showing {sortedTokens.length} of {tokens.length} tokens • Live
@@ -288,7 +208,7 @@ const Signals = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-4">
           {sortedTokens.map((token) => (
             <div
               key={token.id}

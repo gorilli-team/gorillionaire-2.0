@@ -1,21 +1,60 @@
 import React from "react";
 import Token from "../token/index";
+import { trackedTokens } from "@/app/shared/tokenData";
+
+interface TokenData {
+  name: string;
+  symbol: string;
+  price: string;
+  volume: string;
+  image: string;
+}
+
+const untrackedTokens: TokenData[] = [
+  {
+    name: "Zentak",
+    symbol: "ZTK",
+    price: "$0.50",
+    volume: "$100K",
+    image: "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/12345/public",
+  },
+  {
+    name: "Vortex",
+    symbol: "VTX",
+    price: "$1.80",
+    volume: "$400K",
+    image: "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/67890/public",
+  },
+];
 
 const Tokens = () => {
-
   return (
-    <div className="w-full min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
+    <div className="w-full min-h-screen bg-gray-50 p-8">
+      <div className="container mx-auto">
+        <h2 className="text-xl font-bold mb-4">Tracked Tokens</h2>
         <div className="grid grid-cols-3 gap-8">
-          <div className="col-span-1">
-            <Token name="Moyaki" symbol="YAKI" image="https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/6679b698-a845-412b-504b-23463a3e1900/public"/>
-          </div>
-          <div className="col-span-1">
-            <Token name="Molandak" symbol="DAK" image="https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/27759359-9374-4995-341c-b2636a432800/public" />
-          </div>
-          <div className="col-span-1">
-            <Token name="Chog" symbol="CHOG" image="https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/5d1206c2-042c-4edc-9f8b-dcef2e9e8f00/public"/>
-          </div>
+          {trackedTokens.map((token: TokenData, index: number) => (
+            <div key={index} className="bg-white shadow-md rounded-lg">
+              <Token
+                name={token.name}
+                symbol={token.symbol}
+                image={token.image}
+              />
+            </div>
+          ))}
+        </div>
+
+        <h2 className="text-xl font-bold mt-8 mb-4">Untracked Tokens</h2>
+        <div className="grid grid-cols-3 gap-8">
+          {untrackedTokens.map((token: TokenData, index: number) => (
+            <div key={index} className="bg-white shadow-md rounded-lg">
+              <Token
+                name={token.name}
+                symbol={token.symbol}
+                image={token.image}
+              />
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -23,4 +62,3 @@ const Tokens = () => {
 };
 
 export default Tokens;
-  
