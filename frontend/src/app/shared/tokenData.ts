@@ -10,6 +10,9 @@ export interface TokenData {
   address: string;
   isActive: boolean;
   supply: string;
+  trackedSince: string;
+  trackingTime: string;
+  signalsGenerated: number;
 }
 
 export const trackedTokens: TokenData[] = [
@@ -26,6 +29,9 @@ export const trackedTokens: TokenData[] = [
     isActive: false,
     price: "$0.50",
     volume: "$1.2M",
+    trackedSince: "Feb 20, 2025",
+    trackingTime: "5 days",
+    signalsGenerated: 127,
   },
   {
     id: 2,
@@ -39,6 +45,9 @@ export const trackedTokens: TokenData[] = [
     isActive: false,
     price: "$0.50",
     volume: "$1.2M",
+    trackedSince: "Feb 25, 2025",
+    trackingTime: "2 days",
+    signalsGenerated: 84,
   },
   {
     id: 3,
@@ -49,10 +58,12 @@ export const trackedTokens: TokenData[] = [
     age: "28 days 6 hrs ago",
     address: "0xf817257fed379853cDe0fa4F97AB987181B1E5Ea",
     image: "https://imagedelivery.net/cBNDGgkrsEA-b_ixIp9SkQ/usdc.png/public",
-
     isActive: false,
     price: "$0.50",
     volume: "$1.2M",
+    trackedSince: "Mar 1, 2025",
+    trackingTime: "1 day",
+    signalsGenerated: 56,
   },
   {
     id: 11,
@@ -67,6 +78,9 @@ export const trackedTokens: TokenData[] = [
     isActive: false,
     price: "$0.50",
     volume: "$1.2M",
+    trackedSince: "Feb 22, 2025",
+    trackingTime: "4 days",
+    signalsGenerated: 112,
   },
   {
     id: 12,
@@ -78,10 +92,12 @@ export const trackedTokens: TokenData[] = [
     address: "0xfe14...0C50",
     image:
       "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/6679b698-a845-412b-504b-23463a3e1900/public",
-
     isActive: false,
     price: "$0.50",
     volume: "$1.2M",
+    trackedSince: "Feb 24, 2025",
+    trackingTime: "3 days",
+    signalsGenerated: 95,
   },
   {
     id: 13,
@@ -96,5 +112,8 @@ export const trackedTokens: TokenData[] = [
     isActive: false,
     price: "$0.50",
     volume: "$1.2M",
+    trackedSince: "Feb 26, 2025",
+    trackingTime: "2 days",
+    signalsGenerated: 72,
   },
 ];

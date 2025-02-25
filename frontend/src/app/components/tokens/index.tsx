@@ -8,6 +8,9 @@ interface TokenData {
   price: string;
   volume: string;
   image: string;
+  trackedSince?: string;
+  trackingTime?: string;
+  signalsGenerated?: number;
 }
 
 const untrackedTokens: TokenData[] = [
@@ -39,6 +42,9 @@ const Tokens = () => {
                 name={token.name}
                 symbol={token.symbol}
                 image={token.image}
+                trackedSince={token.trackedSince}
+                trackingTime={token.trackingTime}
+                signalsGenerated={token.signalsGenerated}
               />
             </div>
           ))}
