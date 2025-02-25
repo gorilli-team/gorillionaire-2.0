@@ -78,7 +78,7 @@ const Signals = () => {
           token.address || "0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701"
         }`,
         tradingLabel: tradingLabel,
-        signalScore: (parseFloat(aggregateScore) * 3).toFixed(2), // Multiplied by 3 to make scores more like in the screenshot
+        signalScore: parseFloat(aggregateScore).toFixed(2), // Multiplied by 3 to make scores more like in the screenshot
         isActive: false,
       };
     });
@@ -111,28 +111,31 @@ const Signals = () => {
       setTokens((prevTokens) => {
         return prevTokens.map((token) => {
           if (updatedTokenIds.has(token.id)) {
-            const newPriceChange = (Math.random() * 20 - 7).toFixed(2); // Bias towards positive
+            const newPriceChange = (Math.random() * 20 - 7).toFixed(2);
             const newVolumeScore = (
               parseFloat(token.metrics.volume) +
               (Math.random() * 0.2 - 0.1)
             ).toFixed(2);
 
-            // Recalculate signal score and trading label
-            const newAggregateScore = (
-              parseFloat(token.metrics.liquidity) * 0.3 +
-              parseFloat(newVolumeScore) * 0.3 +
-              Math.abs(parseFloat(newPriceChange)) * 0.4
-            ).toFixed(2);
+            // Generate aggregate score based on probability
+            let newAggregateScore: number;
+            if (Math.random() < 0.8) {
+              // 80% chance: score between 0 and 3
+              newAggregateScore = Math.random() * 3;
+            } else {
+              // 20% chance: score between 3 and 15
+              newAggregateScore = Math.random() * 12 + 3;
+            }
 
-            // Assign new trading label
-            let newTradingLabel: TradingLabel = "MODERATE"; // Default value
-            if (parseFloat(newAggregateScore) > 0.75) {
+            // Assign new trading label based on the new ranges
+            let newTradingLabel: TradingLabel = "MODERATE";
+            if (newAggregateScore > 5) {
               newTradingLabel = "DEGEN";
-            } else if (parseFloat(newAggregateScore) > 0.6) {
+            } else if (newAggregateScore > 3) {
               newTradingLabel = "AGGRESSIVE";
-            } else if (parseFloat(newAggregateScore) > 0.45) {
+            } else if (newAggregateScore > 1.5) {
               newTradingLabel = "MODERATE";
-            } else if (parseFloat(newAggregateScore) > 0.3) {
+            } else {
               newTradingLabel = "CONSERVATIVE";
             }
 
@@ -145,7 +148,7 @@ const Signals = () => {
               },
               isActive: true,
               tradingLabel: newTradingLabel,
-              signalScore: (parseFloat(newAggregateScore) * 3).toFixed(2), // Multiplied by 3 to make scores more like in the screenshot
+              signalScore: newAggregateScore.toFixed(2),
             };
           }
           return token;
