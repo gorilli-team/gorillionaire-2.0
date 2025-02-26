@@ -209,7 +209,7 @@ const Signals = () => {
                   }
                 `}
               >
-                Single Token Signals
+                <div className="text-lg font-bold">Single Token Signals</div>
               </button>
               <button
                 onClick={() => setActiveTab("pools")}
@@ -222,7 +222,7 @@ const Signals = () => {
                   }
                 `}
               >
-                Pool Signals
+                <div className="text-lg font-bold">Pool Signals</div>
               </button>
               <button
                 onClick={() => setActiveTab("whales")}
@@ -235,7 +235,7 @@ const Signals = () => {
                   }
                 `}
               >
-                Whale Signals
+                <div className="text-lg font-bold">Whale Signals</div>
               </button>
               <button
                 onClick={() => setActiveTab("social")}
@@ -248,7 +248,7 @@ const Signals = () => {
                   }
                 `}
               >
-                Social Signals
+                <div className="text-lg font-bold">Social Signals</div>
               </button>
             </nav>
           </div>
