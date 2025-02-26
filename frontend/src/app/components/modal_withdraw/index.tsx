@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { ethers } from 'ethers';
+import { ethers } from "ethers";
+import Image from "next/image";
 
 interface ModalWithdrawProps {
   isOpen: boolean;
@@ -25,7 +26,7 @@ export const ModalWithdraw: React.FC<ModalWithdrawProps> = ({
   }, [maxAmount]);
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/[^0-9.]/g, '');
+    const value = e.target.value.replace(/[^0-9.]/g, "");
     if ((value.match(/\./g) || []).length <= 1) {
       setWithdrawAmount(value);
     }
@@ -42,7 +43,11 @@ export const ModalWithdraw: React.FC<ModalWithdrawProps> = ({
   };
 
   const isValidAmount = () => {
-    if (!withdrawAmount || isNaN(Number(withdrawAmount)) || Number(withdrawAmount) <= 0) {
+    if (
+      !withdrawAmount ||
+      isNaN(Number(withdrawAmount)) ||
+      Number(withdrawAmount) <= 0
+    ) {
       return false;
     }
 
@@ -71,9 +76,11 @@ export const ModalWithdraw: React.FC<ModalWithdrawProps> = ({
 
             <div className="flex items-center mb-4">
               <span className="mr-2 text-sm">Token:</span>
-              <img
+              <Image
                 src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png?v=040"
                 alt="USDC"
+                width={24}
+                height={24}
                 className="h-6 w-6"
               />
               <span className="ml-2">USDC</span>
@@ -99,9 +106,9 @@ export const ModalWithdraw: React.FC<ModalWithdrawProps> = ({
               onClick={handleWithdrawSubmit}
               disabled={!isValidAmount()}
               className={`px-4 py-2 w-full rounded-lg ${
-                isValidAmount() 
-                  ? 'bg-blue-500 text-white hover:bg-blue-600' 
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                isValidAmount()
+                  ? "bg-blue-500 text-white hover:bg-blue-600"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
               }`}
             >
               Withdraw

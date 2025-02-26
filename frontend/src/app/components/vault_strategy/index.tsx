@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
 import { fetchVaultTokens } from "../../api/fetchVaultData";
+import Image from "next/image";
 
 interface TokenData {
   token: {
@@ -24,25 +25,25 @@ interface Token {
   logo: string;
 }
 
+const colors = ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0"];
+
 const VaultStrategy: React.FC = () => {
   const [tokens, setTokens] = useState<Token[]>([]);
   const total = tokens.reduce((sum, token) => sum + token.value, 0);
-
-  const colors = ["#00C49F", "#FF6384", "#8A2BE2", "#FFA500", "#4169E1"];
 
   useEffect(() => {
     const getTokenData = async () => {
       try {
         const data: VaultData = await fetchVaultTokens();
-        const filteredTokens = data.items.filter(item => 
-          ['USDC', 'BRETT'].includes(item.token.symbol)
+        const filteredTokens = data.items.filter((item) =>
+          ["USDC", "BRETT"].includes(item.token.symbol)
         );
-  
+
         const formattedTokens = filteredTokens.map((item, index) => {
           // Convert value based on token decimals
           const decimals = parseInt(item.token.decimals);
           const tokenValue = parseFloat(item.value) / Math.pow(10, decimals);
-          
+
           // Calculate value using exchange rate
           const value = tokenValue * parseFloat(item.token.exchange_rate);
 
@@ -50,16 +51,16 @@ const VaultStrategy: React.FC = () => {
             name: `${item.token.name} (${item.token.symbol})`,
             value: value,
             color: colors[index % colors.length],
-            logo: item.token.icon_url || "/placeholder-coin.png"
+            logo: item.token.icon_url || "/placeholder-coin.png",
           };
         });
-        
+
         setTokens(formattedTokens);
       } catch (error) {
         console.error("Error fetching token data:", error);
       }
     };
-  
+
     getTokenData();
   }, []);
 
@@ -71,15 +72,35 @@ const VaultStrategy: React.FC = () => {
     <div className="flex justify-between items-center p-4 bg-white rounded-lg">
       <div className="w-1/3">
         {tokens.map((token) => (
-          <div key={token.name} className="flex justify-between items-center p-2 bg-white border border-gray-200 rounded-lg mb-2">
+          <div
+            key={token.name}
+            className="flex justify-between items-center p-2 bg-white border border-gray-200 rounded-lg mb-2"
+          >
             <div className="flex items-center">
-              <img src={token.logo} alt={token.name} className="w-6 h-6 mr-2" />
+              <Image
+                src={token.logo}
+                alt={token.name}
+                width={24}
+                height={24}
+                className="mr-2"
+              />
               <span>{token.name}</span>
             </div>
             <div className="flex items-center">
-              <span className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: token.color }}></span>
-              <span className="font-bold">${token.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}</span>
-              <span className="ml-2 text-gray-500">({((token.value / total) * 100).toFixed(2)}%)</span>
+              <span
+                className="w-3 h-3 rounded-full mr-2"
+                style={{ backgroundColor: token.color }}
+              ></span>
+              <span className="font-bold">
+                $
+                {token.value.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 6,
+                })}
+              </span>
+              <span className="ml-2 text-gray-500">
+                ({((token.value / total) * 100).toFixed(2)}%)
+              </span>
             </div>
           </div>
         ))}
@@ -105,7 +126,13 @@ const VaultStrategy: React.FC = () => {
       </div>
 
       <div className="w-1/3 flex justify-center items-center">
-        <div className="text-lg font-bold text-gray-700">${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}</div>
+        <div className="text-lg font-bold text-gray-700">
+          $
+          {total.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 6,
+          })}
+        </div>
       </div>
     </div>
   );

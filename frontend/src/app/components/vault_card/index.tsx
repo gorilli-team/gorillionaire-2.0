@@ -1,6 +1,7 @@
 import React from "react";
 import { useAccount } from "wagmi";
 import { WalletDefault } from "@coinbase/onchainkit/wallet";
+import Image from "next/image";
 
 interface CardProps {
   title: string;
@@ -31,18 +32,32 @@ export const Card: React.FC<CardProps> = ({
       </div>
       <div className="flex gap-2 mt-2">
         <div className="flex items-center justify-center bg-gray-300 p-2 rounded-lg w-1/3">
-          <img src="/usdc.jpg" alt="USDC" className="h-4 w-4 mr-2" />
+          <Image
+            src="/usdc.jpg"
+            alt="USDC"
+            width={16}
+            height={16}
+            className="rounded-full mr-2"
+          />
           <span className="text-gray-800">USDC</span>
         </div>
         <div className="flex items-center justify-center bg-gray-300 p-2 rounded-lg w-1/3">
-          <img src="/brett.jpg" alt="BRETT" className="h-4 w-4 mr-2" />
+          <Image
+            src="/brett.jpg"
+            alt="BRETT"
+            width={16}
+            height={16}
+            className="rounded-full mr-2"
+          />
           <span className="text-gray-800">BRETT</span>
         </div>
         <div className="flex items-center justify-center bg-gray-300 p-2 rounded-lg w-1/3">
-          <img
+          <Image
             src={chainImage}
             alt={chainName}
-            className="h-4 w-4 rounded-full mr-2"
+            width={16}
+            height={16}
+            className="rounded-full mr-2"
           />
           <span className="text-gray-800">{chainName}</span>
         </div>
@@ -70,9 +85,12 @@ export const Card: React.FC<CardProps> = ({
             </button>
           </>
         ) : (
-          <div className="w-full flex justify-center" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="w-full flex justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
             <WalletDefault />
-          </div> 
+          </div>
         )}
       </div>
     </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { fetchVaultTokenHolders } from "../../api/fetchVaultData";
 import { getAppState } from "../../store/appStore";
+import Image from "next/image";
 
 interface TokenHolder {
   address: {
@@ -48,13 +49,13 @@ const VaultDepositors: React.FC<VaultDepositorsProps> = ({ depositors }) => {
 
   // Calculate percentage of total supply
   const calculatePercentage = (holderValue: string, totalSupply?: string) => {
-    if (!totalSupply) return '0%';
-    
+    if (!totalSupply) return "0%";
+
     const holderValueNum = parseFloat(holderValue);
     const totalSupplyNum = parseFloat(totalSupply);
-    
-    if (totalSupplyNum === 0) return '0%';
-    
+
+    if (totalSupplyNum === 0) return "0%";
+
     const percentage = (holderValueNum / totalSupplyNum) * 100;
     return `${percentage.toFixed(2)}%`;
   };
@@ -64,25 +65,34 @@ const VaultDepositors: React.FC<VaultDepositorsProps> = ({ depositors }) => {
       <table className="min-w-full border-collapse border border-gray-300">
         <thead>
           <tr>
-            <th className="border border-gray-300 px-4 py-2 text-left">Holder</th>
-            <th className="border border-gray-300 px-4 py-2 text-right">Quantity (vGOR)</th>
-            <th className="border border-gray-300 px-4 py-2 text-right">Percentage</th>
+            <th className="border border-gray-300 px-4 py-2 text-left">
+              Holder
+            </th>
+            <th className="border border-gray-300 px-4 py-2 text-right">
+              Quantity (vGOR)
+            </th>
+            <th className="border border-gray-300 px-4 py-2 text-right">
+              Percentage
+            </th>
           </tr>
         </thead>
         <tbody>
           {tokenHolders.map((holder, index) => {
             // Find matching depositor or use default avatar
-            const depositor = depositors.find(d => 
-              d.investor.toLowerCase() === holder.address.hash.toLowerCase()
+            const depositor = depositors.find(
+              (d) =>
+                d.investor.toLowerCase() === holder.address.hash.toLowerCase()
             );
 
             return (
               <tr key={index}>
                 <td className="border-b border-l border-gray-300 px-4 py-2 flex items-center gap-2">
-                  <img
+                  <Image
                     src={depositor?.image || `/avatar_${(index % 5) + 1}.png`}
                     alt="Holder Avatar"
-                    className="w-8 h-8 rounded-full"
+                    width={32}
+                    height={32}
+                    className="rounded-full"
                   />
                   {holder.address.hash}
                 </td>
@@ -90,7 +100,10 @@ const VaultDepositors: React.FC<VaultDepositorsProps> = ({ depositors }) => {
                   {formatValue(holder.value)}
                 </td>
                 <td className="border border-gray-300 px-4 py-2 text-right">
-                  {calculatePercentage(holder.value, holder.token?.total_supply)}
+                  {calculatePercentage(
+                    holder.value,
+                    holder.token?.total_supply
+                  )}
                 </td>
               </tr>
             );

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Image from "next/image";
 
 interface ModalDepositProps {
   isOpen: boolean;
@@ -17,7 +18,7 @@ export const ModalDeposit: React.FC<ModalDepositProps> = ({
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Only allow numbers and decimals
-    const value = e.target.value.replace(/[^0-9.]/g, '');
+    const value = e.target.value.replace(/[^0-9.]/g, "");
     // Prevent multiple decimal points
     if ((value.match(/\./g) || []).length <= 1) {
       setDepositAmount(value);
@@ -34,10 +35,22 @@ export const ModalDeposit: React.FC<ModalDepositProps> = ({
     }
   };
 
-  const isValidAmount = depositAmount !== "" && !isNaN(Number(depositAmount)) && Number(depositAmount) > 0;
+  const isValidAmount =
+    depositAmount !== "" &&
+    !isNaN(Number(depositAmount)) &&
+    Number(depositAmount) > 0;
   const displayAmount = depositAmount === "" ? "0" : depositAmount;
-  const amountInDecimals = isValidAmount 
-    ? BigInt(displayAmount.replace(".", "").padEnd(displayAmount.includes(".") ? displayAmount.length + 5 : displayAmount.length + 6, "0"))
+  const amountInDecimals = isValidAmount
+    ? BigInt(
+        displayAmount
+          .replace(".", "")
+          .padEnd(
+            displayAmount.includes(".")
+              ? displayAmount.length + 5
+              : displayAmount.length + 6,
+            "0"
+          )
+      )
     : BigInt(0);
 
   return (
@@ -57,9 +70,11 @@ export const ModalDeposit: React.FC<ModalDepositProps> = ({
 
             <div className="flex items-center mb-4">
               <span className="mr-2 text-sm">Token:</span>
-              <img
+              <Image
                 src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png?v=040"
                 alt="USDC"
+                width={24}
+                height={24}
                 className="h-6 w-6"
               />
               <span className="ml-2">USDC</span>
@@ -75,7 +90,8 @@ export const ModalDeposit: React.FC<ModalDepositProps> = ({
                 pattern="[0-9]*[.]?[0-9]*"
               />
               <div className="text-sm text-gray-500 mt-1">
-                {isValidAmount && `Amount in wei: ${amountInDecimals.toString()}`}
+                {isValidAmount &&
+                  `Amount in wei: ${amountInDecimals.toString()}`}
               </div>
             </div>
 
@@ -83,9 +99,9 @@ export const ModalDeposit: React.FC<ModalDepositProps> = ({
               onClick={handleDepositSubmit}
               disabled={!isValidAmount}
               className={`px-4 py-2 w-full rounded-lg ${
-                isValidAmount 
-                  ? 'bg-blue-500 text-white hover:bg-blue-600' 
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                isValidAmount
+                  ? "bg-blue-500 text-white hover:bg-blue-600"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
               }`}
             >
               {amountInDecimals > allowance ? "Approve" : "Deposit"}
