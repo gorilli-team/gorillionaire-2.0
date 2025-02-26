@@ -26,34 +26,78 @@ const TokenPage = ({ params }: { params: { address: string } }) => {
     );
     setToken(tokenData || null);
 
-    // Mock events data - replace with actual API call
-    const mockEvents: TokenEvent[] = [
-      {
-        id: "1",
-        type: "PRICE_CHANGE",
-        timestamp: new Date(Date.now() - 3600000).toISOString(),
-        description: "Price increased significantly",
-        value: "+15.5%",
-        impact: "HIGH",
-      },
-      {
-        id: "2",
-        type: "VOLUME_SPIKE",
-        timestamp: new Date(Date.now() - 7200000).toISOString(),
-        description: "Unusual trading volume detected",
-        value: "2.5x average",
-        impact: "MEDIUM",
-      },
-      {
-        id: "3",
-        type: "HOLDER_CHANGE",
-        timestamp: new Date(Date.now() - 10800000).toISOString(),
-        description: "New whale wallet detected",
-        value: "+500,000 tokens",
-        impact: "HIGH",
-      },
-    ];
-    setEvents(mockEvents);
+    // Generate random events based on signals count
+    if (tokenData) {
+      const eventTypes = [
+        "PRICE_CHANGE",
+        "VOLUME_SPIKE",
+        "HOLDER_CHANGE",
+        "SIGNAL",
+      ] as const;
+      const impacts = ["HIGH", "MEDIUM", "LOW"] as const;
+      const eventCount = tokenData.signalsGenerated || 3; // fallback to 3 if signalsGenerated is not set
+
+      const randomEvents: TokenEvent[] = Array.from(
+        { length: eventCount },
+        (_, index) => {
+          const randomType =
+            eventTypes[Math.floor(Math.random() * eventTypes.length)];
+          const randomImpact =
+            impacts[Math.floor(Math.random() * impacts.length)];
+          const hoursAgo = Math.floor(Math.random() * 24); // Random time within last 24 hours
+
+          const descriptions = {
+            PRICE_CHANGE: [
+              "Price increased significantly",
+              "Price dropped sharply",
+              "Price showing volatility",
+            ],
+            VOLUME_SPIKE: [
+              "Unusual trading volume detected",
+              "Trading volume surge",
+              "Volume above average",
+            ],
+            HOLDER_CHANGE: [
+              "New whale wallet detected",
+              "Major holder reduced position",
+              "Significant holder movement",
+            ],
+            SIGNAL: [
+              "Buy signal generated",
+              "Sell signal detected",
+              "Trading opportunity identified",
+            ],
+          };
+
+          const values = {
+            PRICE_CHANGE: [`${(Math.random() * 30 - 15).toFixed(1)}%`],
+            VOLUME_SPIKE: [`${(Math.random() * 5 + 1).toFixed(1)}x average`],
+            HOLDER_CHANGE: [`${(Math.random() * 1000000).toFixed(0)} tokens`],
+            SIGNAL: ["Strong", "Moderate", "Weak"],
+          };
+
+          return {
+            id: (index + 1).toString(),
+            type: randomType,
+            timestamp: new Date(Date.now() - hoursAgo * 3600000).toISOString(),
+            description:
+              descriptions[randomType][Math.floor(Math.random() * 3)],
+            value:
+              randomType === "HOLDER_CHANGE"
+                ? (Math.random() > 0.5 ? "+" : "-") + values[randomType][0]
+                : values[randomType][0],
+            impact: randomImpact,
+          };
+        }
+      );
+
+      setEvents(
+        randomEvents.sort(
+          (a, b) =>
+            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        )
+      );
+    }
   }, [params.address]);
 
   if (!token) {
@@ -95,10 +139,10 @@ const TokenPage = ({ params }: { params: { address: string } }) => {
   return (
     <div className="flex h-screen bg-gray-100 text-gray-800">
       <Sidebar selectedPage={selectedPage} setSelectedPage={setSelectedPage} />
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col h-screen overflow-hidden">
         <Header />
-        <div className="min-h-screen bg-gray-50 py-8">
-          <div className="container mx-auto px-4">
+        <div className="flex-1 overflow-auto bg-gray-50">
+          <div className="container mx-auto px-4 py-8">
             {/* Token Header */}
             <div className="bg-white rounded-lg shadow-md p-6 mb-8">
               <div className="flex items-center">
