@@ -193,15 +193,19 @@ const Signals = () => {
 
   return (
     <div className="w-full min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-6">
-        {/* Tab Navigation */}
-        <div className="mb-6">
-          <div className="border-b border-gray-200">
-            <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+      <div className="container mx-auto px-2 sm:px-4 py-6">
+        {/* Tab Navigation - Mobile Scrollable */}
+        <div className="mb-6 overflow-x-auto">
+          <div className="border-b border-gray-200 min-w-max">
+            <nav
+              className="-mb-px flex space-x-4 sm:space-x-8"
+              aria-label="Tabs"
+            >
+              {/* Adjusted tab buttons for mobile */}
               <button
                 onClick={() => setActiveTab("tokens")}
                 className={`
-                  py-4 px-1 border-b-2 font-medium text-sm
+                  whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm
                   ${
                     activeTab === "tokens"
                       ? "border-blue-500 text-blue-600"
@@ -209,12 +213,14 @@ const Signals = () => {
                   }
                 `}
               >
-                <div className="text-lg font-bold">Single Token Signals</div>
+                <div className="text-base sm:text-lg font-bold">
+                  Single Token Signals
+                </div>
               </button>
               <button
                 onClick={() => setActiveTab("pools")}
                 className={`
-                  py-4 px-1 border-b-2 font-medium text-sm
+                  whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm
                   ${
                     activeTab === "pools"
                       ? "border-blue-500 text-blue-600"
@@ -222,12 +228,14 @@ const Signals = () => {
                   }
                 `}
               >
-                <div className="text-lg font-bold">Pool Signals</div>
+                <div className="text-base sm:text-lg font-bold">
+                  Pool Signals
+                </div>
               </button>
               <button
                 onClick={() => setActiveTab("whales")}
                 className={`
-                  py-4 px-1 border-b-2 font-medium text-sm
+                  whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm
                   ${
                     activeTab === "whales"
                       ? "border-blue-500 text-blue-600"
@@ -235,12 +243,14 @@ const Signals = () => {
                   }
                 `}
               >
-                <div className="text-lg font-bold">Whale Signals</div>
+                <div className="text-base sm:text-lg font-bold">
+                  Whale Signals
+                </div>
               </button>
               <button
                 onClick={() => setActiveTab("social")}
                 className={`
-                  py-4 px-1 border-b-2 font-medium text-sm
+                  whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm
                   ${
                     activeTab === "social"
                       ? "border-blue-500 text-blue-600"
@@ -248,7 +258,9 @@ const Signals = () => {
                   }
                 `}
               >
-                <div className="text-lg font-bold">Social Signals</div>
+                <div className="text-base sm:text-lg font-bold">
+                  Social Signals
+                </div>
               </button>
             </nav>
           </div>
@@ -257,15 +269,16 @@ const Signals = () => {
         {/* Tab Content */}
         {activeTab === "tokens" ? (
           <>
-            <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold">Signals</h1>
-              <div className="flex items-center">
-                <span className="text-sm text-gray-500 mr-4">
+            {/* Header section - Mobile responsive */}
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 space-y-4 sm:space-y-0">
+              <h1 className="text-xl sm:text-2xl font-bold">Signals</h1>
+              <div className="flex items-center justify-between sm:justify-end">
+                <span className="text-xs sm:text-sm text-gray-500 mr-4">
                   Showing {sortedTokens.length} of {tokens.length} tokens • Live
                   updates (5s)
                 </span>
                 <select
-                  className="bg-white border border-gray-300 rounded-md px-3 py-1 text-sm"
+                  className="bg-white border border-gray-300 rounded-md px-2 sm:px-3 py-1 text-xs sm:text-sm"
                   value={filterLabel}
                   onChange={(e) => setFilterLabel(e.target.value)}
                 >
@@ -278,67 +291,66 @@ const Signals = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-4">
+            {/* Grid - Adjusted for better mobile layout */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
               {sortedTokens.map((token) => (
                 <div
                   key={token.id}
                   className={`
-                  relative rounded-lg shadow-md p-3 transition-all duration-300
-                  ${
-                    blinkingTokens.has(token.id)
-                      ? "bg-green-100 animate-pulse border-2 border-green-500"
-                      : "bg-white"
-                  }
-                  ${
-                    parseFloat(token.metrics.priceChange) > 5
-                      ? "border-l-4 border-l-green-500"
-                      : parseFloat(token.metrics.priceChange) > 0
-                      ? "border-l-4 border-l-blue-400"
-                      : "border-l-4 border-l-red-400"
-                  }
-                `}
+                    relative rounded-lg shadow-md p-2 sm:p-3 transition-all duration-300
+                    ${
+                      blinkingTokens.has(token.id)
+                        ? "bg-green-100 animate-pulse border-2 border-green-500"
+                        : "bg-white"
+                    }
+                    ${
+                      parseFloat(token.metrics.priceChange) > 5
+                        ? "border-l-4 border-l-green-500"
+                        : parseFloat(token.metrics.priceChange) > 0
+                        ? "border-l-4 border-l-blue-400"
+                        : "border-l-4 border-l-red-400"
+                    }
+                  `}
                 >
+                  {/* Token card content - Adjusted spacing for mobile */}
                   <div className="flex flex-col h-full">
-                    {/* Header Section - Redesigned */}
-                    <div className="flex flex-col mb-2">
+                    <div className="flex flex-col mb-1 sm:mb-2">
                       <div className="flex items-center mb-1">
                         {token.image ? (
                           <Image
                             src={token.image}
                             alt={token.name}
-                            width={32}
-                            height={32}
-                            className="mr-2 rounded-full object-cover"
+                            width={24}
+                            height={24}
+                            className="mr-2 rounded-full object-cover sm:w-8 sm:h-8"
                           />
                         ) : (
-                          <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-2">
-                            <span className="font-bold text-xs">
+                          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gray-200 flex items-center justify-center mr-2">
+                            <span className="font-bold text-[10px] sm:text-xs">
                               {token.symbol}
                             </span>
                           </div>
                         )}
                         <div className="overflow-hidden mr-2">
-                          <p className="font-bold text-sm truncate">
+                          <p className="font-bold text-xs sm:text-sm truncate">
                             {token.name}
                           </p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-[10px] sm:text-xs text-gray-500">
                             {token.symbol}
                           </p>
                         </div>
                       </div>
 
-                      {/* Trading Label - Moved to a separate row */}
-                      {token.tradingLabel && (
-                        <div className="flex justify-end">
-                          <div
-                            className={`px-2 py-1 rounded-full text-xs font-bold ${
-                              labelColorMap[token.tradingLabel as TradingLabel]
-                            }`}
-                          >
-                            {token.tradingLabel}
-                          </div>
+                      {/* Trading Label */}
+                      <div className="flex justify-end">
+                        <div
+                          className={`px-2 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold ${
+                            labelColorMap[token.tradingLabel as TradingLabel]
+                          }`}
+                        >
+                          {token.tradingLabel}
                         </div>
-                      )}
+                      </div>
                     </div>
 
                     {/* Signal score displayed prominently */}
