@@ -13,7 +13,7 @@ const SignalsPage = () => {
     <div className="flex h-screen bg-gray-100 text-gray-800">
       {/* Mobile menu button */}
       <button
-        className="lg:hidden fixed top-4 left-4 z-20 p-2 rounded-md bg-gray-200"
+        className="lg:hidden fixed top-4 left-4 z-40 p-2 rounded-md bg-gray-200"
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
       >
         <svg
@@ -45,7 +45,10 @@ const SignalsPage = () => {
             : "-translate-x-full lg:translate-x-0"
         }
         transition-transform duration-300 ease-in-out
-        z-10 lg:z-0
+        z-30 lg:z-0
+        bg-white
+        h-full
+        shadow-xl lg:shadow-none
       `}
       >
         <Sidebar
@@ -57,7 +60,7 @@ const SignalsPage = () => {
       {/* Overlay for mobile */}
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-0 lg:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
