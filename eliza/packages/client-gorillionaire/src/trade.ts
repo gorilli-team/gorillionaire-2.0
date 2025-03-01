@@ -5,9 +5,6 @@ import {
     type State,
 } from "@elizaos/core";
 import type { ClientBase } from "./base.ts";
-import { coinmarketcapPlugin } from "@elizaos/plugin-coinmarketcap";
-import { getEmbeddingZeroVector } from "@elizaos/core";
-import { stringToUuid } from "@elizaos/core";
 
 export class GorillionaireTradeClient {
     client: ClientBase;
@@ -18,11 +15,6 @@ export class GorillionaireTradeClient {
     constructor(client: ClientBase, runtime: IAgentRuntime) {
         this.client = client;
         this.runtime = runtime;
-
-        console.log("TRADE Client Configuration:");
-        console.log(
-            `GORILLIOTRADE - Action Interval: ${this.client.twitterConfig.ACTION_INTERVAL} minutes`
-        );
     }
 
     async start() {
@@ -33,94 +25,7 @@ export class GorillionaireTradeClient {
         const processActionsLoop = async () => {
             while (!this.stopProcessingActions) {
                 try {
-                    const coinmarketcap = await this.runtime.plugins.find(
-                        (plugin) => plugin.name === "coinmarketcap"
-                    );
-
-                    if (!coinmarketcap) {
-                        throw new Error("Coinmarketcap plugin not found");
-                    }
-
-                    // Find the GET_PRICE action
-                    const getPriceAction = coinmarketcap.actions.find(
-                        (action) => action.name === "GET_PRICE"
-                    );
-
-                    if (!getPriceAction) {
-                        throw new Error("GET_PRICE action not found");
-                    }
-
-                    // Create the content object
-                    const content: Content = {
-                        text: "Get price for BRETT",
-                        source: "trade",
-                        attachments: [
-                            {
-                                id: stringToUuid(`price-request-${Date.now()}`),
-                                url: "",
-                                title: "Price Request",
-                                source: "trade",
-                                description: "Request for cryptocurrency price",
-                                text: "Get price for BRETT",
-                            },
-                        ],
-                    };
-
-                    const userId = stringToUuid(
-                        `trade-${this.runtime.agentId}`
-                    );
-                    const roomId = stringToUuid(
-                        `trade-${this.runtime.agentId}`
-                    );
-                    const messageId = stringToUuid(
-                        `trade-${this.runtime.agentId}`
-                    );
-
-                    const memory: Memory = {
-                        id: messageId,
-                        userId,
-                        agentId: this.runtime.agentId,
-                        roomId,
-                        content,
-                        createdAt: Date.now(),
-                        embedding: getEmbeddingZeroVector(),
-                    };
-
-                    // Create a proper State object
-                    const state: State = {
-                        bio: "BRETT advocate and Base chain maximalist believes BRETT is the next legendary",
-                        lore: "rose from the depths of crypto Twitter to become a legend was one of the earliest apes into BRETT and never looked back fought off FUD attacks against Base and BRETT with pure conviction helped push BRETT past $1B market cap with relentless shilling",
-                        messageDirections: "",
-                        postDirections: "",
-                        conversationTone: "",
-                        currentTask: "",
-                        taskList: [],
-                        taskStatus: "idle",
-                        roomId,
-                        actors: "",
-                        recentMessages: "",
-                        recentMessagesData: [],
-                    };
-
-                    // Call the GET_PRICE action with all required parameters
-                    try {
-                        const priceResult = await getPriceAction.handler(
-                            this.runtime,
-                            memory,
-                            state,
-                            {
-                                symbol: "BRETT",
-                                currency: "USD",
-                            }
-                        );
-
-                        console.log("Price result:", priceResult);
-                    } catch (actionError) {
-                        console.error(
-                            "Error executing GET_PRICE action:",
-                            actionError
-                        );
-                    }
+                    console.log("Processing actions...");
 
                     // Wait for 1 hour before next execution
                     await new Promise((resolve) =>
@@ -133,9 +38,9 @@ export class GorillionaireTradeClient {
             }
         };
 
-        // processActionsLoop().catch((error) => {
-        //     console.error("Fatal error in process actions loop:", error);
-        // });
+        processActionsLoop().catch((error) => {
+            console.error("Fatal error in process actions loop:", error);
+        });
     }
 
     async stop() {
