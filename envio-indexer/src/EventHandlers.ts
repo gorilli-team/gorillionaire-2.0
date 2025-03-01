@@ -1,7 +1,14 @@
 /*
  * Please refer to https://docs.envio.dev for a thorough guide on all Envio indexer features
  */
-import { Chog, Chog_Transfer } from "generated";
+import {
+  Chog,
+  Chog_Transfer,
+  Moyaki,
+  Moyaki_Transfer,
+  Molandak,
+  Molandak_Transfer,
+} from "generated";
 
 // Helper function to check if transfer is recent (within last hour)
 const isRecentTransfer = (transferTimestamp: number): boolean => {
@@ -80,12 +87,77 @@ Chog.Transfer.handler(async ({ event, context }) => {
         await sendTelegramNotification(message);
 
         // TODO: SEND A MESSAGE TO THE DISCORD CHANNEL
-      
       }
     } catch (error) {
       console.error("Failed to send Telegram notification:", error);
     }
 
     context.Chog_Transfer.set(entity);
+  }
+});
+
+Molandak.Transfer.handler(async ({ event, context }) => {
+  if (event.params.value > 10000000000000000000000) {
+    const entity: Molandak_Transfer = {
+      id: `${event.chainId}_${event.block.number}_${event.logIndex}`,
+      from: event.params.from,
+      to: event.params.to,
+      value: event.params.value,
+      blockNumber: BigInt(event.block.number),
+      blockTimestamp: BigInt(event.block.timestamp),
+      transactionHash: event.transaction.hash,
+    };
+
+    try {
+      if (isRecentTransfer(Number(event.block.timestamp))) {
+        const formattedAmount = (
+          Number(event.params.value) / 1e18
+        ).toLocaleString();
+        const message = formatTransferMessage(
+          event,
+          formattedAmount,
+          "MOLANDAK",
+          "🦊"
+        );
+        await sendTelegramNotification(message);
+      }
+    } catch (error) {
+      console.error("Failed to send Telegram notification:", error);
+    }
+
+    context.Molandak_Transfer.set(entity);
+  }
+});
+
+Moyaki.Transfer.handler(async ({ event, context }) => {
+  if (event.params.value > 10000000000000000000000) {
+    const entity: Moyaki_Transfer = {
+      id: `${event.chainId}_${event.block.number}_${event.logIndex}`,
+      from: event.params.from,
+      to: event.params.to,
+      value: event.params.value,
+      blockNumber: BigInt(event.block.number),
+      blockTimestamp: BigInt(event.block.timestamp),
+      transactionHash: event.transaction.hash,
+    };
+
+    try {
+      if (isRecentTransfer(Number(event.block.timestamp))) {
+        const formattedAmount = (
+          Number(event.params.value) / 1e18
+        ).toLocaleString();
+        const message = formatTransferMessage(
+          event,
+          formattedAmount,
+          "MOYAKI",
+          "🌊"
+        );
+        await sendTelegramNotification(message);
+      }
+    } catch (error) {
+      console.error("Failed to send Telegram notification:", error);
+    }
+
+    context.Moyaki_Transfer.set(entity);
   }
 });

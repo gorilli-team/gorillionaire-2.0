@@ -7,3 +7,23 @@ type Chog_Transfer {
   blockTimestamp: BigInt!
   transactionHash: String!
 }
+
+type Molandak_Transfer {
+  id: ID!
+  from: String!
+  to: String!
+  value: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type Moyaki_Transfer {
+  id: ID!
+  from: String!
+  to: String!
+  value: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
