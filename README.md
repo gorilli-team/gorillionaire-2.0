@@ -1,91 +1,82 @@
 # Gorillionaire
 
-**Gorillionaire** is an AI-powered agent that trades meme coins in the cryptocurrency market, learns from Twitter trends, and adjusts its trading strategy accordingly. By analyzing social media sentiment and market data, it aims to predict and capitalize on trends to maximize profit in the ever-changing crypto landscape.
+## Overview
+
+**Gorillionaire** is an advanced signal protocol designed to provide real-time trading insights by aggregating and processing multi-source data. It enables AI agents and traders to make informed decisions in the fast-moving cryptocurrency market.
+
+By integrating price feeds, historical on-chain data, whale/developer activity, new token launches, and social sentiment (Twitter/Discord), Gorillionaire generates actionable signals. These signals are streamed to users via multiple channels, including Telegram, Discord, Twitter, and, in the future, Farcaster and Lens.
+
+## Deployment on Monad Testnet
+
+Gorillionaire is being developed and tested on the **Monad Testnet**, launching on Monad to introduce a new way to integrate AI Agents faster and more reliably. This enables high-speed, low-latency execution and enhances the scalability of AI-powered trading strategies.
+
+## Participation in EVM/Accathon
+
+We are excited to announce our participation in the **EVM/Accathon**, where we are showcasing Gorillionaire’s capabilities in AI-driven trading. Our goal is to push the boundaries of AI-integrated crypto trading and establish new industry standards.
+
+![EVM/Accathon Logo](./evmaccathon.png)
 
 ## Features
 
-- **🧠 Eliza: The Brain**: Eliza thinks, AgentKit acts, Gorillionaire profits.
-- **🔒 Custom Vault Permissions**: The agent only swaps tokens—no unauthorized bets, no funny business.
-- **Profit Maximization**: Designed to analyze price movements and social sentiment to capitalize on meme coin trends, increasing the likelihood of profitable trades.
-- **🤖 Tailor-Made AgentKit Action**: A custom action to let our agent interact seamlessly with the vault.
+### Multi-Source Data Aggregation
 
-## Architecture
+- **📊 Price Feeds** – Collects data from multiple sources to ensure accurate market insights.
+- **⛓ Historical On-Chain Data** – Analyzes past blockchain transactions to detect trends and anomalies.
+- **🐋 Whale & Developer Activity** – Monitors large transactions and development patterns.
+- **🚀 New Token Launches** – Identifies and tracks newly launched tokens.
+- **🗣 Social Sentiment Analysis** – Evaluates Twitter and Discord discussions to gauge market sentiment.
 
-The core of **Gorillionaire** is its AI engine, which consists of several key components:
+### Real-Time Signal Processing & Delivery
 
-1. **Twitter Sentiment Analysis**: Utilizes natural language processing (NLP) techniques to gauge public sentiment on various meme coins from Twitter.
-2. **Market Data Integration**: Fetches live market data to monitor price changes, trade volumes, and market volatility.
-3. **Trading Strategy Engine**: A machine learning model that adjusts its trading strategy based on input from the sentiment analysis and market data.
-4. **Trading Platform Integration**: Executes buy/sell orders on supported platforms (e.g., Binance, Coinbase) via their APIs.
+- **📡 Live Signal Websocket** – Clients can subscribe to a real-time signal feed for instant updates.
+- **🔗 Multi-Channel Distribution** – Insights are shared across Telegram, Discord, Twitter, and upcoming decentralized social platforms.
+- **🤖 AI-Ready Signals** – Trading AI agents can integrate Gorillionaire’s insights to enhance decision-making.
 
-## Tech Stack Overview
+## Agent-Based Architecture
 
-### 🤖 Core AI & Execution Framework
+Gorillionaire operates through a layered agent system, with each level specializing in a specific function:
 
-#### **Custom-Built Intelligence**
+### **Level 1: Data Extraction Agents**
 
-- **Eliza AI Client** – A tailored AI framework designed to analyze market trends, sentiment, and price action in real time.
-- **Custom AgentKit Actions** – Proprietary enhancements for Coinbase AgentKit, enabling AI-agent onchain execution and transaction efficiency.
-- **Modular AI Decision Engine** – Generates BUY, SELL, or HOLD signals with confidence scores, integrating multiple data sources for informed decision-making.
+This level is responsible for gathering raw data from various sources. It includes:
 
----
+- **📡 Price Detector** – Aggregates price data from multiple feeds.
+- **🐋 Whale Detector** – Monitors large transactions and whale movements.
+- **🚀 Token Launch Detector** – Identifies new token deployments.
+- **🗣 Social Activity Detector** – Analyzes Twitter and Discord discussions.
+- **📜 General Activity Detector** – Tracks blockchain activity for relevant patterns.
 
-### 🗣 Multi-Channel Market Insights
+### **Level 2: Signal Generation Agents**
 
-#### **Social & On-Chain Data Aggregation**
+This level processes data from Level 1 and generates actionable signals. It currently includes:
 
-- **Discord & Twitter Plugins** – Real-time monitoring of social sentiment, meme trends, and community engagement.
-- **On-Chain Activity Scanner** – Detects liquidity movements, whale trades, and transaction spikes.
-- **Gorillionaire Client** – A proprietary interface for internal data collection and visualization.
+- **🔥 DEGEN NAD** – High-risk, high-reward trading signals.
+- **⚡ AGGRESSIVE NAD** – Balanced strategy with a strong focus on rapid opportunities.
+- **📈 VALUE INVESTOR NAD** – Long-term investment insights based on fundamental value.
 
----
+These agents provide refined insights that other AI agents or human traders can use to make decisions. When transmitting signals, additional metadata is included to support further refinement and validation by external models or decision-makers.
 
-### 📦 Infrastructure & Execution Layer
+## How It Works
 
-#### **Execution & Data Storage**
+1. **Data Collection** – Level 1 agents continuously extract information from multiple sources.
+2. **Processing & Signal Generation** – Level 2 agents analyze data and produce actionable insights.
+3. **Distribution & Subscription** – Users and AI agents subscribe to the websocket to receive live trading signals.
+4. **Decision-Making Support** – External AI trading bots or traders leverage signals for enhanced decision-making.
 
-- **⚡ Coinbase AgentKit**
-  - Gas-optimized transaction handling for efficiency.
-  - Automated trade execution based on Eliza’s AI signals.
-  - Seamless integration with ERC-4626 vaults for secure asset management.
-- **🗄 MongoDB Adapter**
-  - Storing historical trading data, market trends, and sentiment analysis.
-  - Tracking AI-generated decisions for backtesting and model improvement.
-  - Efficient query execution for real-time data retrieval.
+## Getting Started
 
----
-
-### 🧠 AI & Machine Learning Capabilities
-
-#### **Advanced Natural Language Processing (NLP)**
-
-- **OpenAI** – AI-powered models analyze market narratives, influencer sentiment, and breaking news.
-
-#### **Market Data & Price Feeds**
-
-- **CoinMarketCap Plugin** – Provides:
-  - Live price tracking with millisecond accuracy.
-  - Volume, liquidity, and volatility analysis.
-  - Custom API integration for seamless strategy execution.
-
----
-
-### 🔒 Security & Risk Mitigation
-
-#### **Secure On-Chain Execution**
-
-- **ERC-4626 Vault Protection** – Funds remain in a whitelisted vault, with:
-  - Custom permissions ensuring only authorized token swaps.
-  - No speculative or unauthorized transactions allowed.
-- **Rugpull Detection Engine** – AI scans:
-  - Liquidity pool behavior to prevent scams.
-
----
-
-### Start Gorillionaire
-
-To start Gorillionaire, run the following command:
+To start using Gorillionaire, set up the necessary dependencies and run the system with the following command:
 
 ```sh
 pnpm clean && pnpm install --no-frozen-lockfile && pnpm run build && pnpm start --characters="./characters/gorillionaire.character.json"
 ```
+
+## Future Roadmap
+
+- **📢 Integration with Farcaster & Lens** – Expanding social sentiment tracking.
+- **🔬 More Advanced AI Models** – Enhancing predictive capabilities.
+- **🛠 Developer API** – Enabling external agents to interact seamlessly with Gorillionaire.
+
+---
+
+With Gorillionaire, trading AI development becomes faster, easier, and more customizable, making it the go-to protocol for crypto traders looking for cutting-edge market intelligence.
