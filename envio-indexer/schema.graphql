@@ -1,0 +1,9 @@
+type Chog_Transfer {
+  id: ID!
+  from: String!
+  to: String!
+  value: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
