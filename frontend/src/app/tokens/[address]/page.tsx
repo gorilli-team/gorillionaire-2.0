@@ -33,89 +33,114 @@ export default function TokenPage() {
   const [events, setEvents] = useState<TokenEvent[]>([]);
 
   useEffect(() => {
-    if (!params.address) return;
+    const fetchTokenData = async () => {
+      if (!params.address) return;
 
-    const tokenData = trackedTokens.find(
-      (t: TokenData) =>
-        t.address.toLowerCase() ===
-        (typeof params.address === "string"
-          ? params.address.toLowerCase()
-          : undefined)
-    );
-    setToken(tokenData || null);
+      const tokenData = trackedTokens.find(
+        (t: TokenData) =>
+          t.address.toLowerCase() ===
+          (typeof params.address === "string"
+            ? params.address.toLowerCase()
+            : undefined)
+      );
+      setToken(tokenData || null);
 
-    //   // Generate random events based on signals count
-    if (tokenData) {
-      const eventTypes = [
-        "PRICE_CHANGE",
-        "VOLUME_SPIKE",
-        "HOLDER_CHANGE",
-        "SIGNAL",
-      ] as const;
-      const impacts = ["HIGH", "MEDIUM", "LOW"] as const;
-      const eventCount = tokenData.signalsGenerated || 3; // fallback to 3 if signalsGenerated is not set
+      //   // Generate random events based on signals count
+      if (tokenData) {
+        const eventTypes = [
+          "PRICE_CHANGE",
+          "VOLUME_SPIKE",
+          "HOLDER_CHANGE",
+          "SIGNAL",
+        ] as const;
+        const impacts = ["HIGH", "MEDIUM", "LOW"] as const;
+        const eventCount = tokenData.signalsGenerated || 3; // fallback to 3 if signalsGenerated is not set
 
-      const randomEvents: TokenEvent[] = Array.from(
-        { length: eventCount },
-        (_, index) => {
-          const randomType =
-            eventTypes[Math.floor(Math.random() * eventTypes.length)];
-          const randomImpact =
-            impacts[Math.floor(Math.random() * impacts.length)];
-          const hoursAgo = Math.floor(Math.random() * 24); // Random time within last 24 hours
+        const randomEvents: TokenEvent[] = Array.from(
+          { length: eventCount },
+          (_, index) => {
+            const randomType =
+              eventTypes[Math.floor(Math.random() * eventTypes.length)];
+            const randomImpact =
+              impacts[Math.floor(Math.random() * impacts.length)];
+            const hoursAgo = Math.floor(Math.random() * 24); // Random time within last 24 hours
 
-          const descriptions = {
-            PRICE_CHANGE: [
-              "Price increased significantly",
-              "Price dropped sharply",
-              "Price showing volatility",
-            ],
-            VOLUME_SPIKE: [
-              "Unusual trading volume detected",
-              "Trading volume surge",
-              "Volume above average",
-            ],
-            HOLDER_CHANGE: [
-              "New whale wallet detected",
-              "Major holder reduced position",
-              "Significant holder movement",
-            ],
-            SIGNAL: [
-              "Buy signal generated",
-              "Sell signal detected",
-              "Trading opportunity identified",
-            ],
-          };
+            const descriptions = {
+              PRICE_CHANGE: [
+                "Price increased significantly",
+                "Price dropped sharply",
+                "Price showing volatility",
+              ],
+              VOLUME_SPIKE: [
+                "Unusual trading volume detected",
+                "Trading volume surge",
+                "Volume above average",
+              ],
+              HOLDER_CHANGE: [
+                "New whale wallet detected",
+                "Major holder reduced position",
+                "Significant holder movement",
+              ],
+              SIGNAL: [
+                "Buy signal generated",
+                "Sell signal detected",
+                "Trading opportunity identified",
+              ],
+            };
 
-          const values = {
-            PRICE_CHANGE: [`${(Math.random() * 30 - 15).toFixed(1)}%`],
-            VOLUME_SPIKE: [`${(Math.random() * 5 + 1).toFixed(1)}x average`],
-            HOLDER_CHANGE: [`${(Math.random() * 1000000).toFixed(0)} tokens`],
-            SIGNAL: ["Strong", "Moderate", "Weak"],
-          };
+            const values = {
+              PRICE_CHANGE: [`${(Math.random() * 30 - 15).toFixed(1)}%`],
+              VOLUME_SPIKE: [`${(Math.random() * 5 + 1).toFixed(1)}x average`],
+              HOLDER_CHANGE: [`${(Math.random() * 1000000).toFixed(0)} tokens`],
+              SIGNAL: ["Strong", "Moderate", "Weak"],
+            };
 
-          return {
-            id: (index + 1).toString(),
-            type: randomType,
-            timestamp: new Date(Date.now() - hoursAgo * 3600000).toISOString(),
-            description:
-              descriptions[randomType][Math.floor(Math.random() * 3)],
-            value:
-              randomType === "HOLDER_CHANGE"
-                ? (Math.random() > 0.5 ? "+" : "-") + values[randomType][0]
-                : values[randomType][0],
-            impact: randomImpact,
-          };
+            return {
+              id: (index + 1).toString(),
+              type: randomType,
+              timestamp: new Date(
+                Date.now() - hoursAgo * 3600000
+              ).toISOString(),
+              description:
+                descriptions[randomType][Math.floor(Math.random() * 3)],
+              value:
+                randomType === "HOLDER_CHANGE"
+                  ? (Math.random() > 0.5 ? "+" : "-") + values[randomType][0]
+                  : values[randomType][0],
+              impact: randomImpact,
+            };
+          }
+        );
+
+        console.log("tokenData", tokenData);
+
+        if (tokenData.name === "Chog") {
+          try {
+            const response = await fetch(
+              `${process.env.NEXT_PUBLIC_API_URL}/events/token/${tokenData.name}`
+            );
+            const data = await response.json();
+            console.log("data", data);
+            setEvents(data?.events || []);
+            // setEvents(data);
+            return; // Exit early since we've set the events
+          } catch (error) {
+            console.error("Error fetching events:", error);
+            // Fall back to random events if fetch fails
+          }
+        } else {
+          setEvents(
+            randomEvents.sort(
+              (a, b) =>
+                new Date(b.timestamp).getTime() -
+                new Date(a.timestamp).getTime()
+            )
+          );
         }
-      );
+      }
+    };
 
-      setEvents(
-        randomEvents.sort(
-          (a, b) =>
-            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-        )
-      );
-    }
+    fetchTokenData();
   }, [params.address]);
 
   if (!token) {
@@ -149,6 +174,8 @@ export default function TokenPage() {
         return "👥";
       case "SIGNAL":
         return "🎯";
+      case "TRANSFER":
+        return "💸";
       default:
         return "📊";
     }
@@ -222,7 +249,7 @@ export default function TokenPage() {
                         <div>
                           <p className="font-semibold">{event.description}</p>
                           <p className="text-sm text-gray-600">
-                            {new Date(event.timestamp).toLocaleString()}
+                            Date: {new Date(event.timestamp).toLocaleString()}
                           </p>
                         </div>
                       </div>

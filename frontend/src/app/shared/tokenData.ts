@@ -17,47 +17,13 @@ export interface TokenData {
 
 export const trackedTokens: TokenData[] = [
   {
-    id: 1,
-    name: "Wrapped Monad",
-    symbol: "MON",
-    supply: "93,415,274,755",
-    holders: 103039,
-    age: "17 days ago",
-    address: "0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701",
-    image:
-      "https://imagedelivery.net/cBNDGgkrsEA-b_ixIp9SkQ/I_t8rg_V_400x400.jpg/public",
-    isActive: false,
-    price: "$0.50",
-    volume: "$1.2M",
-    trackedSince: "Feb 20, 2025",
-    trackingTime: "5 days",
-    signalsGenerated: 127,
-  },
-  {
-    id: 2,
-    name: "ShMonad",
-    symbol: "ShMON",
-    supply: "27,937",
-    holders: 229794,
-    age: "28 days 6 hrs ago",
-    address: "0x1b4Cb47622705F0F67b6B18bBD1cB1a91fc77d37",
-    image:
-      "https://pbs.twimg.com/media/GjskgXhWsAA_N_L?format=png&name=240x240",
-    isActive: false,
-    price: "$0.50",
-    volume: "$1.2M",
-    trackedSince: "Feb 25, 2025",
-    trackingTime: "2 days",
-    signalsGenerated: 84,
-  },
-  {
     id: 11,
     name: "Molandak",
     symbol: "DAK",
     supply: "296,997",
     holders: 603708,
     age: "10 days 20 hrs ago",
-    address: "0x0F0B...c714",
+    address: "0x0F0BDEbF0F83cD1EE3974779Bcb7315f9808c714",
     image:
       "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/27759359-9374-4995-341c-b2636a432800/public",
     isActive: false,
@@ -74,7 +40,7 @@ export const trackedTokens: TokenData[] = [
     supply: "288,018",
     holders: 536061,
     age: "10 days 20 hrs ago",
-    address: "0xfe14...0C50",
+    address: "0xfe140e1dCe99Be9F4F15d657CD9b7BF622270C50",
     image:
       "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/6679b698-a845-412b-504b-23463a3e1900/public",
     isActive: false,
@@ -91,7 +57,7 @@ export const trackedTokens: TokenData[] = [
     supply: "275,880",
     holders: 565297,
     age: "10 days 20 hrs ago",
-    address: "0xE059...4E6B",
+    address: "0xE0590015A873bF326bd645c3E1266d4db41C4E6B",
     image:
       "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/5d1206c2-042c-4edc-9f8b-dcef2e9e8f00/public",
     isActive: false,
