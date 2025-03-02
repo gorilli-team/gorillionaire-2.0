@@ -13,24 +13,44 @@ interface TokenData {
   trackingTime?: string;
   signalsGenerated?: number;
   address: string;
+  supply: string;
+  holders: number;
+  age: string;
+  isActive: boolean;
 }
 
 const untrackedTokens: TokenData[] = [
   {
-    name: "Zentak",
-    symbol: "ZTK",
+    name: "Wrapped Monad",
+    symbol: "MON",
+    supply: "93,415,274,755",
+    holders: 103039,
+    age: "17 days ago",
+    address: "0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701",
+    image:
+      "https://imagedelivery.net/cBNDGgkrsEA-b_ixIp9SkQ/I_t8rg_V_400x400.jpg/public",
+    isActive: false,
     price: "$0.50",
-    volume: "$100K",
-    address: "0x12345",
-    image: "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/12345/public",
+    volume: "$1.2M",
+    trackedSince: "Feb 20, 2025",
+    trackingTime: "5 days",
+    signalsGenerated: 127,
   },
   {
-    name: "Vortex",
-    symbol: "VTX",
-    price: "$1.80",
-    volume: "$400K",
-    address: "0x67890",
-    image: "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/67890/public",
+    name: "ShMonad",
+    symbol: "ShMON",
+    supply: "27,937",
+    holders: 229794,
+    age: "28 days 6 hrs ago",
+    address: "0x1b4Cb47622705F0F67b6B18bBD1cB1a91fc77d37",
+    image:
+      "https://pbs.twimg.com/media/GjskgXhWsAA_N_L?format=png&name=240x240",
+    isActive: false,
+    price: "$0.50",
+    volume: "$1.2M",
+    trackedSince: "Feb 25, 2025",
+    trackingTime: "2 days",
+    signalsGenerated: 84,
   },
 ];
 
@@ -76,6 +96,9 @@ const Tokens = () => {
                 name={token.name}
                 symbol={token.symbol}
                 image={token.image}
+                trackedSince={token.trackedSince}
+                trackingTime={token.trackingTime}
+                signalsGenerated={token.signalsGenerated}
               />
             </div>
           ))}

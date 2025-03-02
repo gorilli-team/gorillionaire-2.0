@@ -22,15 +22,15 @@ const TransferSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  from: {
+  fromAddress: {
     type: String,
     required: true,
   },
-  to: {
+  toAddress: {
     type: String,
     required: true,
   },
-  value: {
+  amount: {
     type: Number,
     required: true,
   },
@@ -45,10 +45,6 @@ const TransferSchema = new mongoose.Schema({
   blockTimestamp: {
     type: Number,
     required: true,
-  },
-  timestamp: {
-    type: Date,
-    default: Date.now,
   },
 });
 
