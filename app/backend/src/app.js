@@ -22,7 +22,6 @@ app.use(function (req, res, next) {
 });
 
 // Routes
-app.use("/", require("./routes/index"));
 app.use("/signals/transfers", require("./routes/signals/transfers"));
 
 // Basic error handling

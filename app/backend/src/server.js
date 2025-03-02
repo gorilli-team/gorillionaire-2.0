@@ -13,7 +13,7 @@ async function startServer() {
       .split("/")
       .slice(0, -1)
       .join("/");
-    const connectionString = `${cleanConnectionString}/gorillionaire`;
+    const connectionString = `${cleanConnectionString}/signals`;
 
     console.log("Attempting to connect to gorillionaire database...");
 

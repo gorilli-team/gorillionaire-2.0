@@ -6,13 +6,24 @@ const Transfer = require("../../models/Transfer");
 
 router.post("/", async (req, res) => {
   try {
-    const { fromAddress, toAddress, amount, timestamp, transactionHash } =
-      req.body;
+    console.log("Received transfer data:", req.body);
+    const {
+      fromAddress,
+      toAddress,
+      tokenName,
+      tokenSymbol,
+      tokenDecimals,
+      tokenAddress,
+      amount,
+      timestamp,
+      transactionHash,
+    } = req.body;
 
     // Validate required fields
     if (
       !fromAddress ||
       !toAddress ||
+      !token ||
       !amount ||
       !timestamp ||
       !transactionHash
@@ -24,6 +35,10 @@ router.post("/", async (req, res) => {
     const transfer = await Transfer.create({
       fromAddress,
       toAddress,
+      tokenName,
+      tokenSymbol,
+      tokenDecimals,
+      tokenAddress,
       amount,
       timestamp,
       transactionHash,
@@ -33,6 +48,16 @@ router.post("/", async (req, res) => {
   } catch (error) {
     console.error("Error storing transfer:", error);
     res.status(500).json({ error: "Failed to store transfer" });
+  }
+});
+
+router.get("/:token", async (req, res) => {
+  try {
+    const transfers = await Transfer.find({ token: req.params.token });
+    res.status(200).json(transfers);
+  } catch (error) {
+    console.error("Error fetching transfers:", error);
+    res.status(500).json({ error: "Failed to fetch transfers" });
   }
 });
 
