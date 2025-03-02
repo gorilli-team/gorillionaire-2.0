@@ -11,7 +11,7 @@ router.get("/:token", async (req, res) => {
 
     // Get pagination parameters from query string
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 100;
+    const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
 
     // Get total count for pagination metadata

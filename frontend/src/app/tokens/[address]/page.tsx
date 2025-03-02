@@ -31,6 +31,11 @@ export default function TokenPage() {
   const [token, setToken] = useState<TokenData | null>(null);
   const [selectedPage, setSelectedPage] = useState("Tokens");
   const [events, setEvents] = useState<TokenEvent[]>([]);
+  const [allEvents, setAllEvents] = useState<TokenEvent[]>([]);
+  const [filterLabel, setFilterLabel] = useState("ALL");
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
     const fetchTokenData = async () => {
@@ -43,77 +48,16 @@ export default function TokenPage() {
             ? params.address.toLowerCase()
             : undefined)
       );
-      setToken(tokenData || null);
 
-      //   // Generate random events based on signals count
       if (tokenData) {
-        const eventTypes = [
-          "PRICE_CHANGE",
-          "VOLUME_SPIKE",
-          "HOLDER_CHANGE",
-          "SIGNAL",
-        ] as const;
-        const impacts = ["HIGH", "MEDIUM", "LOW"] as const;
-        const eventCount = tokenData.signalsGenerated || 3; // fallback to 3 if signalsGenerated is not set
+        if (tokenData.name === "Chog") {
+          setToken(tokenData);
+        } else {
+          setToken(tokenData);
+        }
+      }
 
-        const randomEvents: TokenEvent[] = Array.from(
-          { length: eventCount },
-          (_, index) => {
-            const randomType =
-              eventTypes[Math.floor(Math.random() * eventTypes.length)];
-            const randomImpact =
-              impacts[Math.floor(Math.random() * impacts.length)];
-            const hoursAgo = Math.floor(Math.random() * 24); // Random time within last 24 hours
-
-            const descriptions = {
-              PRICE_CHANGE: [
-                "Price increased significantly",
-                "Price dropped sharply",
-                "Price showing volatility",
-              ],
-              VOLUME_SPIKE: [
-                "Unusual trading volume detected",
-                "Trading volume surge",
-                "Volume above average",
-              ],
-              HOLDER_CHANGE: [
-                "New whale wallet detected",
-                "Major holder reduced position",
-                "Significant holder movement",
-              ],
-              SIGNAL: [
-                "Buy signal generated",
-                "Sell signal detected",
-                "Trading opportunity identified",
-              ],
-            };
-
-            const values = {
-              PRICE_CHANGE: [`${(Math.random() * 30 - 15).toFixed(1)}%`],
-              VOLUME_SPIKE: [`${(Math.random() * 5 + 1).toFixed(1)}x average`],
-              HOLDER_CHANGE: [`${(Math.random() * 1000000).toFixed(0)} tokens`],
-              SIGNAL: ["Strong", "Moderate", "Weak"],
-            };
-
-            return {
-              id: (index + 1).toString(),
-              type: randomType,
-              timestamp: new Date(
-                Date.now() - hoursAgo * 3600000
-              ).toISOString(),
-              description:
-                descriptions[randomType][Math.floor(Math.random() * 3)],
-              value:
-                randomType === "HOLDER_CHANGE"
-                  ? (Math.random() > 0.5 ? "+" : "-") + values[randomType][0]
-                  : values[randomType][0],
-              impact: randomImpact,
-            };
-          }
-        );
-
-        console.log("tokenData", tokenData);
-
+      if (tokenData) {
         if (tokenData.name === "Chog") {
           try {
             const response = await fetch(
@@ -121,27 +65,92 @@ export default function TokenPage() {
             );
             const data = await response.json();
             console.log("data", data);
+            setToken({
+              ...tokenData,
+              signalsGenerated: data?.pagination?.total,
+            });
+            setAllEvents(data?.events || []);
             setEvents(data?.events || []);
-            // setEvents(data);
-            return; // Exit early since we've set the events
+            return;
           } catch (error) {
             console.error("Error fetching events:", error);
-            // Fall back to random events if fetch fails
           }
         } else {
-          setEvents(
-            randomEvents.sort(
-              (a, b) =>
-                new Date(b.timestamp).getTime() -
-                new Date(a.timestamp).getTime()
-            )
+          const randomEvents = generateRandomEvents(
+            tokenData,
+            tokenData.signalsGenerated || 3
           );
+          setAllEvents(randomEvents);
+          setEvents(randomEvents);
         }
       }
     };
 
     fetchTokenData();
   }, [params.address]);
+
+  useEffect(() => {
+    if (filterLabel === "ALL") {
+      setEvents(allEvents);
+    } else {
+      const filteredEvents = allEvents.filter(
+        (event) => event.impact === filterLabel
+      );
+      setEvents(filteredEvents);
+    }
+  }, [filterLabel, allEvents]);
+
+  const loadMoreEvents = async () => {
+    if (!token || loading || !hasMore) return;
+
+    setLoading(true);
+    const nextPage = page + 1;
+
+    try {
+      if (token.name === "Chog") {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/events/token/${token.name}?page=${nextPage}&limit=20`
+        );
+        const data = await response.json();
+
+        if (data?.events && data.events.length > 0) {
+          setAllEvents((prevEvents) => [...prevEvents, ...data.events]);
+
+          if (filterLabel === "ALL") {
+            setEvents((prevEvents) => [...prevEvents, ...data.events]);
+          } else {
+            const filteredNewEvents = data.events.filter(
+              (event: TokenEvent) => event.impact === filterLabel
+            );
+            setEvents((prevEvents) => [...prevEvents, ...filteredNewEvents]);
+          }
+
+          setPage(nextPage);
+          setHasMore(data.events.length === 20);
+        } else {
+          setHasMore(false);
+        }
+      } else {
+        const newRandomEvents = generateRandomEvents(token, 20);
+        setAllEvents((prevEvents) => [...prevEvents, ...newRandomEvents]);
+
+        if (filterLabel === "ALL") {
+          setEvents((prevEvents) => [...prevEvents, ...newRandomEvents]);
+        } else {
+          const filteredNewEvents = newRandomEvents.filter(
+            (event: TokenEvent) => event.impact === filterLabel
+          );
+          setEvents((prevEvents) => [...prevEvents, ...filteredNewEvents]);
+        }
+
+        setPage(nextPage);
+      }
+    } catch (error) {
+      console.error("Error loading more events:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!token) {
     return (
@@ -219,7 +228,7 @@ export default function TokenPage() {
                   </p>
                 </div>
                 <div className="bg-gray-50 p-4 rounded-lg">
-                  <p className="text-sm text-gray-600">Signals Generated</p>
+                  <p className="text-sm text-gray-600">Events Tracked</p>
                   <p className="text-lg font-semibold">
                     {token.signalsGenerated || 0}
                   </p>
@@ -234,7 +243,21 @@ export default function TokenPage() {
             </div>
 
             <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-bold mb-6">Recent Events</h2>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold mb-6">
+                  Events ({token.signalsGenerated})
+                </h2>
+                <select
+                  className="w-full sm:w-auto bg-white border border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-md px-3 py-2 text-sm font-medium text-gray-700 shadow-sm appearance-none cursor-pointer transition-colors duration-200 focus:outline-none"
+                  value={filterLabel}
+                  onChange={(e) => setFilterLabel(e.target.value)}
+                >
+                  <option value="ALL">All Events</option>
+                  <option value="HIGH">High</option>
+                  <option value="MEDIUM">Medium</option>
+                  <option value="LOW">Low</option>
+                </select>
+              </div>
               <div className="space-y-4">
                 {events.map((event) => (
                   <div
@@ -267,10 +290,91 @@ export default function TokenPage() {
                   </div>
                 ))}
               </div>
+
+              <div className="flex justify-center mt-6">
+                {hasMore && (
+                  <button
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={loadMoreEvents}
+                    disabled={loading}
+                  >
+                    {loading ? "Loading..." : "Load More"}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+function generateRandomEvents(
+  tokenData: TokenData,
+  count: number
+): TokenEvent[] {
+  const eventTypes = [
+    "PRICE_CHANGE",
+    "VOLUME_SPIKE",
+    "HOLDER_CHANGE",
+    "SIGNAL",
+  ] as const;
+  const impacts = ["HIGH", "MEDIUM", "LOW"] as const;
+
+  const randomEvents: TokenEvent[] = Array.from(
+    { length: count },
+    (_, index) => {
+      const randomType =
+        eventTypes[Math.floor(Math.random() * eventTypes.length)];
+      const randomImpact = impacts[Math.floor(Math.random() * impacts.length)];
+      const hoursAgo = Math.floor(Math.random() * 24 * (index + 1));
+
+      const descriptions = {
+        PRICE_CHANGE: [
+          "Price increased significantly",
+          "Price dropped sharply",
+          "Price showing volatility",
+        ],
+        VOLUME_SPIKE: [
+          "Unusual trading volume detected",
+          "Trading volume surge",
+          "Volume above average",
+        ],
+        HOLDER_CHANGE: [
+          "New whale wallet detected",
+          "Major holder reduced position",
+          "Significant holder movement",
+        ],
+        SIGNAL: [
+          "Buy signal generated",
+          "Sell signal detected",
+          "Trading opportunity identified",
+        ],
+      };
+
+      const values = {
+        PRICE_CHANGE: [`${(Math.random() * 30 - 15).toFixed(1)}%`],
+        VOLUME_SPIKE: [`${(Math.random() * 5 + 1).toFixed(1)}x average`],
+        HOLDER_CHANGE: [`${(Math.random() * 1000000).toFixed(0)} tokens`],
+        SIGNAL: ["Strong", "Moderate", "Weak"],
+      };
+
+      return {
+        id: `additional-${index}-${Date.now()}`,
+        type: randomType,
+        timestamp: new Date(Date.now() - hoursAgo * 3600000).toISOString(),
+        description: descriptions[randomType][Math.floor(Math.random() * 3)],
+        value:
+          randomType === "HOLDER_CHANGE"
+            ? (Math.random() > 0.5 ? "+" : "-") + values[randomType][0]
+            : values[randomType][0],
+        impact: randomImpact,
+      };
+    }
+  );
+
+  return randomEvents.sort(
+    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
   );
 }
