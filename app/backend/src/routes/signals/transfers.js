@@ -45,21 +45,6 @@ router.post("/", async (req, res) => {
         transfer: existingTransfer,
       });
     }
-
-    //console.log all
-    console.log("--------------------------------");
-    console.log("fromAddress", fromAddress);
-    console.log("toAddress", toAddress);
-    console.log("tokenName", tokenName);
-    console.log("tokenSymbol", tokenSymbol);
-    console.log("tokenDecimals", tokenDecimals);
-    console.log("tokenAddress", tokenAddress);
-    console.log("amount", amount);
-    console.log("transactionHash", transactionHash);
-    console.log("blockNumber", blockNumber);
-    console.log("blockTimestamp", blockTimestamp);
-    console.log("--------------------------------");
-
     const id = uuidv4();
 
     // Create new transfer record in database
@@ -78,8 +63,6 @@ router.post("/", async (req, res) => {
       blockTimestamp,
     });
 
-    console.log("Transfer created:", transfer);
-
     await transfer.save();
 
     res.status(201).json(transfer);
@@ -91,8 +74,34 @@ router.post("/", async (req, res) => {
 
 router.get("/:token", async (req, res) => {
   try {
-    const transfers = await Transfer.find({ token: req.params.token });
-    res.status(200).json(transfers);
+    console.log("req.params.token", req.params.token);
+
+    // Get pagination parameters from query string
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 25;
+    const skip = (page - 1) * limit;
+
+    // Get total count for pagination metadata
+    const totalCount = await Transfer.countDocuments({
+      tokenName: req.params.token,
+    });
+
+    // Fetch paginated transfers
+    const transfers = await Transfer.find({ tokenName: req.params.token })
+      .sort({ timestamp: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    // Return transfers with pagination metadata
+    res.status(200).json({
+      transfers,
+      pagination: {
+        total: totalCount,
+        page,
+        limit,
+        pages: Math.ceil(totalCount / limit),
+      },
+    });
   } catch (error) {
     console.error("Error fetching transfers:", error);
     res.status(500).json({ error: "Failed to fetch transfers" });
