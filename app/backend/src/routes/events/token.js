@@ -14,40 +14,51 @@ router.get("/:token", async (req, res) => {
     const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
 
-    // Get total count for pagination metadata
-    const totalCount = await Transfer.countDocuments({
-      tokenName: req.params.token,
-    });
+    // Build query object for the token
+    const query = { tokenName: req.params.token };
 
-    // Fetch paginated transfers
-    const transfers = await Transfer.find({ tokenName: req.params.token })
-      .sort({ blockTimestamp: -1 })
-      .skip(skip)
-      .limit(limit);
+    // Fetch all transfers for this token (we'll filter by impact later)
+    const transfers = await Transfer.find(query).sort({ blockTimestamp: -1 });
 
-    const events = transfers.map((transfer) => {
+    // Map transfers to events and calculate impact
+    const allEvents = transfers.map((transfer) => {
+      const amount = Number(transfer.amount) / 1e18;
+      const impact =
+        amount > 1000000 ? "HIGH" : amount > 500000 ? "MEDIUM" : "LOW";
+
       return {
         id: transfer.id,
         type: "TRANSFER",
+        blockTimestamp: transfer.blockTimestamp, // Keep original for sorting
         timestamp: transfer.blockTimestamp
           ? new Date(parseInt(transfer.blockTimestamp) * 1000).toLocaleString()
           : new Date(transfer.timestamp).toLocaleString(),
-        description: `Transferred ${(
-          Number(transfer.amount) / 1e18
-        ).toLocaleString()} ${transfer.tokenSymbol}`,
-        value: (Number(transfer.amount) / 1e18).toLocaleString(),
-        impact:
-          Number(transfer.amount) / 1e18 > 1000000
-            ? "HIGH"
-            : Number(transfer.amount) / 1e18 > 500000
-            ? "MEDIUM"
-            : "LOW",
+        description: `Transferred ${amount.toLocaleString()} ${
+          transfer.tokenSymbol
+        }`,
+        value: amount.toLocaleString(),
+        impact: impact,
       };
     });
 
-    // Return transfers with pagination metadata
+    // Apply impact filter if provided
+    let filteredEvents = allEvents;
+    if (
+      req.query.impact &&
+      ["HIGH", "MEDIUM", "LOW"].includes(req.query.impact)
+    ) {
+      filteredEvents = allEvents.filter(
+        (event) => event.impact === req.query.impact
+      );
+    }
+
+    // Apply pagination
+    const totalCount = filteredEvents.length;
+    const paginatedEvents = filteredEvents.slice(skip, skip + limit);
+
+    // Return events with pagination metadata
     res.status(200).json({
-      events,
+      events: paginatedEvents,
       pagination: {
         total: totalCount,
         page,

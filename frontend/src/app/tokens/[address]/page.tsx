@@ -36,6 +36,7 @@ export default function TokenPage() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [eventsNumber, setEventsNumber] = useState(0);
 
   useEffect(() => {
     const fetchTokenData = async () => {
@@ -90,15 +91,50 @@ export default function TokenPage() {
   }, [params.address]);
 
   useEffect(() => {
-    if (filterLabel === "ALL") {
-      setEvents(allEvents);
-    } else {
-      const filteredEvents = allEvents.filter(
-        (event) => event.impact === filterLabel
-      );
-      setEvents(filteredEvents);
-    }
-  }, [filterLabel, allEvents]);
+    const fetchFilteredEvents = async () => {
+      if (!token) return;
+
+      setPage(1);
+      setHasMore(true);
+
+      if (token.name === "Chog") {
+        try {
+          setLoading(true);
+          const filterParam =
+            filterLabel === "ALL" ? "" : `&impact=${filterLabel}`;
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/events/token/${token.name}?page=1&limit=20${filterParam}`
+          );
+          const data = await response.json();
+
+          if (data?.events) {
+            setEvents(data.events);
+            setEventsNumber(data.pagination.total);
+            setHasMore(data.events.length === 20 && data.pagination.total > 20);
+          } else {
+            setEvents([]);
+            setHasMore(false);
+          }
+        } catch (error) {
+          console.error("Error fetching filtered events:", error);
+          setEvents([]);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        if (filterLabel === "ALL") {
+          setEvents(allEvents);
+        } else {
+          const filteredEvents = allEvents.filter(
+            (event) => event.impact === filterLabel
+          );
+          setEvents(filteredEvents);
+        }
+      }
+    };
+
+    fetchFilteredEvents();
+  }, [filterLabel, token, allEvents]);
 
   const loadMoreEvents = async () => {
     if (!token || loading || !hasMore) return;
@@ -108,23 +144,15 @@ export default function TokenPage() {
 
     try {
       if (token.name === "Chog") {
+        const filterParam =
+          filterLabel === "ALL" ? "" : `&impact=${filterLabel}`;
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/events/token/${token.name}?page=${nextPage}&limit=20`
+          `${process.env.NEXT_PUBLIC_API_URL}/events/token/${token.name}?page=${nextPage}&limit=20${filterParam}`
         );
         const data = await response.json();
 
         if (data?.events && data.events.length > 0) {
-          setAllEvents((prevEvents) => [...prevEvents, ...data.events]);
-
-          if (filterLabel === "ALL") {
-            setEvents((prevEvents) => [...prevEvents, ...data.events]);
-          } else {
-            const filteredNewEvents = data.events.filter(
-              (event: TokenEvent) => event.impact === filterLabel
-            );
-            setEvents((prevEvents) => [...prevEvents, ...filteredNewEvents]);
-          }
-
+          setEvents((prevEvents) => [...prevEvents, ...data.events]);
           setPage(nextPage);
           setHasMore(data.events.length === 20);
         } else {
@@ -132,17 +160,17 @@ export default function TokenPage() {
         }
       } else {
         const newRandomEvents = generateRandomEvents(token, 20);
-        setAllEvents((prevEvents) => [...prevEvents, ...newRandomEvents]);
 
         if (filterLabel === "ALL") {
           setEvents((prevEvents) => [...prevEvents, ...newRandomEvents]);
         } else {
           const filteredNewEvents = newRandomEvents.filter(
-            (event: TokenEvent) => event.impact === filterLabel
+            (event) => event.impact === filterLabel
           );
           setEvents((prevEvents) => [...prevEvents, ...filteredNewEvents]);
         }
 
+        setAllEvents((prevEvents) => [...prevEvents, ...newRandomEvents]);
         setPage(nextPage);
       }
     } catch (error) {
@@ -245,7 +273,7 @@ export default function TokenPage() {
             <div className="bg-white rounded-lg shadow-md p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold mb-6">
-                  Events ({token.signalsGenerated})
+                  Events ({eventsNumber})
                 </h2>
                 <select
                   className="w-full sm:w-auto bg-white border border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-md px-3 py-2 text-sm font-medium text-gray-700 shadow-sm appearance-none cursor-pointer transition-colors duration-200 focus:outline-none"
