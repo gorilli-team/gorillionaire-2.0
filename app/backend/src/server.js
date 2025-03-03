@@ -1,8 +1,11 @@
 // server.js
+const express = require("express");
+const http = require("http");
 const app = require("./app");
+const { initWebSocketServer } = require("./websocket");
 require("dotenv").config();
 const mongoose = require("mongoose");
-const PORT = process.env.PORT || 3003;
+const PORT = process.env.PORT || 3001;
 
 async function startServer() {
   try {
@@ -34,9 +37,17 @@ async function startServer() {
       collections.map((c) => c.name)
     );
 
-    const server = app.listen(PORT, () =>
-      console.log(`Server running on port: ${PORT} 🚀`)
-    );
+    // Create HTTP server
+    const server = http.createServer(app);
+
+    // Initialize WebSocket server
+    const wss = initWebSocketServer(server);
+
+    // Start server
+    server.listen(PORT, () => {
+      console.log(`HTTP server running on port ${PORT}`);
+      console.log(`WebSocket server initialized`);
+    });
 
     // Error handling for the server
     server.on("error", (error) => {
@@ -54,6 +65,9 @@ async function startServer() {
       console.error("Unhandled Rejection:", error);
       restartServer();
     });
+
+    // Return the server instance
+    return server;
   } catch (error) {
     console.error("Failed to connect to MongoDB:", error);
     restartServer();
@@ -79,4 +93,16 @@ function restartServer() {
   });
 }
 
-startServer();
+// Start the server and store the instance
+let serverInstance;
+startServer().then((server) => {
+  serverInstance = server;
+});
+
+// Export the server instance and the startServer function
+module.exports = {
+  get server() {
+    return serverInstance;
+  },
+  startServer,
+};

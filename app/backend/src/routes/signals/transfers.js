@@ -63,6 +63,27 @@ router.post("/", async (req, res) => {
       blockTimestamp,
     });
 
+    // Create event object
+    const newEvent = {
+      id: transfer._id.toString(),
+      type: "TRANSFER",
+      blockTimestamp: transfer.blockTimestamp,
+      timestamp: new Date().toISOString(),
+      description: `Transferred ${(
+        Number(transfer.amount) / 1e18
+      ).toLocaleString()} ${transfer.tokenSymbol}`,
+      value: (Number(transfer.amount) / 1e18).toLocaleString(),
+      impact:
+        Number(transfer.amount) / 1e18 > 1000000
+          ? "HIGH"
+          : Number(transfer.amount) / 1e18 > 500000
+          ? "MEDIUM"
+          : "LOW",
+    };
+
+    // Broadcast to WebSocket clients
+    broadcastEvent(tokenName, newEvent);
+
     await transfer.save();
 
     res.status(201).json(transfer);
