@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import Sidebar from "../../components/sidebar";
 import Header from "../../components/header";
@@ -37,6 +37,8 @@ export default function TokenPage() {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [eventsNumber, setEventsNumber] = useState(0);
+  const [newEventIds, setNewEventIds] = useState<Set<string>>(new Set());
+  const wsRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
     const fetchTokenData = async () => {
@@ -89,6 +91,83 @@ export default function TokenPage() {
 
     fetchTokenData();
   }, [params.address]);
+
+  useEffect(() => {
+    if (!token || token.name !== "Chog") {
+      return;
+    }
+
+    if (wsRef.current) {
+      wsRef.current.close();
+    }
+
+    const wsUrl = `${process.env.NEXT_PUBLIC_API_URL}/events/token/${token.name}`;
+    console.log(`Connecting to WebSocket: ${wsUrl}`);
+    wsRef.current = new WebSocket(wsUrl);
+
+    wsRef.current.onopen = () => {
+      console.log("WebSocket connection established");
+    };
+
+    wsRef.current.onmessage = (event) => {
+      try {
+        const message = JSON.parse(event.data);
+        console.log("WebSocket message received:", message);
+
+        if (message.type === "NEW_EVENT") {
+          const newEvent = message.data;
+
+          setEvents((prevEvents) => {
+            if (prevEvents.some((e) => e.id === newEvent.id)) {
+              return prevEvents;
+            }
+            return [newEvent, ...prevEvents];
+          });
+
+          setAllEvents((prevEvents) => {
+            if (prevEvents.some((e) => e.id === newEvent.id)) {
+              return prevEvents;
+            }
+            return [newEvent, ...prevEvents];
+          });
+
+          setEventsNumber((prev) => prev + 1);
+
+          setNewEventIds((prevIds) => {
+            const updatedIds = new Set(prevIds);
+            updatedIds.add(newEvent.id);
+            return updatedIds;
+          });
+
+          setTimeout(() => {
+            setNewEventIds((prevIds) => {
+              const updatedIds = new Set(prevIds);
+              updatedIds.delete(newEvent.id);
+              return updatedIds;
+            });
+          }, 5000);
+        }
+      } catch (error) {
+        console.error("Error processing WebSocket message:", error);
+      }
+    };
+
+    wsRef.current.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+
+    wsRef.current.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    return () => {
+      if (wsRef.current) {
+        console.log("Closing WebSocket connection");
+        wsRef.current.close();
+        wsRef.current = null;
+      }
+    };
+  }, [token?.name]);
 
   useEffect(() => {
     const fetchFilteredEvents = async () => {
@@ -290,7 +369,9 @@ export default function TokenPage() {
                 {events.map((event) => (
                   <div
                     key={event.id}
-                    className="border-l-4 border-blue-500 pl-4 py-2"
+                    className={`border-l-4 border-blue-500 pl-4 py-2 transition-colors duration-1000 ${
+                      newEventIds.has(event.id) ? "bg-green-200" : ""
+                    }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
@@ -322,7 +403,7 @@ export default function TokenPage() {
               <div className="flex justify-center mt-6">
                 {hasMore && (
                   <button
-                    className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition-colors duration-5000 disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={loadMoreEvents}
                     disabled={loading}
                   >
