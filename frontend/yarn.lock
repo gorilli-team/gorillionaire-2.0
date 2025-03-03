@@ -2965,7 +2965,7 @@ gopd@^1.0.1, gopd@^1.2.0:
   dependencies:
     "@coinbase/onchainkit" "^0.36.9"
     ethers "^6.13.5"
-    gorillionaire-frontend "file:../../../../../Library/Caches/Yarn/v6/npm-gorillionaire-frontend-0.1.0-c7712582-f066-4fd6-8191-c045e6b89764-1740002049297/node_modules/gorillionaire-frontend"
+    gorillionaire-frontend "file:../../../../../Library/Caches/Yarn/v6/npm-gorillionaire-frontend-0.1.0-6820c37a-4a93-4b72-98a7-1c554a3dad38-1740988585737/node_modules/gorillionaire-frontend"
     next "15.1.6"
     pino-pretty "^13.0.0"
     react "^19.0.0"

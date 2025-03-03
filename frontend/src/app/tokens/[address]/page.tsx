@@ -117,6 +117,12 @@ export default function TokenPage() {
         if (message.type === "NEW_EVENT") {
           const newEvent = message.data;
 
+          setNewEventIds((prevIds) => {
+            const updatedIds = new Set(prevIds);
+            updatedIds.add(newEvent.id);
+            return updatedIds;
+          });
+
           setEvents((prevEvents) => {
             if (prevEvents.some((e) => e.id === newEvent.id)) {
               return prevEvents;
@@ -132,12 +138,6 @@ export default function TokenPage() {
           });
 
           setEventsNumber((prev) => prev + 1);
-
-          setNewEventIds((prevIds) => {
-            const updatedIds = new Set(prevIds);
-            updatedIds.add(newEvent.id);
-            return updatedIds;
-          });
 
           setTimeout(() => {
             setNewEventIds((prevIds) => {
@@ -167,7 +167,7 @@ export default function TokenPage() {
         wsRef.current = null;
       }
     };
-  }, [token?.name]);
+  }, [token?.name, token]);
 
   useEffect(() => {
     const fetchFilteredEvents = async () => {
@@ -336,9 +336,7 @@ export default function TokenPage() {
                 </div>
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-600">Events Tracked</p>
-                  <p className="text-lg font-semibold">
-                    {token.signalsGenerated || 0}
-                  </p>
+                  <p className="text-lg font-semibold">{eventsNumber || 0}</p>
                 </div>
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-600">Holders</p>
@@ -369,9 +367,9 @@ export default function TokenPage() {
                 {events.map((event) => (
                   <div
                     key={event.id}
-                    className={`border-l-4 border-blue-500 pl-4 py-2 transition-colors duration-1000 ${
-                      newEventIds.has(event.id) ? "bg-green-200" : ""
-                    }`}
+                    className={`border-l-4 border-blue-500 pl-4 py-2 ${
+                      newEventIds.has(event.id) ? "bg-green-200" : "bg-white"
+                    } transition-all duration-700 ease-in-out`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
