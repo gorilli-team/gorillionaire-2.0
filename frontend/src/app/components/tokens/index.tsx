@@ -31,7 +31,6 @@ const untrackedTokens: TokenData[] = [
     price: "$0.50",
     volume: "$1.2M",
     trackedSince: "Feb 20, 2025",
-    trackingTime: "5 days",
     signalsGenerated: 127,
   },
   {
@@ -48,7 +47,6 @@ const untrackedTokens: TokenData[] = [
     price: "$0.50",
     volume: "$1.2M",
     trackedSince: "Feb 25, 2025",
-    trackingTime: "2 days",
     signalsGenerated: 84,
   },
 ];
@@ -102,7 +100,6 @@ const Tokens = () => {
                 symbol={token.symbol}
                 image={token.image}
                 trackedSince={token.trackedSince}
-                trackingTime={token.trackingTime}
                 signalsGenerated={token.signalsGenerated}
               />
             </div>
@@ -122,7 +119,6 @@ const Tokens = () => {
                 symbol={token.symbol}
                 image={token.image}
                 trackedSince={token.trackedSince}
-                trackingTime={token.trackingTime}
                 signalsGenerated={token.signalsGenerated}
               />
             </div>
