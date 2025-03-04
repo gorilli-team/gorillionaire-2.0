@@ -4,7 +4,6 @@ import {
   fetchVaultTransactions,
   fetchCreationTransaction,
 } from "../../api/fetchVaultData";
-import { fetchTokenData } from "@/app/api/fetchFeedData";
 import TokenChart from "../token_chart";
 import Image from "next/image";
 interface TokenInfo {
@@ -57,7 +56,7 @@ const VaultStats: React.FC = () => {
         const transactions = await fetchVaultTransactions();
         setTransactionCount(transactions.length);
 
-        const tokenResponse = await fetchTokenData();
+        const tokenResponse = null;
         setTokenData(tokenResponse);
       } catch (error) {
         console.error("Error fetching data:", error);

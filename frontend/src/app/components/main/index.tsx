@@ -143,38 +143,6 @@ export default function Main({
   >(null);
 
   useEffect(() => {
-    const fetchInitialData = async () => {
-      const feedData = await fetchFeedData();
-      const tweetsData = await fetchTweetsData();
-      const pricesData = await fetchPricesData();
-      const tokenData = await fetchTokenData();
-
-      console.log("token dati prices", tokenData);
-
-      if (feedData && feedData.data.length > 0) {
-        const parsedFeedData = JSON.parse(feedData.data[0].value);
-        setFeedSignal(parsedFeedData.value);
-      }
-
-      if (tweetsData && tweetsData.data.length > 0) {
-        const parsedTweets = tweetsData.data
-          .slice(0, 10)
-          .map(
-            (item: { value: string }) => JSON.parse(item.value).value as Tweet
-          );
-        setTweets(parsedTweets);
-      }
-
-      if (pricesData && pricesData.data.length > 0) {
-        const parsedPricesData = JSON.parse(pricesData.data[0].value);
-        setPriceData(parsedPricesData.value);
-      }
-    };
-
-    fetchInitialData();
-  }, []);
-
-  useEffect(() => {
     if (allowanceData) {
       setAllowance(allowanceData);
     }

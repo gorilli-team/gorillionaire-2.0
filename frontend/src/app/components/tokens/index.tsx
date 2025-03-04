@@ -1,26 +1,24 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Token from "../token/index";
-import { trackedTokens } from "@/app/shared/tokenData";
+import {
+  trackedTokens,
+  fetchAllTokens,
+  TokenData,
+} from "@/app/shared/tokenData";
 import { useRouter } from "next/navigation";
 
-interface TokenData {
+interface TokenStats {
   name: string;
   symbol: string;
-  price: string;
-  volume: string;
-  image: string;
-  trackedSince?: string;
-  trackingTime?: string;
-  signalsGenerated?: number;
   address: string;
-  supply: string;
-  holders: number;
-  age: string;
-  isActive: boolean;
+  totalEvents: number;
+  trackedSince: string;
+  trackingTime: string;
 }
 
 const untrackedTokens: TokenData[] = [
   {
+    id: 1,
     name: "Wrapped Monad",
     symbol: "MON",
     supply: "93,415,274,755",
@@ -37,6 +35,7 @@ const untrackedTokens: TokenData[] = [
     signalsGenerated: 127,
   },
   {
+    id: 2,
     name: "ShMonad",
     symbol: "ShMON",
     supply: "27,937",
@@ -56,6 +55,32 @@ const untrackedTokens: TokenData[] = [
 
 const Tokens = () => {
   const router = useRouter();
+  const [tokenStats, setTokenStats] = useState<TokenStats[]>([]);
+
+  useEffect(() => {
+    const getTokens = async () => {
+      try {
+        const fetchedTokens = await fetchAllTokens();
+        setTokenStats(fetchedTokens || []);
+      } catch (error) {
+        console.error("Error fetching tokens:", error);
+        setTokenStats([]);
+      }
+    };
+
+    getTokens();
+  }, []);
+
+  // Merge static data with dynamic stats
+  const trackedTokensWithStats = trackedTokens.map((token) => {
+    const stats = tokenStats.find((t) => t.name === token.name);
+    return {
+      ...token,
+      signalsGenerated: stats?.totalEvents || 0,
+      trackedSince: stats?.trackedSince || "",
+      trackingTime: stats?.trackingTime || "",
+    };
+  });
 
   const handleTokenClick = (address: string) => {
     router.push(`/tokens/${address}`);
@@ -66,7 +91,7 @@ const Tokens = () => {
       <div className="container mx-auto">
         <h2 className="text-xl font-bold mb-4">Tracked Tokens</h2>
         <div className="grid grid-cols-3 gap-8">
-          {trackedTokens.map((token: TokenData, index: number) => (
+          {trackedTokensWithStats.map((token: TokenData, index: number) => (
             <div
               key={index}
               className="bg-white shadow-md rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200"

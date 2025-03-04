@@ -11,16 +11,25 @@ export interface TokenData {
   isActive: boolean;
   supply: string;
   trackedSince: string;
-  trackingTime: string;
   signalsGenerated: number;
 }
+
+//fetch all tokens from backend
+export const fetchAllTokens = async () => {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/events/token`
+  );
+  const data = await response.json();
+  console.log("data", data);
+  return data;
+};
 
 export const trackedTokens: TokenData[] = [
   {
     id: 11,
     name: "Molandak",
     symbol: "DAK",
-    supply: "296,997",
+    supply: "10,000,000",
     holders: 603708,
     age: "10 days 20 hrs ago",
     address: "0x0F0BDEbF0F83cD1EE3974779Bcb7315f9808c714",
@@ -29,15 +38,14 @@ export const trackedTokens: TokenData[] = [
     isActive: false,
     price: "$0.50",
     volume: "$1.2M",
-    trackedSince: "Feb 22, 2025",
-    trackingTime: "4 days",
+    trackedSince: "Jan 01, 2025",
     signalsGenerated: 112,
   },
   {
     id: 12,
     name: "Moyaki",
     symbol: "YAKI",
-    supply: "288,018",
+    supply: "1,000,000,000",
     holders: 536061,
     age: "10 days 20 hrs ago",
     address: "0xfe140e1dCe99Be9F4F15d657CD9b7BF622270C50",
@@ -46,15 +54,14 @@ export const trackedTokens: TokenData[] = [
     isActive: false,
     price: "$0.50",
     volume: "$1.2M",
-    trackedSince: "Feb 24, 2025",
-    trackingTime: "3 days",
+    trackedSince: "Jan 01, 2025",
     signalsGenerated: 95,
   },
   {
     id: 13,
     name: "Chog",
     symbol: "CHOG",
-    supply: "275,880",
+    supply: "100,000,000",
     holders: 565297,
     age: "10 days 20 hrs ago",
     address: "0xE0590015A873bF326bd645c3E1266d4db41C4E6B",
@@ -63,8 +70,7 @@ export const trackedTokens: TokenData[] = [
     isActive: false,
     price: "$0.50",
     volume: "$1.2M",
-    trackedSince: "Feb 26, 2025",
-    trackingTime: "2 days",
+    trackedSince: "Jan 01, 2025",
     signalsGenerated: 72,
   },
 ];
