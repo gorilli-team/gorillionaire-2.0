@@ -79,6 +79,7 @@ export default function TokenPage() {
             setToken({
               ...tokenData,
               signalsGenerated: data?.pagination?.total,
+              trackedSince: data?.tokenInfo?.trackedSince,
             });
             setAllEvents(data?.events || []);
             setEvents(data?.events || []);

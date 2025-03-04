@@ -134,8 +134,29 @@ router.get("/:token", async (req, res) => {
     const totalCount = filteredEvents.length;
     const paginatedEvents = filteredEvents.slice(skip, skip + limit);
 
+    // Get the oldest timestamp from all events
+    const oldestEvent = transfers.reduce((oldest, current) => {
+      return parseInt(current.blockTimestamp) < parseInt(oldest.blockTimestamp)
+        ? current
+        : oldest;
+    }, transfers[0]);
+
+    const tokenInfo = {
+      name: req.params.token,
+      symbol: req.params.token,
+      address: req.params.token,
+      totalEvents: totalCount,
+      trackedSince: oldestEvent
+        ? formatDate(oldestEvent.blockTimestamp)
+        : "Unknown",
+      trackingTime: oldestEvent
+        ? getTrackingTimeString(oldestEvent.blockTimestamp)
+        : "Unknown",
+    };
+
     // Return events with pagination metadata
     res.status(200).json({
+      tokenInfo: tokenInfo,
       events: paginatedEvents,
       pagination: {
         total: totalCount,
