@@ -4,7 +4,7 @@ const express = require("express");
 const router = express.Router();
 const Transfer = require("../../models/Transfer");
 const { v4: uuidv4 } = require("uuid");
-
+const { broadcastEvent } = require("../../websocket");
 router.post("/", async (req, res) => {
   try {
     const {
@@ -63,6 +63,15 @@ router.post("/", async (req, res) => {
       blockTimestamp,
     });
 
+    let highImpactBaseValue = 1000000;
+    if (tokenName === "Chog") {
+      highImpactBaseValue = 100000;
+    } else if (tokenName === "Molandak") {
+      highImpactBaseValue = 10000;
+    } else if (tokenName === "Moyaki") {
+      highImpactBaseValue = 1000000;
+    }
+
     // Create event object
     const newEvent = {
       id: transfer._id.toString(),
@@ -74,9 +83,9 @@ router.post("/", async (req, res) => {
       ).toLocaleString()} ${transfer.tokenSymbol}`,
       value: (Number(transfer.amount) / 1e18).toLocaleString(),
       impact:
-        Number(transfer.amount) / 1e18 > 1000000
+        Number(transfer.amount) / 1e18 > highImpactBaseValue * 10
           ? "HIGH"
-          : Number(transfer.amount) / 1e18 > 500000
+          : Number(transfer.amount) / 1e18 > highImpactBaseValue * 5
           ? "MEDIUM"
           : "LOW",
     };

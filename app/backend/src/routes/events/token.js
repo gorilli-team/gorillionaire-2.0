@@ -24,8 +24,13 @@ router.get("/:token", async (req, res) => {
     // Map transfers to events and calculate impact
     const allEvents = transfers.map((transfer) => {
       const amount = Number(transfer.amount) / 1e18;
-      const impact =
+      let impact =
         amount > 1000000 ? "HIGH" : amount > 500000 ? "MEDIUM" : "LOW";
+
+      if (req.params.token === "Moyaki") {
+        impact =
+          amount > 10000000 ? "HIGH" : amount > 5000000 ? "MEDIUM" : "LOW";
+      }
 
       return {
         id: transfer.id,
