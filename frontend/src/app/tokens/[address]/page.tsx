@@ -53,7 +53,11 @@ export default function TokenPage() {
       );
 
       if (tokenData) {
-        if (tokenData.name === "Chog") {
+        if (
+          tokenData.name === "Chog" ||
+          tokenData.name === "Molandak" ||
+          tokenData.name === "Moyaki"
+        ) {
           setToken(tokenData);
         } else {
           setToken(tokenData);
@@ -61,7 +65,11 @@ export default function TokenPage() {
       }
 
       if (tokenData) {
-        if (tokenData.name === "Chog") {
+        if (
+          tokenData.name === "Chog" ||
+          tokenData.name === "Molandak" ||
+          tokenData.name === "Moyaki"
+        ) {
           try {
             const response = await fetch(
               `${process.env.NEXT_PUBLIC_API_URL}/events/token/${tokenData.name}`
@@ -93,7 +101,12 @@ export default function TokenPage() {
   }, [params.address]);
 
   useEffect(() => {
-    if (!token || token.name !== "Chog") {
+    if (
+      !token ||
+      (token.name !== "Chog" &&
+        token.name !== "Molandak" &&
+        token.name !== "Moyaki")
+    ) {
       return;
     }
 
@@ -176,7 +189,11 @@ export default function TokenPage() {
       setPage(1);
       setHasMore(true);
 
-      if (token.name === "Chog") {
+      if (
+        token.name === "Chog" ||
+        token.name === "Molandak" ||
+        token.name === "Moyaki"
+      ) {
         try {
           setLoading(true);
           const filterParam =
@@ -222,7 +239,11 @@ export default function TokenPage() {
     const nextPage = page + 1;
 
     try {
-      if (token.name === "Chog") {
+      if (
+        token.name === "Chog" ||
+        token.name === "Molandak" ||
+        token.name === "Moyaki"
+      ) {
         const filterParam =
           filterLabel === "ALL" ? "" : `&impact=${filterLabel}`;
         const response = await fetch(
