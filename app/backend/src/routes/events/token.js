@@ -6,6 +6,78 @@ const Transfer = require("../../models/Transfer");
 const { v4: uuidv4 } = require("uuid");
 const { broadcastEvent } = require("../../websocket");
 
+//get all tokens
+router.get("/", async (req, res) => {
+  try {
+    // Get all tokens with their event counts
+    const tokenStats = await Transfer.aggregate([
+      {
+        $group: {
+          _id: "$tokenName",
+          totalEvents: { $sum: 1 },
+          tokenSymbol: { $first: "$tokenSymbol" },
+          tokenAddress: { $first: "$tokenAddress" },
+          firstEventDate: { $min: "$blockTimestamp" }, //make it in this format Feb 25, 2025 // Get the oldest event timestamp
+        },
+      },
+    ]);
+
+    const tokensWithStats = tokenStats.map((token) => ({
+      name: token._id,
+      symbol: token.tokenSymbol,
+      address: token.tokenAddress,
+      totalEvents: token.totalEvents,
+      trackedSince: token.firstEventDate
+        ? formatDate(token.firstEventDate)
+        : "Unknown",
+      trackingTime: token.firstEventDate
+        ? getTrackingTimeString(parseInt(token.firstEventDate))
+        : "Unknown",
+    }));
+
+    res.json(tokensWithStats);
+  } catch (error) {
+    console.error("Error fetching token stats:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Helper function to calculate tracking time
+function getTrackingTimeString(timestamp) {
+  const now = Math.floor(Date.now() / 1000);
+  const diffInSeconds = now - timestamp;
+  const diffInDays = Math.floor(diffInSeconds / (24 * 60 * 60));
+
+  if (diffInDays === 0) {
+    const diffInHours = Math.floor(diffInSeconds / (60 * 60));
+    return `${diffInHours} hours`;
+  }
+
+  return `${diffInDays} days`;
+}
+
+function formatDate(timestamp) {
+  const date = new Date(parseInt(timestamp) * 1000);
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  return `${months[date.getMonth()]} ${date
+    .getDate()
+    .toString()
+    .padStart(2, "0")}, ${date.getFullYear()}`;
+}
+
 router.get("/:token", async (req, res) => {
   try {
     console.log("req.params.token", req.params.token);
