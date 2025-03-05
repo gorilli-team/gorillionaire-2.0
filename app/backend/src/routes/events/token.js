@@ -3,6 +3,7 @@
 const express = require("express");
 const router = express.Router();
 const Transfer = require("../../models/Transfer");
+const Spike = require("../../models/Spike");
 const { v4: uuidv4 } = require("uuid");
 const { broadcastEvent } = require("../../websocket");
 
@@ -94,7 +95,7 @@ router.get("/:token", async (req, res) => {
     const transfers = await Transfer.find(query).sort({ blockTimestamp: -1 });
 
     // Map transfers to events and calculate impact
-    const allEvents = transfers.map((transfer) => {
+    const allTransfers = transfers.map((transfer) => {
       const amount = Number(transfer.amount) / 1e18;
       let impact =
         amount > 1000000 ? "HIGH" : amount > 500000 ? "MEDIUM" : "LOW";
@@ -120,15 +121,64 @@ router.get("/:token", async (req, res) => {
     });
 
     // Apply impact filter if provided
-    let filteredEvents = allEvents;
+    let filteredTransfers = allTransfers;
     if (
       req.query.impact &&
       ["HIGH", "MEDIUM", "LOW"].includes(req.query.impact)
     ) {
-      filteredEvents = allEvents.filter(
-        (event) => event.impact === req.query.impact
+      filteredTransfers = allTransfers.filter(
+        (transfer) => transfer.impact === req.query.impact
       );
     }
+
+    //get all spikes
+    const allSpikes = await Spike.find(query).sort({ blockTimestamp: -1 });
+
+    //map spikes to events
+    const allSpikesEvents = allSpikes.map((spike) => {
+      const increasePercentage =
+        ((spike.thisHourTransfers - spike.previousHourTransfers) /
+          spike.previousHourTransfers) *
+        100;
+      return {
+        id: spike.id,
+        type: "ACTIVITY_SPIKE",
+        blockTimestamp: spike.blockTimestamp, // Keep original for sorting
+        timestamp: spike.blockTimestamp
+          ? new Date(parseInt(spike.blockTimestamp) * 1000).toLocaleString()
+          : new Date(spike.timestamp).toLocaleString(),
+        description: `${
+          spike.tokenSymbol
+        } Spike: ${spike.thisHourTransfers.toLocaleString()} transfers. Previous hour: ${spike.previousHourTransfers.toLocaleString()} 
+(+${increasePercentage.toFixed(2)}%)`,
+        value: spike.thisHourTransfers.toLocaleString(),
+        impact:
+          increasePercentage > 100
+            ? "HIGH"
+            : increasePercentage > 50
+            ? "MEDIUM"
+            : "LOW",
+      };
+    });
+
+    // Apply impact filter if provided
+    let filteredSpikes = allSpikesEvents;
+    if (
+      req.query.impact &&
+      ["HIGH", "MEDIUM", "LOW"].includes(req.query.impact)
+    ) {
+      filteredSpikes = allSpikesEvents.filter(
+        (spike) => spike.impact === req.query.impact
+      );
+    }
+
+    //
+
+    //add spikes to events
+    filteredEvents = [...filteredTransfers, ...filteredSpikes];
+
+    //sort events by blockTimestamp
+    filteredEvents.sort((a, b) => b.blockTimestamp - a.blockTimestamp);
 
     // Apply pagination
     const totalCount = filteredEvents.length;
@@ -198,9 +248,9 @@ router.post("/:token", async (req, res) => {
     // Create event object
     const newEvent = {
       id: newTransfer._id.toString(),
-      type: "TRANSFER",
       blockTimestamp: newTransfer.blockTimestamp,
       timestamp: new Date().toISOString(),
+      type: "TRANSFER",
       description: `Transferred ${(
         Number(newTransfer.amount) / 1e18
       ).toLocaleString()} ${newTransfer.tokenSymbol}`,

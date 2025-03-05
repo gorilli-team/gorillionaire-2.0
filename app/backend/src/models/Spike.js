@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const TransferSchema = new mongoose.Schema({
+const SpikeSchema = new mongoose.Schema({
   id: {
     type: String,
     required: true,
@@ -22,7 +22,7 @@ const TransferSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  totalTransfersPerHour: {
+  thisHourTransfers: {
     type: Number,
     required: true,
   },
@@ -40,4 +40,4 @@ const TransferSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Transfer", TransferSchema);
+module.exports = mongoose.model("Spike", SpikeSchema);
