@@ -11,7 +11,7 @@ async function processText() {
         }
 
         const splitter = new RecursiveCharacterTextSplitter({
-            chunkSize: 500,
+            chunkSize: 350,
             chunkOverlap: 50,
         });
 
