@@ -49,7 +49,7 @@ router.post("/", async (req, res) => {
       !blockNumber ||
       !blockTimestamp
     ) {
-      console.log("Missing required fields");
+      console.log("Missing required fields in spike", req.body);
       return res.status(400).json({ error: "Missing required fields" });
     }
 
