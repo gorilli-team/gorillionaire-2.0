@@ -308,6 +308,8 @@ export default function TokenPage() {
         return "💰";
       case "VOLUME_SPIKE":
         return "📈";
+      case "ACTIVITY_SPIKE":
+        return "🔥";
       case "HOLDER_CHANGE":
         return "👥";
       case "SIGNAL":
