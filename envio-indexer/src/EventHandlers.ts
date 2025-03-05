@@ -24,13 +24,9 @@ const chogTracker = new TransferTracker("CHOG");
 const moyakiTracker = new TransferTracker("MOYAKI");
 const molandakTracker = new TransferTracker("MOLANDAK");
 
-// Helper function to check if transfer is recent (within last hour)
-const isRecentTransfer = (transferTimestamp: number): boolean => {
-  const currentTimestamp = Math.floor(Date.now() / 1000);
-  // const oneHourInSeconds = 3600;
-  const oneDayInSeconds = 86400;
-  return currentTimestamp - transferTimestamp <= oneDayInSeconds;
-};
+let trackedTransfersChog = 0;
+let trackedTransfersMoyaki = 0;
+let trackedTransfersMolandak = 0;
 
 // Helper function to format transfer message
 const formatTransferMessage = (
@@ -69,7 +65,7 @@ Chog.Transfer.handler(async ({ event, context }) => {
   };
 
   // Track the transfer
-  chogTracker.trackTransfer(event);
+  chogTracker.trackTransfer(event, "CHOG", "Chog", 18, CHOG_ADDRESS);
   const stats = chogTracker.getStats();
 
   // Only proceed with whale transfer handling if threshold is met

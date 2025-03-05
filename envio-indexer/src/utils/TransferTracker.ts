@@ -39,12 +39,23 @@ export class TransferTracker {
     return `${day} ${month} ${hour}:00, ${year}`;
   }
 
-  async trackTransfer(entity: any): Promise<void> {
+  async trackTransfer(
+    entity: any,
+    tokenSymbol: string,
+    tokenName: string,
+    tokenDecimals: number,
+    tokenAddress: string
+  ): Promise<void> {
     const date = new Date(Number(entity.block.timestamp) * 1000);
     const currentHour = date.getHours();
+    const currentDate = date.toISOString();
+    
+    // Check if we need to log a new hour summary
+    if (this.trackedHour !== null && currentHour !== this.trackedHour) {
+      console.log("NEW HOUR", currentHour, this.trackedHour, currentDate);
 
-    if (currentHour !== this.trackedHour) {
-      console.log("NEW HOUR", currentHour, this.trackedHour);
+      // Always update the tracked hour after processing the previous hour
+      this.trackedHour = currentHour;
 
       console.log(
         `[${this.tokenName}] Hourly Summary: ${
@@ -61,10 +72,10 @@ export class TransferTracker {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              tokenName: entity.tokenName,
-              tokenSymbol: entity.tokenSymbol,
-              tokenDecimals: entity.tokenDecimals,
-              tokenAddress: entity.tokenAddress,
+              tokenName,
+              tokenSymbol,
+              tokenDecimals,
+              tokenAddress,
               thisHourTransfers: this.transfersPerHour,
               previousHourTransfers: this.previousHourTransfers,
               blockNumber: entity.block.number.toString(),
@@ -98,9 +109,9 @@ export class TransferTracker {
       }
       this.previousHourTransfers = this.transfersPerHour;
       this.transfersPerHour = 0;
-      this.trackedHour = currentHour;
     }
 
+    // Increment the transfer counter
     this.transfersPerHour++;
   }
 
