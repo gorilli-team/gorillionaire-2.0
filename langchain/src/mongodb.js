@@ -1,6 +1,7 @@
+import "dotenv/config";
 import { MongoClient } from "mongodb";
 
-const uri = 'mongodb+srv://paolo:EbNqBrLhR85GnrJv@gorillionaire.ifxq5.mongodb.net/?retryWrites=true&w=majority&appName=signals';
+const uri = process.env.MONGODB_CONNECTION_STRING;
 
 let client;
 let db;
