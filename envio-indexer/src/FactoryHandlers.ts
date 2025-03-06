@@ -33,39 +33,39 @@ async function handleNewListing(
   };
   context.TokenListed.set(entity);
 
-  //   try {
-  //     // Store the token in the database via a POST request to the backend
-  //     const response = await fetch(
-  //       `${process.env.NEXT_PUBLIC_API_BASE_URL}/signals/listing`,
-  //       {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({
-  //           tokenAddress: entity.id.toString(),
-  //           blockNumber: entity.blockNumber.toString(),
-  //           blockTimestamp: entity.blockTimestamp.toString(),
-  //           transactionHash: entity.transactionHash,
-  //         }),
-  //       }
-  //     );
+  try {
+    // Store the token in the database via a POST request to the backend
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/signals/listings`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          tokenAddress: entity.id.toString(),
+          blockNumber: entity.blockNumber.toString(),
+          blockTimestamp: entity.blockTimestamp.toString(),
+          transactionHash: entity.transactionHash,
+        }),
+      }
+    );
 
-  //     if (!response.ok) {
-  //       const errorText = await response.text();
-  //       console.error(
-  //         `Failed to store transfer: ${response.status} - ${errorText}`
-  //       );
-  //     } else if (response.status === 200) {
-  //       console.log("Transfer already exists");
-  //     } else if (response.status === 201) {
-  //       // here put the telegram notification
-  //       const message = "New Listing!!!";
-  //       await sendTelegramNotification(message);
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(
+        `Failed to store listing: ${response.status} - ${errorText}`
+      );
+    } else if (response.status === 200) {
+      console.log("listing already exists");
+    } else if (response.status === 201) {
+      // here put the telegram notification
+      const message = "New Listing!!!";
+      // await sendTelegramNotification(message);
 
-  //       console.log("Transfer stored successfully");
-  //     }
-  //   } catch (error) {
-  //     console.error("Failed to track transfer:", error);
-  //   }
+      console.log("listing stored successfully");
+    }
+  } catch (error) {
+    console.error("Failed to track listing:", error);
+  }
 }

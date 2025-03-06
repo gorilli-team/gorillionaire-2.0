@@ -24,6 +24,7 @@ app.use(function (req, res, next) {
 // Routes
 app.use("/events/token", require("./routes/events/token"));
 app.use("/signals/transfers", require("./routes/signals/transfers"));
+app.use("/signals/listings", require("./routes/signals/listings"));
 
 // Basic error handling
 app.use((err, req, res, next) => {
