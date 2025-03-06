@@ -29,7 +29,6 @@ export async function fetchData() {
     const db = await connectDB();
     const spikes = db.collection("spikes");
     const transfers = db.collection("transfers");
-    const listings = db.collection("listings");
 
     const twentyFourHoursAgo = Math.floor(Date.now() / 1000) - 24 * 60 * 60;
 
@@ -49,11 +48,6 @@ export async function fetchData() {
       })
       .toArray();
 
-    const listingsDocuments = await listings
-      .find()
-      .toArray();
-
-
     return (
       spikesDocuments
         .map(
@@ -68,13 +62,6 @@ export async function fetchData() {
           (doc) =>
             `Transfer Event: Token Name: ${doc.tokenName}, Token Symbol: ${doc.tokenSymbol}, ` +
             `Amount: ${doc.amount}, From: ${doc.fromAddress}, To: ${doc.toAddress}`
-        )
-        .join("\n") +
-      "\n" +
-      listingsDocuments
-        .map(
-          (doc) =>
-            `Listing Event: Token Name: ${doc.tokenName}, Token Symbol: ${doc.tokenSymbol}, Listing Date: ${doc.blockTimestamp}`
         )
         .join("\n")
     );
