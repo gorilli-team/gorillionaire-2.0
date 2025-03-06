@@ -29,7 +29,13 @@ export async function fetchData() {
         const db = await connectDB();
         const collection = db.collection('transfers');
 
-        const documents = await collection.find().toArray();
+        const twentyFourHoursAgo = Math.floor(Date.now() / 1000) - 24 * 60 * 60;
+
+        const documents = await collection.find({
+            blockTimestamp: {
+                $gte: twentyFourHoursAgo,
+            },
+        }).toArray();
 
         if (documents.length === 0) {
             console.warn("No documents found in the 'transfers' collection.");
