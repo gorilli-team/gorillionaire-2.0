@@ -33,6 +33,7 @@ export default function TokenPage() {
   const [events, setEvents] = useState<TokenEvent[]>([]);
   const [allEvents, setAllEvents] = useState<TokenEvent[]>([]);
   const [filterLabel, setFilterLabel] = useState("ALL");
+  const [filterEvent, setFilterEvent] = useState("ALL");
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -75,7 +76,6 @@ export default function TokenPage() {
               `${process.env.NEXT_PUBLIC_API_URL}/events/token/${tokenData.name}`
             );
             const data = await response.json();
-            console.log("data", data);
             setToken({
               ...tokenData,
               signalsGenerated: data?.pagination?.total,
@@ -198,7 +198,13 @@ export default function TokenPage() {
         try {
           setLoading(true);
           const filterParam =
-            filterLabel === "ALL" ? "" : `&impact=${filterLabel}`;
+            filterLabel === "ALL" && filterEvent === "ALL"
+              ? ""
+              : filterLabel === "ALL"
+              ? `&type=${filterEvent}`
+              : filterEvent === "ALL"
+              ? `&impact=${filterLabel}`
+              : `&impact=${filterLabel}&type=${filterEvent}`;
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/events/token/${token.name}?page=1&limit=20${filterParam}`
           );
@@ -227,11 +233,17 @@ export default function TokenPage() {
           );
           setEvents(filteredEvents);
         }
+        if (filterEvent !== "ALL") {
+          const filteredEvents = allEvents.filter(
+            (event) => event.type === filterEvent
+          );
+          setEvents(filteredEvents);
+        }
       }
     };
 
     fetchFilteredEvents();
-  }, [filterLabel, token, allEvents]);
+  }, [filterLabel, filterEvent, token, allEvents]);
 
   const loadMoreEvents = async () => {
     if (!token || loading || !hasMore) return;
@@ -246,7 +258,13 @@ export default function TokenPage() {
         token.name === "Moyaki"
       ) {
         const filterParam =
-          filterLabel === "ALL" ? "" : `&impact=${filterLabel}`;
+          filterLabel === "ALL" && filterEvent === "ALL"
+            ? ""
+            : filterLabel === "ALL"
+            ? `&type=${filterEvent}`
+            : filterEvent === "ALL"
+            ? `&impact=${filterLabel}`
+            : `&impact=${filterLabel}&type=${filterEvent}`;
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/events/token/${token.name}?page=${nextPage}&limit=20${filterParam}`
         );
@@ -262,11 +280,12 @@ export default function TokenPage() {
       } else {
         const newRandomEvents = generateRandomEvents(token, 20);
 
-        if (filterLabel === "ALL") {
+        if (filterLabel === "ALL" && filterEvent === "ALL") {
           setEvents((prevEvents) => [...prevEvents, ...newRandomEvents]);
         } else {
           const filteredNewEvents = newRandomEvents.filter(
-            (event) => event.impact === filterLabel
+            (event) =>
+              event.impact === filterLabel && event.type === filterEvent
           );
           setEvents((prevEvents) => [...prevEvents, ...filteredNewEvents]);
         }
@@ -376,16 +395,33 @@ export default function TokenPage() {
                 <h2 className="text-xl font-bold mb-6">
                   Events ({eventsNumber})
                 </h2>
-                <select
-                  className="w-full sm:w-auto bg-white border border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-md px-3 py-2 text-sm font-medium text-gray-700 shadow-sm appearance-none cursor-pointer transition-colors duration-200 focus:outline-none"
-                  value={filterLabel}
-                  onChange={(e) => setFilterLabel(e.target.value)}
-                >
-                  <option value="ALL">All Events</option>
-                  <option value="HIGH">High</option>
-                  <option value="MEDIUM">Medium</option>
-                  <option value="LOW">Low</option>
-                </select>
+                <div className="flex items-center space-x-4">
+                  <select
+                    className="w-full sm:w-auto bg-white border border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-md px-3 py-2 text-sm font-medium text-gray-700 shadow-sm appearance-none cursor-pointer transition-colors duration-200 focus:outline-none"
+                    value={filterEvent}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      setFilterEvent(e.target.value);
+                    }}
+                  >
+                    <option value="ALL">All Events</option>
+                    <option value="ACTIVITY_SPIKE">Activity Spike</option>
+                    <option value="TRANSFER">Transfer</option>
+                  </select>
+                  <select
+                    className="w-full sm:w-auto bg-white border border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-md px-3 py-2 text-sm font-medium text-gray-700 shadow-sm appearance-none cursor-pointer transition-colors duration-200 focus:outline-none"
+                    value={filterLabel}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      setFilterLabel(e.target.value);
+                    }}
+                  >
+                    <option value="ALL">Levels</option>
+                    <option value="HIGH">High</option>
+                    <option value="MEDIUM">Medium</option>
+                    <option value="LOW">Low</option>
+                  </select>
+                </div>
               </div>
               <div className="space-y-4">
                 {events.map((event) => (
