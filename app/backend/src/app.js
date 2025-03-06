@@ -22,9 +22,10 @@ app.use(function (req, res, next) {
 });
 
 // Routes
+app.use("/events/spike", require("./routes/events/spike"));
 app.use("/events/token", require("./routes/events/token"));
-app.use("/signals/transfers", require("./routes/signals/transfers"));
-app.use("/signals/listings", require("./routes/signals/listings"));
+app.use("/events/listings", require("./routes/events/listings"));
+app.use("/events/transfers", require("./routes/events/transfers"));
 
 // Basic error handling
 app.use((err, req, res, next) => {

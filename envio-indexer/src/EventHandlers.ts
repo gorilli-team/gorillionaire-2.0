@@ -9,6 +9,8 @@ import {
   Molandak,
   Molandak_Transfer,
 } from "generated";
+import sendTelegramNotification from "./services/telegram";
+import { TransferTracker } from "./utils/TransferTracker";
 
 const CHOG_____WHALE_TRANSFER = 100000000000000000000000;
 const MOYAKI___WHALE_TRANSFER = 1000000000000000000000000;
@@ -16,16 +18,15 @@ const MOLANDAK_WHALE_TRANSFER = 10000000000000000000000;
 const CHOG_ADDRESS = "0xE0590015A873bF326bd645c3E1266d4db41C4E6B";
 const MOLANDAK_ADDRESS = "0x0F0BDEbF0F83cD1EE3974779Bcb7315f9808c714";
 const MOYAKI_ADDRESS = "0xfe140e1dCe99Be9F4F15d657CD9b7BF622270C50";
-const NOTIFICATION_DELAY = 1000; // 1 second delay between notifications
-let lastNotificationTime = 0;
 
-// Helper function to check if transfer is recent (within last hour)
-const isRecentTransfer = (transferTimestamp: number): boolean => {
-  const currentTimestamp = Math.floor(Date.now() / 1000);
-  // const oneHourInSeconds = 3600;
-  const oneDayInSeconds = 86400;
-  return currentTimestamp - transferTimestamp <= oneDayInSeconds;
-};
+// Initialize trackers for each token
+const chogTracker = new TransferTracker("CHOG");
+const moyakiTracker = new TransferTracker("MOYAKI");
+const molandakTracker = new TransferTracker("MOLANDAK");
+
+let trackedTransfersChog = 0;
+let trackedTransfersMoyaki = 0;
+let trackedTransfersMolandak = 0;
 
 // Helper function to format transfer message
 const formatTransferMessage = (
@@ -51,52 +52,27 @@ const formatTransferMessage = (
   );
 };
 
-// Helper function to send Telegram notification
-const sendTelegramNotification = async (message: string): Promise<void> => {
-  const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN;
-  const telegramChatId = process.env.TELEGRAM_CHAT_ID;
-
-  if (!telegramBotToken || !telegramChatId) {
-    console.log("Telegram configuration missing");
-    throw new Error("Telegram configuration missing");
-  }
-
-  // Add delay if needed
-  const now = Date.now();
-  const timeSinceLastNotification = now - lastNotificationTime;
-  if (timeSinceLastNotification < NOTIFICATION_DELAY) {
-    await new Promise((resolve) =>
-      setTimeout(resolve, NOTIFICATION_DELAY - timeSinceLastNotification)
-    );
-  }
-
-  const encodedMessage = encodeURIComponent(message);
-  const telegramUrl = `https://api.telegram.org/bot${telegramBotToken}/sendMessage?chat_id=${telegramChatId}&text=${encodedMessage}&parse_mode=HTML`;
-
-  const response = await fetch(telegramUrl);
-  if (!response.ok) {
-    throw new Error(`Telegram API error: ${response.status}`);
-  }
-
-  lastNotificationTime = Date.now();
-};
-
 Chog.Transfer.handler(async ({ event, context }) => {
-  if (event.params.value > CHOG_____WHALE_TRANSFER) {
-    const entity: Chog_Transfer = {
-      id: `${event.chainId}_${event.block.number}_${event.logIndex}`,
-      from: event.params.from,
-      to: event.params.to,
-      value: event.params.value,
-      blockNumber: BigInt(event.block.number),
-      blockTimestamp: BigInt(event.block.timestamp),
-      transactionHash: event.transaction.hash,
-    };
+  // Track all transfers, not just whale transfers
+  const entity: Chog_Transfer = {
+    id: `${event.chainId}_${event.block.number}_${event.logIndex}`,
+    from: event.params.from,
+    to: event.params.to,
+    value: event.params.value,
+    blockNumber: BigInt(event.block.number),
+    blockTimestamp: BigInt(event.block.timestamp),
+    transactionHash: event.transaction.hash,
+  };
 
+  // Track the transfer
+  chogTracker.trackTransfer(event, "CHOG", "Chog", 18, CHOG_ADDRESS);
+  const stats = chogTracker.getStats();
+
+  // Only proceed with whale transfer handling if threshold is met
+  if (event.params.value > CHOG_____WHALE_TRANSFER) {
     try {
-      // Store the transfer in the database via a POST request to the backend
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/signals/transfers`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/events/transfers`,
         {
           method: "POST",
           headers: {
@@ -113,6 +89,7 @@ Chog.Transfer.handler(async ({ event, context }) => {
             tokenName: "Chog",
             tokenDecimals: 18,
             tokenAddress: CHOG_ADDRESS,
+            thisHourTransfers: stats.transfersPerHour,
           }),
         }
       );
@@ -125,7 +102,6 @@ Chog.Transfer.handler(async ({ event, context }) => {
       } else if (response.status === 200) {
         console.log("Transfer already exists");
       } else if (response.status === 201) {
-        // here put the telegram notification
         const formattedAmount = (
           Number(event.params.value) / 1e18
         ).toLocaleString();
@@ -162,7 +138,7 @@ Molandak.Transfer.handler(async ({ event, context }) => {
     try {
       // Store the transfer in the database via a POST request to the backend
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/signals/transfers`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/events/transfers`,
         {
           method: "POST",
           headers: {
@@ -228,7 +204,7 @@ Moyaki.Transfer.handler(async ({ event, context }) => {
     try {
       // Store the transfer in the database via a POST request to the backend
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/signals/transfers`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/events/transfers`,
         {
           method: "POST",
           headers: {

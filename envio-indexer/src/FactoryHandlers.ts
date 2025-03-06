@@ -36,7 +36,7 @@ async function handleNewListing(
   try {
     // Store the token in the database via a POST request to the backend
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/signals/listings`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/events/listings`,
       {
         method: "POST",
         headers: {
