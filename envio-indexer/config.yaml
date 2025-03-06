@@ -24,6 +24,13 @@ networks:
         handler: src/EventHandlers.ts
         events:
           - event: Transfer(address indexed from, address indexed to, uint256 value)
+
+      - name: UniswapPoolFactory
+        address:
+          - 0x961235a9020B05C44DF1026D956D1F4D78014276
+        handler: src/FactoryHandlers.ts
+        events:
+          - event: PoolCreated(address indexed token0, address indexed token1, uint24 indexed fee, int24 tickSpacing, address pool)
 field_selection:
   transaction_fields:
     - "hash"

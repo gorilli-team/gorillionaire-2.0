@@ -27,3 +27,10 @@ type Moyaki_Transfer {
   blockTimestamp: BigInt!
   transactionHash: String!
 }
+
+type TokenListed {
+  id: ID!
+  blockNumber: Int!
+  blockTimestamp: Int!
+  transactionHash: String!
+}
