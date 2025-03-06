@@ -6,15 +6,24 @@ const uri = process.env.MONGODB_CONNECTION_STRING;
 let client;
 let db;
 
+/**
+ * Connect to MongoDB database
+ * @returns {Promise<Db>} MongoDB database instance
+ */
 async function connectDB() {
     if (!client) {
         client = new MongoClient(uri);
         await client.connect();
         db = client.db('signals');
+        console.log("Connected to MongoDB database");
     }
     return db;
 }
 
+/**
+ * Fetch data from MongoDB transfers collection
+ * @returns {Promise<string>} Formatted string with transfer data
+ */
 export async function fetchData() {
     try {
         const db = await connectDB();
@@ -37,3 +46,16 @@ export async function fetchData() {
         return '';
     }
 }
+
+/**
+ * Close MongoDB connection
+ */
+export async function closeConnection() {
+    if (client) {
+        await client.close();
+        client = null;
+        db = null;
+        console.log("MongoDB connection closed");
+    }
+}
+
