@@ -124,17 +124,28 @@ Chog.Transfer.handler(async ({ event, context }) => {
 });
 
 Molandak.Transfer.handler(async ({ event, context }) => {
-  if (event.params.value > MOLANDAK_WHALE_TRANSFER) {
-    const entity: Molandak_Transfer = {
-      id: `${event.chainId}_${event.block.number}_${event.logIndex}`,
-      from: event.params.from,
-      to: event.params.to,
-      value: event.params.value,
-      blockNumber: BigInt(event.block.number),
-      blockTimestamp: BigInt(event.block.timestamp),
-      transactionHash: event.transaction.hash,
-    };
+  // Track all transfers, not just whale transfers
+  const entity: Molandak_Transfer = {
+    id: `${event.chainId}_${event.block.number}_${event.logIndex}`,
+    from: event.params.from,
+    to: event.params.to,
+    value: event.params.value,
+    blockNumber: BigInt(event.block.number),
+    blockTimestamp: BigInt(event.block.timestamp),
+    transactionHash: event.transaction.hash,
+  };
 
+  // Track the transfer
+  molandakTracker.trackTransfer(
+    event,
+    "MOLANDAK",
+    "Molandak",
+    18,
+    MOLANDAK_ADDRESS
+  );
+  const stats = molandakTracker.getStats();
+
+  if (event.params.value > MOLANDAK_WHALE_TRANSFER) {
     try {
       // Store the transfer in the database via a POST request to the backend
       const response = await fetch(
@@ -155,6 +166,7 @@ Molandak.Transfer.handler(async ({ event, context }) => {
             tokenName: "Molandak",
             tokenDecimals: 18,
             tokenAddress: MOLANDAK_ADDRESS,
+            thisHourTransfers: stats.transfersPerHour,
           }),
         }
       );
@@ -190,17 +202,22 @@ Molandak.Transfer.handler(async ({ event, context }) => {
 });
 
 Moyaki.Transfer.handler(async ({ event, context }) => {
-  if (event.params.value > MOYAKI___WHALE_TRANSFER) {
-    const entity: Moyaki_Transfer = {
-      id: `${event.chainId}_${event.block.number}_${event.logIndex}`,
-      from: event.params.from,
-      to: event.params.to,
-      value: event.params.value,
-      blockNumber: BigInt(event.block.number),
-      blockTimestamp: BigInt(event.block.timestamp),
-      transactionHash: event.transaction.hash,
-    };
+  // Track all transfers, not just whale transfers
+  const entity: Moyaki_Transfer = {
+    id: `${event.chainId}_${event.block.number}_${event.logIndex}`,
+    from: event.params.from,
+    to: event.params.to,
+    value: event.params.value,
+    blockNumber: BigInt(event.block.number),
+    blockTimestamp: BigInt(event.block.timestamp),
+    transactionHash: event.transaction.hash,
+  };
 
+  // Track the transfer
+  moyakiTracker.trackTransfer(event, "MOYAKI", "Moyaki", 18, MOYAKI_ADDRESS);
+  const stats = moyakiTracker.getStats();
+
+  if (event.params.value > MOYAKI___WHALE_TRANSFER) {
     try {
       // Store the transfer in the database via a POST request to the backend
       const response = await fetch(
@@ -221,6 +238,7 @@ Moyaki.Transfer.handler(async ({ event, context }) => {
             tokenName: "Moyaki",
             tokenDecimals: 18,
             tokenAddress: MOYAKI_ADDRESS,
+            thisHourTransfers: stats.transfersPerHour,
           }),
         }
       );

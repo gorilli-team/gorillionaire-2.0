@@ -135,7 +135,7 @@ export class TransferTracker {
       }
 
       // Update tracking variables for the new hour
-      this.previousHourTransfers = completedHourTransfers;
+      this.previousHourTransfers = completedHourTransfers; // This is correct - keep this hour's transfers as previous
       this.transfersPerHour = 1; // This transfer counts for the new hour
       this.trackedHour = currentHour;
 
@@ -143,6 +143,9 @@ export class TransferTracker {
         `[${tokenName}] Hour transition complete - Previous hour had: ${this.previousHourTransfers} transfers, New hour starts with: 1`
       );
     } else {
+      // Same hour, just increment the counter
+      this.transfersPerHour++;
+
       // Update the trackedHour if it's different but we've already processed this transition
       if (
         currentHour !== this.trackedHour &&
@@ -150,8 +153,6 @@ export class TransferTracker {
       ) {
         this.trackedHour = currentHour;
       }
-      // Same hour, just increment the counter
-      this.transfersPerHour++;
     }
   }
 

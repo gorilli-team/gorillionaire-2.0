@@ -23,18 +23,39 @@ router.get("/", async (req, res) => {
       },
     ]);
 
-    const tokensWithStats = tokenStats.map((token) => ({
-      name: token._id,
-      symbol: token.tokenSymbol,
-      address: token.tokenAddress,
-      totalEvents: token.totalEvents,
-      trackedSince: token.firstEventDate
-        ? formatDate(token.firstEventDate)
-        : "Unknown",
-      trackingTime: token.firstEventDate
-        ? getTrackingTimeString(parseInt(token.firstEventDate))
-        : "Unknown",
-    }));
+    console.log(tokenStats);
+
+    const spikeStats = await Spike.aggregate([
+      {
+        $group: {
+          _id: "$tokenName",
+          totalEvents: { $sum: 1 },
+          tokenSymbol: { $first: "$tokenSymbol" },
+          tokenAddress: { $first: "$tokenAddress" },
+          firstEventDate: { $min: "$blockTimestamp" }, //make it in this format Feb 25, 2025 // Get the oldest event timestamp
+        },
+      },
+    ]);
+
+    console.log(spikeStats);
+
+    const tokensWithStats = tokenStats.map((token) => {
+      // Find matching spike stats for this token
+      const matchingSpike = spikeStats.find((spike) => spike._id === token._id);
+
+      return {
+        name: token._id,
+        symbol: token.tokenSymbol,
+        address: token.tokenAddress,
+        totalEvents: token.totalEvents + (matchingSpike?.totalEvents || 0),
+        trackedSince: token.firstEventDate
+          ? formatDate(token.firstEventDate)
+          : "Unknown",
+        trackingTime: token.firstEventDate
+          ? getTrackingTimeString(parseInt(token.firstEventDate))
+          : "Unknown",
+      };
+    });
 
     res.json(tokensWithStats);
   } catch (error) {
