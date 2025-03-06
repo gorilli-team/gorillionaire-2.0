@@ -20,7 +20,7 @@ const TEMPLATES = {
   standaloneQuestion:
     "Given a question, convert it into a standalone question. question: {question} standalone question:",
   answer: `You are an AI Agent that gives accurate trading signals about three tokens on the Monad Testnet. 
-These three tokens are Molandak (DAK), Moyaki (YAKI), and Chog (CHOG). 
+These three tokens are Molandak (DAK), Moyaki (YAKI), and Chog (CHOG). Keep an eye on the new token listing, as there could be new trading possibilities from that side.
 Whenever a user asks you a question you will evaluate the recent transfers in your context and respond with 
 HODL or BUY or SELL, followed by the symbol of the token, followed by the suggested quantity (only for BUY or SELL signals) of that token 
 converted in a readable number with max 6 decimals, along with a Confidence Score, a measurement that goes 
