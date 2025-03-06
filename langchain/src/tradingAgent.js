@@ -9,6 +9,7 @@ import {
   RunnablePassthrough,
   RunnableSequence,
 } from "@langchain/core/runnables";
+import { MongoClient } from "mongodb";
 
 // Environment variables
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
@@ -73,6 +74,11 @@ function createTradingChain() {
 
   const answerChain = answerPrompt.pipe(llm).pipe(outputParser);
 
+  const saveSignalStep = async ({ context, answer }) => {
+    await saveSignal(answer, context);
+    return { context, answer };
+  };
+
   return RunnableSequence.from([
     {
       standalone_question: standaloneQuestionChain,
@@ -82,14 +88,22 @@ function createTradingChain() {
       context: retrieverChain,
       question: ({ original_input }) => original_input.question,
     },
-    answerChain,
+    {
+      answer: answerChain,
+      context: ({ context }) => context,
+    },
+    saveSignalStep,
   ]);
 }
 
 export async function getTradingSignal(question) {
   try {
     const chain = createTradingChain();
-    return await chain.invoke({ question });
+    const result = await chain.invoke({ question });
+    return {
+      signal: result,
+      context: result.context || "No context available",
+    };
   } catch (error) {
     console.error("Error generating trading signal:", error);
     throw error;
@@ -102,18 +116,42 @@ export async function generateSignal() {
   try {
     console.log(`\n[${timestamp}] Generating trading signal...`);
 
-    const signal = await getTradingSignal(
-      "Give me the best trading advice based on the most recent information you have in your context."
+    const answer = await getTradingSignal(
+      "Give me the best trading signal you can deduce from the context you have, do not repeat yourself, every signal must be different from the previous one, we want to make money."
     );
 
     console.log(`[${timestamp}] TRADING SIGNAL:`);
     console.log("-".repeat(50));
-    console.log(signal);
+    console.log(answer.signal.answer);
     console.log("-".repeat(50));
   } catch (error) {
     console.error(`[${timestamp}] Error generating signal:`, error);
   }
 }
+
+async function saveSignal(signal, events) {
+  const client = new MongoClient(process.env.MONGODB_CONNECTION_STRING);
+  try {
+    await client.connect();
+    const db = client.db("signals");
+    const generatedSignals = db.collection("generated-signals");
+
+    const data = {
+      created_at: new Date(),
+      ...(signal && { signal_text: signal }),
+      ...(events && { events }),
+    };
+
+
+    const result = await generatedSignals.insertOne(data);
+    console.log("Signal saved to MongoDB: ", result.insertedId);
+  } catch (error) {
+    console.error("Error saving signal to MongoDB:", error);
+  } finally {
+    await client.close();
+  }
+}
+
 
 export function startSignalPolling(interval = 60000) {
   console.log(

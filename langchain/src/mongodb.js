@@ -10,7 +10,7 @@ let db;
  * Connect to MongoDB database
  * @returns {Promise<Db>} MongoDB database instance
  */
-async function connectDB() {
+export async function connectDB() {
   if (!client) {
     client = new MongoClient(uri);
     await client.connect();
@@ -28,7 +28,7 @@ export async function fetchData() {
   try {
     const db = await connectDB();
     const spikes = db.collection("spikes");
-    const transfers = db.collection("spikes");
+    const transfers = db.collection("transfers");
     const listings = db.collection("listings");
 
     const twentyFourHoursAgo = Math.floor(Date.now() / 1000) - 24 * 60 * 60;
@@ -58,7 +58,7 @@ export async function fetchData() {
       spikesDocuments
         .map(
           (doc) =>
-            `Token Name: ${doc.tokenName}, Token Symbol: ${doc.tokenSymbol}, ` +
+            `Spike Event: Token Name: ${doc.tokenName}, Token Symbol: ${doc.tokenSymbol}, ` +
             `Hourly Transfers: ${doc.thisHourTransfers}, Previous Hour Transfers: ${doc.previousHourTransfers}`
         )
         .join("\n") +
@@ -66,7 +66,7 @@ export async function fetchData() {
       transfersDocuments
         .map(
           (doc) =>
-            `Token Name: ${doc.tokenName}, Token Symbol: ${doc.tokenSymbol}, ` +
+            `Transfer Event: Token Name: ${doc.tokenName}, Token Symbol: ${doc.tokenSymbol}, ` +
             `Amount: ${doc.amount}, From: ${doc.fromAddress}, To: ${doc.toAddress}`
         )
         .join("\n") +
@@ -74,7 +74,7 @@ export async function fetchData() {
       listingsDocuments
         .map(
           (doc) =>
-            `Token Name: ${doc.tokenName}, Token Symbol: ${doc.tokenSymbol}, Listing Date: ${doc.blockTimestamp}`
+            `Listing Event: Token Name: ${doc.tokenName}, Token Symbol: ${doc.tokenSymbol}, Listing Date: ${doc.blockTimestamp}`
         )
         .join("\n")
     );
