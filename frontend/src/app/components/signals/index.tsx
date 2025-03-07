@@ -210,7 +210,7 @@ const Signals = () => {
                 <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 relative">
                   <Image
                     src={token.imageUrl || ""}
-                    alt={token.name || ""}
+                    alt={token.name || "token image"}
                     width={128}
                     height={128}
                     className="object-cover rounded-full"
@@ -308,7 +308,7 @@ const Signals = () => {
                             src={
                               fetchImageFromSignalText(signal.signal_text) || ""
                             }
-                            alt={signal.signal_text}
+                            alt={signal.signal_text || "signal image"}
                             width={24}
                             height={24}
                             className="object-cover rounded-full"
@@ -523,7 +523,7 @@ const Signals = () => {
                   <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0 relative mr-2">
                     <Image
                       src={fetchImageFromSignalText(signal.signal_text) || ""}
-                      alt={signal.signal_text}
+                      alt={signal.signal_text || "signal image"}
                       width={24}
                       height={24}
                       className="object-cover rounded-full"
