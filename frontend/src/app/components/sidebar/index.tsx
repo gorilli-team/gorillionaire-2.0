@@ -1,5 +1,5 @@
 import React from "react";
-import { useAccount } from "wagmi";
+// import { useAccount } from "wagmi";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
@@ -12,7 +12,7 @@ export default function Sidebar({
   selectedPage,
   setSelectedPage,
 }: SidebarProps) {
-  const { address } = useAccount();
+  // const { address } = useAccount();
   const router = useRouter();
 
   const handleGorillionaireClick = () => {
@@ -87,32 +87,19 @@ export default function Sidebar({
             </button>
           </li>
 
-          {address && (
-            <>
-              <li>
-                <button
-                  className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
-                    selectedPage === "TestTrading" ? "bg-gray-200" : ""
-                  }`}
-                  onClick={() => handlePageChange("TestTrading")}
-                >
-                  <i className="fa-solid fa-chart-line pr-2"></i>
-                  <span>Test trading</span>
-                </button>
-              </li>
-              <li>
-                <button
-                  className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
-                    selectedPage === "My Account" ? "bg-gray-200" : ""
-                  }`}
-                  onClick={() => handlePageChange("My Account")}
-                >
-                  <i className="fa-solid fa-circle-user pr-2"></i>
-                  <span>My account</span>
-                </button>
-              </li>
-            </>
-          )}
+          <>
+            <li>
+              <button
+                className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
+                  selectedPage === "MyAccount" ? "bg-gray-200" : ""
+                }`}
+                onClick={() => handlePageChange("Leaderboard")}
+              >
+                <i className="fa-solid fa-circle-user pr-2"></i>
+                <span>Leaderboard</span>
+              </button>
+            </li>
+          </>
         </ul>
       </nav>
     </aside>
