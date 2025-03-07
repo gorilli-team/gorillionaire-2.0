@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 type Token = {
   symbol: string;
@@ -21,19 +21,30 @@ type TradeEvent = {
 };
 
 type TradeSignal = {
+  _id: string;
   type: "Buy" | "Sell";
-  amount: string;
   token: string;
+  amount: string;
+  signal_text: string;
+  events: string[];
   risk: "Moderate" | "Aggressive" | "Conservative";
-  timeAgo: string;
-  spikes: {
-    amount: string;
-    count: number;
-  };
-  transfers: {
-    amount: string;
-    token: string;
-  }[];
+  created_at: string;
+};
+
+const fetchImageFromSignalText = (signalText: string) => {
+  //find the first instance of one of the following words: CHOG, DAK, YAKI
+  const token = signalText?.split(" ")[1];
+  console.log(token);
+  if (token === "CHOG") {
+    return "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/5d1206c2-042c-4edc-9f8b-dcef2e9e8f00/public";
+  } else if (token === "DAK") {
+    return "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/27759359-9374-4995-341c-b2636a432800/public";
+  } else if (token === "YAKI") {
+    return "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/6679b698-a845-412b-504b-23463a3e1900/public";
+  } else {
+    //return placeholder image/ no token
+    return "https://imagedelivery.net/cBNDGgkrsEA-b_ixIp9SkQ/I_t8rg_V_400x400.jpg/public";
+  }
 };
 
 const findTokenImage = (symbol: string) => {
@@ -44,6 +55,29 @@ const findTokenImage = (symbol: string) => {
   } else if (symbol === "CHOG") {
     return "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/5d1206c2-042c-4edc-9f8b-dcef2e9e8f00/public";
   }
+};
+
+const getTimeAgo = (date: string) => {
+  const seconds = Math.floor(
+    (new Date().getTime() - new Date(date).getTime()) / 1000
+  );
+
+  let interval = seconds / 31536000; // years
+  if (interval > 1) return Math.floor(interval) + " years ago";
+
+  interval = seconds / 2592000; // months
+  if (interval > 1) return Math.floor(interval) + " months ago";
+
+  interval = seconds / 86400; // days
+  if (interval > 1) return Math.floor(interval) + " days ago";
+
+  interval = seconds / 3600; // hours
+  if (interval > 1) return Math.floor(interval) + " hours ago";
+
+  interval = seconds / 60; // minutes
+  if (interval > 1) return Math.floor(interval) + " minutes ago";
+
+  return Math.floor(seconds) + " seconds ago";
 };
 
 const Signals = () => {
@@ -125,24 +159,30 @@ const Signals = () => {
     },
   ];
 
-  const tradeSignals: TradeSignal[] = [
-    {
-      type: "Buy",
-      amount: "20k",
-      token: "DAK",
-      risk: "Moderate",
-      timeAgo: "15s ago",
-      spikes: { amount: "12.1k", count: 3 },
-      transfers: [
-        { amount: "11.6k", token: "DAK" },
-        { amount: "57.1k", token: "DAK" },
-      ],
-    },
-  ];
+  const [tradeSignals, setTradeSignals] = useState<TradeSignal[]>([]);
 
-  const pastSignals = [
-    { type: "Buy", amount: "20k", token: "DAK", status: "Refused" },
-  ];
+  //eslint-disable-next-line
+  const [pastSignals, setPastSignals] = useState<TradeSignal[]>([]);
+
+  useEffect(() => {
+    const fetchSignals = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/signals/generated-signals`
+        );
+        const data = await response.json();
+        const firstFiveSignals = data.slice(0, 5);
+        const otherSignals = data.slice(5);
+        setTradeSignals(firstFiveSignals);
+        setPastSignals(otherSignals);
+        console.log(data);
+      } catch (error) {
+        console.error("Error fetching past signals:", error);
+      }
+    };
+
+    fetchSignals();
+  }, []);
 
   // State for Yes/No buttons
   const [selectedOptions, setSelectedOptions] = useState<
@@ -170,7 +210,7 @@ const Signals = () => {
                 <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 relative">
                   <Image
                     src={token.imageUrl || ""}
-                    alt={token.name}
+                    alt={token.name || ""}
                     width={128}
                     height={128}
                     className="object-cover rounded-full"
@@ -265,15 +305,17 @@ const Signals = () => {
                       <div className="flex items-center">
                         <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0 relative mr-2">
                           <Image
-                            src={findTokenImage(signal.token) || ""}
-                            alt={signal.token}
+                            src={
+                              fetchImageFromSignalText(signal.signal_text) || ""
+                            }
+                            alt={signal.signal_text}
                             width={24}
                             height={24}
                             className="object-cover rounded-full"
                           />
                         </div>
                         <span className="font-medium">
-                          Buy {signal.amount} {signal.token}?
+                          {signal.signal_text}
                         </span>
                       </div>
                       <span
@@ -320,16 +362,22 @@ const Signals = () => {
                         Yes
                       </button>
                     </div>
+                    {/* 
+                    add here the date: time timeAgo
+                    */}
+                    <div className="text-xs text-gray-400 mt-2">
+                      {getTimeAgo(signal.created_at)}
+                    </div>
 
                     <div className="grid grid-cols-2 gap-2">
-                      <div className="col-span-2">
+                      {/* <div className="col-span-2">
                         <div className="flex items-center text-xs text-orange-500">
                           <span>
                             🔥 Spike: {signal.spikes.amount} transfers
                           </span>
                         </div>
-                      </div>
-
+                      </div> */}
+                      {/* 
                       {signal.transfers.map((transfer, idx) => (
                         <div
                           key={idx}
@@ -339,12 +387,12 @@ const Signals = () => {
                             💸 {transfer.amount} {transfer.token} transfer
                           </span>
                         </div>
-                      ))}
+                      ))} */}
                     </div>
 
-                    <div className="text-xs text-gray-400 mt-2">
+                    {/* <div className="text-xs text-gray-400 mt-2">
                       {signal.timeAgo}
-                    </div>
+                    </div> */}
                   </div>
                 ))}
             </div>
@@ -367,13 +415,13 @@ const Signals = () => {
                     <div className="flex justify-between items-center mb-3">
                       <div className="flex items-center">
                         <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0 relative mr-2">
-                          <Image
+                          {/* <Image
                             src={findTokenImage(signal.token) || ""}
                             alt={signal.token}
                             width={24}
                             height={24}
                             className="object-cover rounded-full"
-                          />
+                          /> */}
                         </div>
                         <span className="font-medium">
                           Sell {signal.amount} {signal.token}?
@@ -432,13 +480,13 @@ const Signals = () => {
                     <div className="grid grid-cols-2 gap-2">
                       <div className="col-span-2">
                         <div className="flex items-center text-xs text-orange-500">
-                          <span>
+                          {/* <span>
                             🔥 Spike: {signal.spikes.amount} transfers
-                          </span>
+                          </span> */}
                         </div>
                       </div>
 
-                      {signal.transfers.map((transfer, idx) => (
+                      {/* {signal.transfers.map((transfer, idx) => (
                         <div
                           key={idx}
                           className="flex items-center text-xs text-gray-500"
@@ -447,12 +495,12 @@ const Signals = () => {
                             💸 {transfer.amount} {transfer.token} transfer
                           </span>
                         </div>
-                      ))}
+                      ))} */}
                     </div>
 
-                    <div className="text-xs text-gray-400 mt-2">
+                    {/* <div className="text-xs text-gray-400 mt-2">
                       {signal.timeAgo}
-                    </div>
+                    </div> */}
                   </div>
                 ))}
             </div>
@@ -467,15 +515,29 @@ const Signals = () => {
 
           <div className="bg-white rounded-lg shadow p-4">
             {pastSignals.map((signal, index) => (
-              <div key={index} className="flex justify-between items-center">
+              <div
+                key={index}
+                className="flex justify-between items-center bg-gray-50 m-4 p-4 rounded-lg"
+              >
                 <div className="flex items-center">
-                  <div className="w-6 h-6 rounded-full bg-gray-200 overflow-hidden flex-shrink-0 mr-2"></div>
-                  <span className="font-medium">
-                    {signal.type} {signal.amount} {signal.token}?
-                  </span>
+                  <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0 relative mr-2">
+                    <Image
+                      src={fetchImageFromSignalText(signal.signal_text) || ""}
+                      alt={signal.signal_text}
+                      width={24}
+                      height={24}
+                      className="object-cover rounded-full"
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-medium">{signal.signal_text}</span>
+                    <span className="text-xs text-gray-400">
+                      {getTimeAgo(signal.created_at)}
+                    </span>
+                  </div>
                 </div>
-                <span className="text-xs px-2 py-1 rounded bg-red-100 text-red-800">
-                  {signal.status}
+                <span className="text-xs px-2 py-1 rounded bg-gray-200 text-gray-700">
+                  Expired
                 </span>
               </div>
             ))}

@@ -28,6 +28,11 @@ app.use("/events/listings", require("./routes/events/listings"));
 app.use("/events/transfers", require("./routes/events/transfers"));
 app.use("/events/prices", require("./routes/events/prices"));
 app.use("/trade", require("./routes/trade/0x"));
+//app.use("/events/price-feeds", require("./routes/events/price-feeds"));
+app.use(
+  "/signals/generated-signals",
+  require("./routes/signals/generated-signals")
+);
 
 // Basic error handling
 app.use((err, req, res, next) => {
