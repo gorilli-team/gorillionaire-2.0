@@ -10,7 +10,6 @@ export interface Transaction {
   // txnFee: string;
 }
 
-
 export interface TradingViewWidgetOptions {
   autosize: boolean;
   symbol: string;
@@ -22,6 +21,13 @@ export interface TradingViewWidgetOptions {
   toolbar_bg: string;
   hide_side_toolbar: boolean;
   allow_symbol_change: boolean;
+}
+
+export interface Token {
+  address: `0x${string}`;
+  symbol: string;
+  name: string;
+  decimals: number;
 }
 
 declare global {

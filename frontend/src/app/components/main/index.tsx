@@ -10,36 +10,16 @@ import FeedSignalComponent from "../feed_components/feedSignalComponent";
 import TweetComponent from "../feed_components/tweetComponent";
 import PriceComponent from "../feed_components/priceComponent";
 import styles from "./index.module.css";
-import {
-  fetchFeedData,
-  fetchPricesData,
-  fetchTweetsData,
-  fetchTokenData,
-} from "@/app/api/fetchFeedData";
-import { ethers } from "ethers";
-import {
-  useAccount,
-  useReadContract,
-  useSendTransaction,
-  useWriteContract,
-} from "wagmi";
 
-import { TransactionDefault } from "@coinbase/onchainkit/transaction";
-import {
-  Transaction,
-  TransactionButton,
-  TransactionSponsor,
-  TransactionStatus,
-  TransactionStatusAction,
-  TransactionStatusLabel,
-} from "@coinbase/onchainkit/transaction";
-import { WalletDefault } from "@coinbase/onchainkit/wallet";
+import { ethers } from "ethers";
+import { useAccount, useReadContract, useWriteContract } from "wagmi";
 import { vaultAbi } from "../../../../public/abi/vaultabi";
 import { erc20abi } from "../../../../public/abi/erc20abi";
 import Tokens from "../tokens";
 import Image from "next/image";
 import Signals from "../signals";
 import Agents from "../agents";
+import Trades from "../trades";
 
 interface FeedSignal {
   signal: string;
@@ -247,6 +227,12 @@ export default function Main({
         return (
           <div className="w-full flex flex-col justify-center items-center text-gray-800">
             <Signals />
+          </div>
+        );
+      case "Trades":
+        return (
+          <div className="w-full flex flex-col justify-center items-center text-gray-800">
+            <Trades />
           </div>
         );
 
