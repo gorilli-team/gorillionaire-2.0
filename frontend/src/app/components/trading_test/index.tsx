@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { ethers, Log } from 'ethers';
-import { useAccount } from 'wagmi';
+import React, { useState, useEffect } from "react";
+import { ethers, Log } from "ethers";
+import { useAccount } from "wagmi";
 
 declare global {
   interface Window {
-    ethereum?: {
-      request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
-      chainId?: string;
-    };
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ethereum?: any;
   }
 }
 
@@ -19,24 +17,24 @@ const VAULT_ABI = [
   "event TradeExecuted(address indexed tokenIn, address indexed tokenOut, uint256 amountIn, uint256 amountOut)",
   "function totalAssets() external view returns (uint256)",
   "function maxTradingAllocation() external view returns (uint256)",
-  "function aiAgent() external view returns (address)"
+  "function aiAgent() external view returns (address)",
 ];
 
 const BASE_CHAIN_ID = "0x2105";
 
 const TradingAgentSetup = () => {
   // States for agent setup
-  const [vaultAddress, setVaultAddress] = useState('');
-  const [agentAddress, setAgentAddress] = useState('');
-  const [status, setStatus] = useState('');
+  const [vaultAddress, setVaultAddress] = useState("");
+  const [agentAddress, setAgentAddress] = useState("");
+  const [status, setStatus] = useState("");
   const [currentAgent, setCurrentAgent] = useState<string | null>(null);
-  const [tradeMode, setTradeMode] = useState('buy');
+  const [tradeMode, setTradeMode] = useState("buy");
 
   // States for trading operations
-  const [tokenAddress, setTokenAddress] = useState('');
-  const [amountIn, setAmountIn] = useState('');
-  const [minAmountOut, setMinAmountOut] = useState('');
-  const [tradeStatus, setTradeStatus] = useState('');
+  const [tokenAddress, setTokenAddress] = useState("");
+  const [amountIn, setAmountIn] = useState("");
+  const [minAmountOut, setMinAmountOut] = useState("");
+  const [tradeStatus, setTradeStatus] = useState("");
 
   const account = useAccount();
   const [showSetAgent, setShowSetAgent] = useState(false);
@@ -44,27 +42,36 @@ const TradingAgentSetup = () => {
   useEffect(() => {
     const checkOwnership = async () => {
       if (!account.isConnected) return;
-      const ownerAddress = process.env.NEXT_PUBLIC_DEPLOYED_CONTRACT_WALLET_ADDRESS;
-      setShowSetAgent(account.address?.toLowerCase() === ownerAddress?.toLowerCase());
+      const ownerAddress =
+        process.env.NEXT_PUBLIC_DEPLOYED_CONTRACT_WALLET_ADDRESS;
+      setShowSetAgent(
+        account.address?.toLowerCase() === ownerAddress?.toLowerCase()
+      );
     };
 
     checkOwnership();
   }, [account.isConnected, account.address]);
 
-  const checkCurrentAgent = async (vaultContractAddress: string): Promise<boolean> => {
+  const checkCurrentAgent = async (
+    vaultContractAddress: string
+  ): Promise<boolean> => {
     if (!window.ethereum || !vaultContractAddress) return false;
 
     try {
       const provider = new ethers.BrowserProvider(window.ethereum);
-      const vaultContract = new ethers.Contract(vaultContractAddress, VAULT_ABI, provider);
-      
+      const vaultContract = new ethers.Contract(
+        vaultContractAddress,
+        VAULT_ABI,
+        provider
+      );
+
       const agent = await vaultContract.aiAgent();
       setCurrentAgent(agent);
-      
+
       // Check if agent is set (address is not zero)
       return agent !== "0x0000000000000000000000000000000000000000";
     } catch (error) {
-      console.error('Error checking current agent:', error);
+      console.error("Error checking current agent:", error);
       return false;
     }
   };
@@ -73,17 +80,19 @@ const TradingAgentSetup = () => {
     if (!window.ethereum) return false;
 
     try {
-      const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+      const chainId = await window.ethereum.request({ method: "eth_chainId" });
       if (chainId !== BASE_CHAIN_ID) {
         await window.ethereum.request({
-          method: 'wallet_switchEthereumChain',
+          method: "wallet_switchEthereumChain",
           params: [{ chainId: BASE_CHAIN_ID }],
         });
       }
       return true;
     } catch (error) {
-      console.error('Network switch error:', error);
-      setStatus('Error switching network. Please make sure you are on Base Mainnet');
+      console.error("Network switch error:", error);
+      setStatus(
+        "Error switching network. Please make sure you are on Base Mainnet"
+      );
       return false;
     }
   };
@@ -91,50 +100,53 @@ const TradingAgentSetup = () => {
   const handleSetAgent = async () => {
     try {
       if (!window.ethereum) {
-        setStatus('MetaMask is not installed');
+        setStatus("MetaMask is not installed");
         return;
       }
 
       if (!ethers.isAddress(vaultAddress) || !ethers.isAddress(agentAddress)) {
-        setStatus('Invalid addresses');
+        setStatus("Invalid addresses");
         return;
       }
 
       const isCorrectNetwork = await checkAndSwitchNetwork();
       if (!isCorrectNetwork) return;
 
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
+      await window.ethereum.request({ method: "eth_requestAccounts" });
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
-      
-      const vaultContract = new ethers.Contract(vaultAddress, VAULT_ABI, signer);
+
+      const vaultContract = new ethers.Contract(
+        vaultAddress,
+        VAULT_ABI,
+        signer
+      );
 
       const tx = await vaultContract.setAIAgent(agentAddress);
-      setStatus('Transaction sent...');
+      setStatus("Transaction sent...");
 
       const receipt = await tx.wait();
-      
+
       const event = receipt?.logs.find((log: Log) => {
         try {
           const parsed = vaultContract.interface.parseLog(log);
-          return parsed?.name === 'AIAgentUpdated';
+          return parsed?.name === "AIAgentUpdated";
         } catch {
           return false;
         }
       });
 
       if (event) {
-        setStatus('Agent set successfully! 🎉');
+        setStatus("Agent set successfully! 🎉");
         setCurrentAgent(agentAddress);
       }
-
     } catch (switchError: unknown) {
       if (switchError instanceof Error) {
-        if ('code' in switchError && switchError.code === 4902) {
-          setStatus('Base Mainnet not configured in MetaMask');
+        if ("code" in switchError && switchError.code === 4902) {
+          setStatus("Base Mainnet not configured in MetaMask");
         } else {
-          console.error('Error:', switchError);
-          setStatus(switchError.message || 'Error setting the agent');
+          console.error("Error:", switchError);
+          setStatus(switchError.message || "Error setting the agent");
         }
       }
     }
@@ -142,62 +154,74 @@ const TradingAgentSetup = () => {
 
   const checkMaxTradeAmount = async () => {
     if (!vaultAddress || !window.ethereum) return;
-    
+
     try {
       const provider = new ethers.BrowserProvider(window.ethereum);
-      const vaultContract = new ethers.Contract(vaultAddress, VAULT_ABI, provider);
-      
+      const vaultContract = new ethers.Contract(
+        vaultAddress,
+        VAULT_ABI,
+        provider
+      );
+
       const totalAssets = await vaultContract.totalAssets();
       const maxAllocation = await vaultContract.maxTradingAllocation();
-      
+
       const maxAmount = (totalAssets * BigInt(maxAllocation)) / BigInt(10000);
-      setTradeStatus(`Maximum tradeable amount: ${ethers.formatUnits(maxAmount, 6)} USDC`);
+      setTradeStatus(
+        `Maximum tradeable amount: ${ethers.formatUnits(maxAmount, 6)} USDC`
+      );
     } catch (error) {
-      console.error('Error checking max trade amount:', error);
-      setTradeStatus('Error checking max trade amount');
+      console.error("Error checking max trade amount:", error);
+      setTradeStatus("Error checking max trade amount");
     }
   };
 
   const handleTrade = async (isExit: boolean) => {
     try {
       if (!window.ethereum) {
-        setTradeStatus('MetaMask is not installed');
+        setTradeStatus("MetaMask is not installed");
         return;
       }
 
       if (!vaultAddress) {
-        setTradeStatus('Please enter a vault address');
+        setTradeStatus("Please enter a vault address");
         return;
       }
 
       const hasAgent = await checkCurrentAgent(vaultAddress);
       if (!hasAgent) {
-        setTradeStatus('Trading agent not set. Please set an agent before trading.');
+        setTradeStatus(
+          "Trading agent not set. Please set an agent before trading."
+        );
         return;
       }
 
       if (!ethers.isAddress(tokenAddress)) {
-        setTradeStatus('Please insert a valid BRETT token address');
+        setTradeStatus("Please insert a valid BRETT token address");
         return;
       }
 
       if (!amountIn || !minAmountOut) {
-        setTradeStatus('Invalid amounts');
+        setTradeStatus("Invalid amounts");
         return;
       }
 
       const isCorrectNetwork = await checkAndSwitchNetwork();
       if (!isCorrectNetwork) return;
 
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
+      await window.ethereum.request({ method: "eth_requestAccounts" });
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
-      
-      const vaultContract = new ethers.Contract(vaultAddress, VAULT_ABI, signer);
+
+      const vaultContract = new ethers.Contract(
+        vaultAddress,
+        VAULT_ABI,
+        signer
+      );
 
       const deadline = Math.floor(Date.now() / 1000) + 1800;
 
-      const tx = isExit 
+      const tx = isExit
         ? await vaultContract.exitTrade(
             tokenAddress,
             ethers.parseUnits(amountIn, 18),
@@ -207,41 +231,40 @@ const TradingAgentSetup = () => {
         : await vaultContract.executeTrade(
             tokenAddress,
             ethers.parseUnits(amountIn, 6),
-            ethers.parseUnits(minAmountOut, 6), 
+            ethers.parseUnits(minAmountOut, 6),
             deadline
           );
 
-      setTradeStatus('Transaction sent...');
+      setTradeStatus("Transaction sent...");
 
       const receipt = await tx.wait();
-      
+
       const event = receipt?.logs.find((log: Log) => {
         try {
           const parsed = vaultContract.interface.parseLog(log);
-          return parsed?.name === 'TradeExecuted';
+          return parsed?.name === "TradeExecuted";
         } catch {
           return false;
         }
       });
 
       if (event) {
-        setTradeStatus(`Trade ${isExit ? 'exit' : 'execution'} successful! 🎉`);
+        setTradeStatus(`Trade ${isExit ? "exit" : "execution"} successful! 🎉`);
       }
-
     } catch (error: unknown) {
       if (error instanceof Error) {
-        console.error('Error:', error);
-        setTradeStatus(error.message || 'Error executing trade');
+        console.error("Error:", error);
+        setTradeStatus(error.message || "Error executing trade");
       }
     }
   };
 
   return (
-    <div className='flex w-full p-2 py-4 gap-4 justify-center'>
+    <div className="flex w-full p-2 py-4 gap-4 justify-center">
       {showSetAgent && (
         <div className="p-6 w-[600px] max-w-[600px] bg-white rounded-xl shadow-md">
           <h2 className="text-xl font-bold mb-4">Set Trading Agent</h2>
-          
+
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">
@@ -284,33 +307,37 @@ const TradingAgentSetup = () => {
           </div>
         </div>
       )}
-     <div className={`p-6 ${showSetAgent ? 'w-[600px] max-w-[600px]' : 'w-full'} bg-white rounded-xl shadow-md`}>
+      <div
+        className={`p-6 ${
+          showSetAgent ? "w-[600px] max-w-[600px]" : "w-full"
+        } bg-white rounded-xl shadow-md`}
+      >
         <h2 className="text-xl font-bold mb-4">Trading Operations</h2>
-        
+
         <div className="flex gap-4 mb-6">
           <button
-            onClick={() => setTradeMode('buy')}
+            onClick={() => setTradeMode("buy")}
             className={`flex-1 py-3 px-4 rounded-md text-lg font-medium ${
-              tradeMode === 'buy' 
-                ? 'bg-green-100 text-green-700 border-2 border-green-500' 
-                : 'bg-gray-50 text-gray-600 border-2 border-transparent'
+              tradeMode === "buy"
+                ? "bg-green-100 text-green-700 border-2 border-green-500"
+                : "bg-gray-50 text-gray-600 border-2 border-transparent"
             }`}
           >
             Buy BRETT
           </button>
 
           <button
-            onClick={() => setTradeMode('sell')}
+            onClick={() => setTradeMode("sell")}
             className={`flex-1 py-3 px-4 rounded-md text-lg font-medium ${
-              tradeMode === 'sell' 
-                ? 'bg-red-100 text-red-700 border-2 border-red-500' 
-                : 'bg-gray-50 text-gray-600 border-2 border-transparent'
+              tradeMode === "sell"
+                ? "bg-red-100 text-red-700 border-2 border-red-500"
+                : "bg-gray-50 text-gray-600 border-2 border-transparent"
             }`}
           >
             Sell BRETT
           </button>
         </div>
-        
+
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">
@@ -365,14 +392,14 @@ const TradingAgentSetup = () => {
           </div>
 
           <button
-            onClick={() => handleTrade(tradeMode === 'sell')}
+            onClick={() => handleTrade(tradeMode === "sell")}
             className={`w-full py-3 px-4 rounded-md text-white ${
-              tradeMode === 'buy' 
-                ? 'bg-green-500 hover:bg-green-600' 
-                : 'bg-red-500 hover:bg-red-600'
+              tradeMode === "buy"
+                ? "bg-green-500 hover:bg-green-600"
+                : "bg-red-500 hover:bg-red-600"
             } outline-none`}
           >
-            {tradeMode === 'buy' ? 'Buy BRETT' : 'Sell BRETT'}
+            {tradeMode === "buy" ? "Buy BRETT" : "Sell BRETT"}
           </button>
 
           <button
@@ -392,7 +419,9 @@ const TradingAgentSetup = () => {
 
           {tradeStatus && (
             <div className="mt-4 p-2 rounded bg-gray-100">
-              <p className="text-sm break-words overflow-hidden">{tradeStatus}</p>
+              <p className="text-sm break-words overflow-hidden">
+                {tradeStatus}
+              </p>
             </div>
           )}
         </div>
