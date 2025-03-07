@@ -11,7 +11,6 @@ import Leaderboard from "../leaderboard";
 
 interface MainProps {
   selectedPage: string;
-  setSelectedVault: React.Dispatch<React.SetStateAction<string | null>>;
   setSelectedPage: React.Dispatch<React.SetStateAction<string>>;
 }
 

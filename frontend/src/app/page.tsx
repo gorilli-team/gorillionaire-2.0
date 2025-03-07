@@ -7,7 +7,6 @@ import Main from "./components/main/index";
 
 export default function AppLayout() {
   const [selectedPage, setSelectedPage] = useState("Tokens");
-  const [selectedVault, setSelectedVault] = useState<string | null>(null);
 
   return (
     <div className="flex h-screen bg-gray-100 text-gray-800">
@@ -16,8 +15,6 @@ export default function AppLayout() {
         <Header />
         <Main
           selectedPage={selectedPage}
-          selectedVault={selectedVault}
-          setSelectedVault={setSelectedVault}
           setSelectedPage={setSelectedPage}
         />
       </div>
