@@ -13,10 +13,7 @@ export default function AppLayout() {
       <Sidebar selectedPage={selectedPage} setSelectedPage={setSelectedPage} />
       <div className="flex-1 flex flex-col">
         <Header />
-        <Main
-          selectedPage={selectedPage}
-          setSelectedPage={setSelectedPage}
-        />
+        <Main selectedPage={selectedPage} setSelectedPage={setSelectedPage} />
       </div>
     </div>
   );
