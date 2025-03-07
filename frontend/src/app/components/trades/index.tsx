@@ -128,7 +128,13 @@ export default function Trades() {
 
       console.log(hash);
     },
-    [address, sendTransactionAsync, signTypedDataAsync]
+    [
+      address,
+      sendTransactionAsync,
+      signTypedDataAsync,
+      config,
+      writeContractAsync,
+    ]
   );
 
   return (
