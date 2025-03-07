@@ -5,6 +5,7 @@ import Button from "../button";
 import { Token } from "@/app/types";
 import {
   useAccount,
+  useReadContracts,
   useSendTransaction,
   useSignTypedData,
   useWriteContract,
@@ -12,6 +13,7 @@ import {
 import { numberToHex, size, concat, erc20Abi, parseUnits } from "viem";
 import { waitForTransactionReceipt } from "@wagmi/core";
 import { useConfig } from "wagmi";
+import { trackedTokens } from "@/app/shared/tokenData";
 
 const MOLANDAK_ADDRESS = "0x0F0BDEbF0F83cD1EE3974779Bcb7315f9808c714" as const;
 const WMONAD_ADDRESS = "0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701" as const;
@@ -23,6 +25,18 @@ export default function Trades() {
   const { signTypedDataAsync } = useSignTypedData();
   const { sendTransactionAsync } = useSendTransaction();
   const { writeContractAsync } = useWriteContract();
+
+  const { data } = useReadContracts({
+    contracts: trackedTokens.map((t) => ({
+      address: t.address as `0x${string}`,
+      abi: erc20Abi,
+      functionName: "balanceOf",
+      args: [address],
+      chainId: MONAD_CHAIN_ID,
+    })),
+  });
+  console.log("balances", data);
+
   const config = useConfig();
 
   const buyNotifications = [
