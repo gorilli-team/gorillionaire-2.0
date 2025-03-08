@@ -17,11 +17,26 @@ router.get("/", async (req, res) => {
         Array.isArray(signal.events) &&
         signal.events.length > 0
       ) {
-        console.log("HAS EVENTS", signal.events);
         // Since events is an array, take the first element and split it
         signal.events = signal.events[0]
           .split("\n\n")
-          .filter((event) => event.trim());
+          .filter((event) => event.trim())
+          .map((event) => {
+            if (event.toLowerCase().includes("transfer")) {
+              const amountMatch = event.match(/\d+(\.\d+)?/);
+              const amount = amountMatch ? parseFloat(amountMatch[0]) : 0;
+              let formattedAmount;
+              if (amount >= 1000000) {
+                formattedAmount = (amount / 1000000).toFixed(1) + "M";
+              } else if (amount >= 1000) {
+                formattedAmount = (amount / 1000).toFixed(1) + "K";
+              } else {
+                formattedAmount = amount.toFixed(2);
+              }
+              return `💸 ${formattedAmount} transfer`;
+            }
+            return event;
+          });
       } else {
         console.log("NO EVENTS");
       }

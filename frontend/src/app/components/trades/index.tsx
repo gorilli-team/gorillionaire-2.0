@@ -83,7 +83,7 @@ export default function Trades() {
       const quote = await res.json();
       console.log(quote);
 
-      if (quote.issues.allowance !== null) {
+      if (quote && quote.issues && quote.issues.allowance !== null) {
         try {
           const test = await writeContractAsync({
             abi: erc20Abi,

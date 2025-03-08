@@ -2,6 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import { trackedTokens } from "@/app/shared/tokenData";
+import { useAccount, useReadContracts } from "wagmi";
+import { erc20Abi, isAddress } from "viem";
+
 type Token = {
   symbol: string;
   name: string;
@@ -31,10 +35,11 @@ type TradeSignal = {
   created_at: string;
 };
 
+const MONAD_CHAIN_ID = 10143;
+
 const fetchImageFromSignalText = (signalText: string) => {
   //find the first instance of one of the following words: CHOG, DAK, YAKI
   const token = signalText?.split(" ")[1];
-  console.log(token);
   if (token === "CHOG") {
     return "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/5d1206c2-042c-4edc-9f8b-dcef2e9e8f00/public";
   } else if (token === "DAK") {
@@ -80,12 +85,62 @@ const getTimeAgo = (date: string) => {
   return Math.floor(seconds) + " seconds ago";
 };
 
+const formatNumber = (num: number): string => {
+  if (num >= 1_000_000) {
+    return (
+      (num / 1_000_000).toLocaleString("en-US", { maximumFractionDigits: 1 }) +
+      "M"
+    );
+  } else if (num >= 1_000) {
+    return (
+      (num / 1_000).toLocaleString("en-US", { maximumFractionDigits: 1 }) + "K"
+    );
+  } else {
+    return num.toLocaleString("en-US", { maximumFractionDigits: 1 });
+  }
+};
+
 const Signals = () => {
+  const { address } = useAccount();
+  const [moyakiBalance, setMoyakiBalance] = useState<number>(0);
+  const [chogBalance, setChogBalance] = useState<number>(0);
+  const [dakBalance, setDakBalance] = useState<number>(0);
+
+  console.log(
+    "trackedTokens",
+    trackedTokens.map((t) => t.address)
+  );
+
+  const { data } = useReadContracts({
+    contracts: trackedTokens
+      .filter((t) => isAddress(t.address) && address && isAddress(address))
+      .flatMap((t) => [
+        {
+          address: t.address as `0x${string}`,
+          abi: erc20Abi,
+          functionName: "balanceOf",
+          args: [address],
+          chainId: MONAD_CHAIN_ID,
+        },
+      ]),
+  });
+
+  console.log("processed tokens:", data);
+
+  useEffect(() => {
+    if (data && data.length >= 3) {
+      // Convert BigInt to number, dividing by 10^18 for proper token amount
+      setDakBalance(Number((data[0].result as bigint) / BigInt(10 ** 18)));
+      setMoyakiBalance(Number((data[1].result as bigint) / BigInt(10 ** 18)));
+      setChogBalance(Number((data[2].result as bigint) / BigInt(10 ** 18)));
+    }
+  }, [data]);
+
   const tokens: Token[] = [
     {
       symbol: "DAK",
       name: "Molandak",
-      totalHolding: 44200,
+      totalHolding: dakBalance,
       price: 1507.38,
       priceChange: 2,
       imageUrl: findTokenImage("DAK"),
@@ -93,7 +148,7 @@ const Signals = () => {
     {
       symbol: "YAKI",
       name: "Moyaki",
-      totalHolding: 24700,
+      totalHolding: moyakiBalance,
       price: 2923.52,
       priceChange: -5,
       imageUrl: findTokenImage("YAKI"),
@@ -101,7 +156,7 @@ const Signals = () => {
     {
       symbol: "CHOG",
       name: "Chog",
-      totalHolding: 12600,
+      totalHolding: chogBalance,
       price: 1007.97,
       priceChange: 2,
       imageUrl: findTokenImage("CHOG"),
@@ -171,11 +226,12 @@ const Signals = () => {
           `${process.env.NEXT_PUBLIC_API_URL}/signals/generated-signals`
         );
         const data = await response.json();
-        const firstFiveSignals = data.slice(0, 5);
-        const otherSignals = data.slice(5);
-        setTradeSignals(firstFiveSignals);
-        setPastSignals(otherSignals);
-        console.log(data);
+        if (data && Array.isArray(data)) {
+          const firstFiveSignals = data.slice(0, 5);
+          const otherSignals = data.slice(5);
+          setTradeSignals(firstFiveSignals);
+          setPastSignals(otherSignals);
+        }
       } catch (error) {
         console.error("Error fetching past signals:", error);
       }
@@ -219,12 +275,10 @@ const Signals = () => {
                 <div className="flex flex-col flex-grow">
                   <span className="text-sm">{token.name}</span>
                   <span className="text-xl font-bold">
-                    {(token.totalHolding / 1000).toLocaleString("en-US", {
-                      maximumFractionDigits: 1,
-                    })}
-                    k <span className="text-xl font-bold">{token.symbol}</span>
+                    {formatNumber(token.totalHolding)}{" "}
+                    <span className="text-xl font-bold">{token.symbol}</span>
                   </span>
-                  <div className="flex justify-between items-center">
+                  {/* <div className="flex justify-between items-center">
                     <div className="flex items-baseline">
                       <span className="text-sm">
                         Price:{" "}
@@ -234,9 +288,9 @@ const Signals = () => {
                       </span>
                       <span className="text-sm ml-1">$</span>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
-                <div className="flex flex-col items-end">
+                {/* <div className="flex flex-col items-end">
                   <span
                     className={`text-sm ${
                       token.priceChange >= 0 ? "text-green-500" : "text-red-500"
@@ -245,7 +299,7 @@ const Signals = () => {
                     {token.priceChange >= 0 ? "+" : ""}
                     {token.priceChange}% (last 24h)
                   </span>
-                </div>
+                </div> */}
               </div>
             </div>
           ))}
@@ -362,9 +416,16 @@ const Signals = () => {
                         Yes
                       </button>
                     </div>
-                    {/* 
-                    add here the date: time timeAgo
-                    */}
+                    <div className="flex items-center">
+                      {signal.events.map((event, idx) => (
+                        <div
+                          key={idx}
+                          className="text-xs bg-gray-100 px-2 py-1 rounded-full mt-2 mr-2"
+                        >
+                          {event}
+                        </div>
+                      ))}
+                    </div>
                     <div className="text-xs text-gray-400 mt-2">
                       {getTimeAgo(signal.created_at)}
                     </div>
