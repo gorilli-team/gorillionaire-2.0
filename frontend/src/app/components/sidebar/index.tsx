@@ -95,7 +95,7 @@ export default function Sidebar({
                 }`}
                 onClick={() => handlePageChange("Leaderboard")}
               >
-                <i className="fa-solid fa-circle-user pr-2"></i>
+                <i className="fa-solid fa-star pr-2"></i>
                 <span>Leaderboard</span>
               </button>
             </li>
