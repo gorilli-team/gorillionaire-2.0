@@ -23,7 +23,6 @@ const untrackedTokens: TokenData[] = [
     symbol: "MON",
     supply: "93,415,274,755",
     holders: 103039,
-    age: "17 days ago",
     address: "0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701",
     image:
       "https://imagedelivery.net/cBNDGgkrsEA-b_ixIp9SkQ/I_t8rg_V_400x400.jpg/public",
@@ -39,7 +38,6 @@ const untrackedTokens: TokenData[] = [
     symbol: "ShMON",
     supply: "27,937",
     holders: 229794,
-    age: "28 days 6 hrs ago",
     address: "0x1b4Cb47622705F0F67b6B18bBD1cB1a91fc77d37",
     image:
       "https://pbs.twimg.com/media/GjskgXhWsAA_N_L?format=png&name=240x240",
