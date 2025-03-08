@@ -107,7 +107,7 @@ const Leaderboard = () => {
   const currentActivities = activities.slice(indexOfFirstActivity, indexOfLastActivity);
 
   // Function to create empty rows to maintain height
-  const getEmptyRows = (items: any[], itemsPerPage: number): null[] => {
+  const getEmptyRows = <T,>(items: T[], itemsPerPage: number): null[] => {
     const currentItemCount = items.length;
     if (currentItemCount < itemsPerPage) {
       return Array(itemsPerPage - currentItemCount).fill(null);
