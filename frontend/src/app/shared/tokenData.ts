@@ -25,21 +25,6 @@ export const fetchAllTokens = async () => {
 
 export const trackedTokens: TokenData[] = [
   {
-    id: 10,
-    name: "Wrapped Monad",
-    symbol: "MON",
-    supply: "10,000,000",
-    holders: 603708,
-    address: "0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701",
-    image:
-      "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/27759359-9374-4995-341c-b2636a432800/public",
-    isActive: false,
-    price: "$0.50",
-    volume: "$1.2M",
-    trackedSince: "Jan 01, 2025",
-    signalsGenerated: 112,
-  },
-  {
     id: 11,
     name: "Molandak",
     symbol: "DAK",
