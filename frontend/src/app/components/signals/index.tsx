@@ -40,7 +40,7 @@ const MONAD_CHAIN_ID = 10143;
 
 const fetchImageFromSignalText = (signalText: string) => {
   //find the first instance of one of the following words: CHOG, DAK, YAKI
-  const token = signalText?.split(" ")[1];
+  const token = signalText.match(/CHOG|DAK|YAKI/)?.[0];
   if (token === "CHOG") {
     return "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/5d1206c2-042c-4edc-9f8b-dcef2e9e8f00/public";
   } else if (token === "DAK") {
