@@ -5,6 +5,7 @@ import Image from "next/image";
 import { trackedTokens } from "@/app/shared/tokenData";
 import { useAccount, useReadContracts } from "wagmi";
 import { erc20Abi, isAddress } from "viem";
+import { getTimeAgo } from "@/app/utils/time";
 
 type Token = {
   symbol: string;
@@ -51,39 +52,6 @@ const fetchImageFromSignalText = (signalText: string) => {
     //return placeholder image/ no token
     return "https://imagedelivery.net/cBNDGgkrsEA-b_ixIp9SkQ/I_t8rg_V_400x400.jpg/public";
   }
-};
-
-const findTokenImage = (symbol: string) => {
-  if (symbol === "DAK") {
-    return "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/27759359-9374-4995-341c-b2636a432800/public";
-  } else if (symbol === "YAKI") {
-    return "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/6679b698-a845-412b-504b-23463a3e1900/public";
-  } else if (symbol === "CHOG") {
-    return "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/5d1206c2-042c-4edc-9f8b-dcef2e9e8f00/public";
-  }
-};
-
-const getTimeAgo = (date: string) => {
-  const seconds = Math.floor(
-    (new Date().getTime() - new Date(date).getTime()) / 1000
-  );
-
-  let interval = seconds / 31536000; // years
-  if (interval > 1) return Math.floor(interval) + " years ago";
-
-  interval = seconds / 2592000; // months
-  if (interval > 1) return Math.floor(interval) + " months ago";
-
-  interval = seconds / 86400; // days
-  if (interval > 1) return Math.floor(interval) + " days ago";
-
-  interval = seconds / 3600; // hours
-  if (interval > 1) return Math.floor(interval) + " hours ago";
-
-  interval = seconds / 60; // minutes
-  if (interval > 1) return Math.floor(interval) + " minutes ago";
-
-  return Math.floor(seconds) + " seconds ago";
 };
 
 const formatNumber = (num: number): string => {
@@ -147,7 +115,7 @@ const Signals = () => {
       totalHolding: dakBalance,
       price: 1507.38,
       priceChange: 2,
-      imageUrl: findTokenImage("DAK"),
+      imageUrl: fetchImageFromSignalText("DAK"),
     },
     {
       symbol: "YAKI",
@@ -155,7 +123,7 @@ const Signals = () => {
       totalHolding: moyakiBalance,
       price: 2923.52,
       priceChange: -5,
-      imageUrl: findTokenImage("YAKI"),
+      imageUrl: fetchImageFromSignalText("YAKI"),
     },
     {
       symbol: "CHOG",
@@ -163,7 +131,7 @@ const Signals = () => {
       totalHolding: chogBalance,
       price: 1007.97,
       priceChange: 2,
-      imageUrl: findTokenImage("CHOG"),
+      imageUrl: fetchImageFromSignalText("CHOG"),
     },
   ];
 

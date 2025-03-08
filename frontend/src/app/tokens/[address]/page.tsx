@@ -6,6 +6,7 @@ import Sidebar from "../../components/sidebar";
 import Header from "../../components/header";
 import { trackedTokens } from "@/app/shared/tokenData";
 import Image from "next/image";
+import { getTimeAgo } from "@/app/utils/time";
 
 interface TokenData {
   address: string;
@@ -439,7 +440,7 @@ export default function TokenPage() {
                         <div>
                           <p className="font-semibold">{event.description}</p>
                           <p className="text-sm text-gray-600">
-                            Date: {new Date(event.timestamp).toLocaleString()}
+                            {getTimeAgo(event.timestamp)}
                           </p>
                         </div>
                       </div>
