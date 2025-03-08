@@ -35,10 +35,10 @@ export async function processAndStoreData(text) {
       new OpenAIEmbeddings({ openAIApiKey }),
       {
         client,
-        tableName: 'documents',
+        tableName: "documents",
       }
     );
-    
+
     console.log("Data successfully processed and stored in Supabase");
   } catch (err) {
     console.error("Error processing and storing data:", err);

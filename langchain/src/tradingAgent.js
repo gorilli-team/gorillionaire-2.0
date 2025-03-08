@@ -15,6 +15,7 @@ import { MongoClient } from "mongodb";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const SUPABASE_API_KEY = process.env.SUPABASE_API_KEY;
 const SUPABASE_URL = process.env.SUPABASE_URL_GORILLIONAIRE;
+const POLLING_INTERVAL = 60 * 60 * 1000; // 1 hour
 
 // Templates for prompts
 const TEMPLATES = {
@@ -27,6 +28,8 @@ BUY or SELL, followed by the symbol of the token (if you give a signal about Mol
 from 0 to 10, with two decimals, that represents how much you feel confident about the signal you gave. 
 These responses will have to reflect the exact market situation in which the user is operating and will have 
 to allow the user to maximize profits from their trades.
+Provide a mix of BUY and SELL signals, don't always give the same signal.
+Consider that we want the user to spend an average of 5 MON per signal and that 1 MON is approximately 140 CHOG, 1600 YAKI and 8 DAK.
 
 context: {context}
 question: {question}
@@ -34,7 +37,8 @@ answer:`,
 };
 
 function combineDocuments(docs) {
-  return docs.map((doc) => doc.pageContent).join("\n\n");
+  const combinedDocs = docs.map((doc) => doc.pageContent).join("\n\n");
+  return combinedDocs;
 }
 
 function initializeServices() {
@@ -99,6 +103,7 @@ export async function getTradingSignal(question) {
   try {
     const chain = createTradingChain();
     const result = await chain.invoke({ question });
+
     return {
       signal: result,
       context: result.context || "No context available",
@@ -141,7 +146,6 @@ async function saveSignal(signal, events) {
       ...(events && { events }),
     };
 
-
     const result = await generatedSignals.insertOne(data);
     console.log("Signal saved to MongoDB: ", result.insertedId);
   } catch (error) {
@@ -151,8 +155,7 @@ async function saveSignal(signal, events) {
   }
 }
 
-
-export function startSignalPolling(interval = 60000) {
+export function startSignalPolling(interval = POLLING_INTERVAL) {
   console.log(
     `Starting trading signal generator with interval: ${
       interval / 1000

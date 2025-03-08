@@ -48,23 +48,45 @@ export async function fetchData() {
       })
       .toArray();
 
-    return (
-      spikesDocuments
-        .map(
-          (doc) =>
-            `Spike Event: Token Name: ${doc.tokenName}, Token Symbol: ${doc.tokenSymbol}, ` +
-            `Hourly Transfers: ${doc.thisHourTransfers}, Previous Hour Transfers: ${doc.previousHourTransfers}`
-        )
-        .join("\n") +
-      "\n" +
-      transfersDocuments
-        .map(
-          (doc) =>
-            `Transfer Event: Token Name: ${doc.tokenName}, Token Symbol: ${doc.tokenSymbol}, ` +
-            `Amount: ${doc.amount}, From: ${doc.fromAddress}, To: ${doc.toAddress}`
-        )
-        .join("\n")
-    );
+    //merge the two arrays, add type information, and sort them by blockTimestamp
+    const mergedDocuments = [
+      ...spikesDocuments.map((doc) => ({ ...doc, type: "spike" })),
+      ...transfersDocuments.map((doc) => ({ ...doc, type: "transfer" })),
+    ].sort((a, b) => a.blockTimestamp - b.blockTimestamp);
+
+    const formattedData = mergedDocuments
+      .map((doc) => {
+        if (doc.type === "spike") {
+          const hourlyTransfers = doc.thisHourTransfers;
+          let formattedTransfers;
+          if (hourlyTransfers >= 1000000) {
+            formattedTransfers = (hourlyTransfers / 1000000).toFixed(1) + "M";
+          } else if (hourlyTransfers >= 1000) {
+            formattedTransfers = (hourlyTransfers / 1000).toFixed(1) + "K";
+          } else {
+            formattedTransfers = hourlyTransfers.toFixed(2);
+          }
+          return `🔥 ${formattedTransfers} transfers of ${doc.tokenSymbol}`;
+        } else if (doc.type === "transfer") {
+          // Convert to BigInt and divide by 10^18 for proper token amount
+          const rawAmount = BigInt(doc.amount);
+          const amount = Number(rawAmount) / Math.pow(10, 18);
+          let formattedAmount;
+          if (amount >= 1000000) {
+            formattedAmount = (amount / 1000000).toFixed(1) + "M";
+          } else if (amount >= 1000) {
+            formattedAmount = (amount / 1000).toFixed(1) + "K";
+          } else {
+            formattedAmount = amount.toFixed(2);
+          }
+          return `💸 ${formattedAmount} ${doc.tokenSymbol} transfer`;
+        }
+        return ""; // Handle any other types
+      })
+      .filter(Boolean) // Remove empty strings
+      .join("\n");
+
+    return formattedData;
   } catch (error) {
     console.error("Error fetching data from MongoDB:", error);
     return "";
