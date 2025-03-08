@@ -2,7 +2,7 @@
 import { usePrivy } from '@privy-io/react-auth';
 
 export default function Header() {
-  const { ready, authenticated, user, login, logout, createWallet } = usePrivy();
+  const { ready, authenticated, user, login, logout } = usePrivy();
 
   return (
     <header className="h-16 px-6 flex items-center justify-between border-b border-gray-300 bg-gray-100">
