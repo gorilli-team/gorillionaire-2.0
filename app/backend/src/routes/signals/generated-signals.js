@@ -17,14 +17,19 @@ router.get("/", async (req, res) => {
         Array.isArray(signal.events) &&
         signal.events.length > 0
       ) {
-        // Since events is an array, take the first element and split it
         signal.events = signal.events[0]
           .split("\n\n")
           .filter((event) => event.trim())
           .map((event) => {
+            if (event.toLowerCase().includes("spike")) {
+              const token = event.match(/DAK|YAKI|CHOG/)[0];
+              return `🔥 ${token} spike`;
+            }
             if (event.toLowerCase().includes("transfer")) {
               const amountMatch = event.match(/\d+(\.\d+)?/);
-              const amount = amountMatch ? parseFloat(amountMatch[0]) : 0;
+              const rawAmount = BigInt(amountMatch ? amountMatch[0] : "0");
+              const amount = Number(rawAmount) / Math.pow(10, 18);
+              const token = event.match(/DAK|YAKI|CHOG/)[0];
               let formattedAmount;
               if (amount >= 1000000) {
                 formattedAmount = (amount / 1000000).toFixed(1) + "M";
@@ -33,7 +38,7 @@ router.get("/", async (req, res) => {
               } else {
                 formattedAmount = amount.toFixed(2);
               }
-              return `💸 ${formattedAmount} transfer`;
+              return `💸 ${formattedAmount} ${token} transfer`;
             }
             return event;
           });

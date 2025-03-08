@@ -106,11 +106,6 @@ const Signals = () => {
   const [chogBalance, setChogBalance] = useState<number>(0);
   const [dakBalance, setDakBalance] = useState<number>(0);
 
-  console.log(
-    "trackedTokens",
-    trackedTokens.map((t) => t.address)
-  );
-
   const { data } = useReadContracts({
     contracts: trackedTokens
       .filter((t) => isAddress(t.address) && address && isAddress(address))
@@ -124,8 +119,6 @@ const Signals = () => {
         },
       ]),
   });
-
-  console.log("processed tokens:", data);
 
   useEffect(() => {
     if (data && data.length >= 3) {
@@ -568,42 +561,44 @@ const Signals = () => {
           </div>
         </div>
 
-        <div className="mb-6">
-          <div className="flex items-center mb-4">
-            <span className="text-gray-500 mr-2">🕰️</span>
-            <span className="font-medium text-lg">Past Signals</span>
-          </div>
+        {pastSignals.length > 0 && (
+          <div className="mb-6">
+            <div className="flex items-center mb-4">
+              <span className="text-gray-500 mr-2">🕰️</span>
+              <span className="font-medium text-lg">Past Signals</span>
+            </div>
 
-          <div className="bg-white rounded-lg shadow p-4">
-            {pastSignals.map((signal, index) => (
-              <div
-                key={index}
-                className="flex justify-between items-center bg-gray-50 m-4 p-4 rounded-lg"
-              >
-                <div className="flex items-center">
-                  <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0 relative mr-2">
-                    <Image
-                      src={fetchImageFromSignalText(signal.signal_text) || ""}
-                      alt={signal.signal_text || "signal image"}
-                      width={24}
-                      height={24}
-                      className="object-cover rounded-full"
-                    />
+            <div className="bg-white rounded-lg shadow p-4">
+              {pastSignals.map((signal, index) => (
+                <div
+                  key={index}
+                  className="flex justify-between items-center bg-gray-50 m-4 p-4 rounded-lg"
+                >
+                  <div className="flex items-center">
+                    <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0 relative mr-2">
+                      <Image
+                        src={fetchImageFromSignalText(signal.signal_text) || ""}
+                        alt={signal.signal_text || "signal image"}
+                        width={24}
+                        height={24}
+                        className="object-cover rounded-full"
+                      />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-medium">{signal.signal_text}</span>
+                      <span className="text-xs text-gray-400">
+                        {getTimeAgo(signal.created_at)}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex flex-col">
-                    <span className="font-medium">{signal.signal_text}</span>
-                    <span className="text-xs text-gray-400">
-                      {getTimeAgo(signal.created_at)}
-                    </span>
-                  </div>
+                  <span className="text-xs px-2 py-1 rounded bg-gray-200 text-gray-700">
+                    Expired
+                  </span>
                 </div>
-                <span className="text-xs px-2 py-1 rounded bg-gray-200 text-gray-700">
-                  Expired
-                </span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* CSS for ticker animation */}
