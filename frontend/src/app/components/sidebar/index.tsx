@@ -25,7 +25,7 @@ export default function Sidebar({
   };
 
   return (
-    <aside className="w-64 text-gray-800 flex flex-col border border-gray-300">
+    <aside className="w-64 text-gray-800 flex flex-col">
       <div
         className="h-16 text-xl font-bold flex items-center ps-4 cursor-pointer"
         onClick={handleGorillionaireClick}
@@ -91,7 +91,7 @@ export default function Sidebar({
             <li>
               <button
                 className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
-                  selectedPage === "MyAccount" ? "bg-gray-200" : ""
+                  selectedPage === "Leaderboard" ? "bg-gray-200" : ""
                 }`}
                 onClick={() => handlePageChange("Leaderboard")}
               >
