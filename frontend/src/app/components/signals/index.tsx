@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { trackedTokens } from "@/app/shared/tokenData";
-import { useAccount, useReadContracts } from "wagmi";
+import { useAccount, useReadContracts, useBalance } from "wagmi";
 import { erc20Abi, isAddress } from "viem";
 import { getTimeAgo } from "@/app/utils/time";
 
@@ -40,14 +40,16 @@ type TradeSignal = {
 const MONAD_CHAIN_ID = 10143;
 
 const fetchImageFromSignalText = (signalText: string) => {
-  //find the first instance of one of the following words: CHOG, DAK, YAKI
-  const token = signalText.match(/CHOG|DAK|YAKI/)?.[0];
+  //find the first instance of one of the following words: CHOG, DAK, YAKI, MON
+  const token = signalText.match(/CHOG|DAK|YAKI|MON/)?.[0];
   if (token === "CHOG") {
     return "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/5d1206c2-042c-4edc-9f8b-dcef2e9e8f00/public";
   } else if (token === "DAK") {
     return "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/27759359-9374-4995-341c-b2636a432800/public";
   } else if (token === "YAKI") {
     return "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/6679b698-a845-412b-504b-23463a3e1900/public";
+  } else if (token === "MON") {
+    return "https://imagedelivery.net/cBNDGgkrsEA-b_ixIp9SkQ/I_t8rg_V_400x400.jpg/public";
   } else {
     //return placeholder image/ no token
     return "https://imagedelivery.net/cBNDGgkrsEA-b_ixIp9SkQ/I_t8rg_V_400x400.jpg/public";
@@ -84,7 +86,15 @@ const Signals = () => {
   const [moyakiBalance, setMoyakiBalance] = useState<number>(0);
   const [chogBalance, setChogBalance] = useState<number>(0);
   const [dakBalance, setDakBalance] = useState<number>(0);
+  const [monBalance, setMonBalance] = useState<number>(0);
 
+  // Get native MON balance
+  const { data: monBalanceData } = useBalance({
+    address,
+    chainId: MONAD_CHAIN_ID,
+  });
+
+  // Get other token balances
   const { data } = useReadContracts({
     contracts: trackedTokens
       .filter((t) => isAddress(t.address) && address && isAddress(address))
@@ -100,7 +110,14 @@ const Signals = () => {
   });
 
   useEffect(() => {
+    if (monBalanceData) {
+      setMonBalance(Number(monBalanceData.formatted));
+    }
+  }, [monBalanceData]);
+
+  useEffect(() => {
     if (data && data.length >= 3) {
+      console.log("balances", data);
       // Convert BigInt to number, dividing by 10^18 for proper token amount
       setDakBalance(Number((data[0].result as bigint) / BigInt(10 ** 18)));
       setMoyakiBalance(Number((data[1].result as bigint) / BigInt(10 ** 18)));
@@ -109,6 +126,14 @@ const Signals = () => {
   }, [data]);
 
   const tokens: Token[] = [
+    {
+      symbol: "MON",
+      name: "Monad",
+      totalHolding: monBalance,
+      price: 1507.38,
+      priceChange: 2,
+      imageUrl: fetchImageFromSignalText("MON"),
+    },
     {
       symbol: "DAK",
       name: "Molandak",
@@ -137,7 +162,7 @@ const Signals = () => {
 
   const recentTrades: TradeEvent[] = [
     {
-      user: "arthur457.lens",
+      user: "arthur457.nad",
       action: "Sold",
       amount: 10,
       token: "CHOG",
@@ -145,7 +170,7 @@ const Signals = () => {
       userImageUrl: "/arthur.png",
     },
     {
-      user: "imfrancis.lens",
+      user: "imfrancis.nad",
       action: "Bought",
       amount: 5,
       token: "YAKI",
@@ -153,7 +178,7 @@ const Signals = () => {
       userImageUrl: "/francis.png",
     },
     {
-      user: "nfthomas.lens",
+      user: "nfthomas.nad",
       action: "Sold",
       amount: 5,
       token: "YAKI",
@@ -161,7 +186,7 @@ const Signals = () => {
       userImageUrl: "/thomas.png",
     },
     {
-      user: "luduvigo.lens",
+      user: "luduvigo.nad",
       action: "Bought",
       amount: 20,
       token: "DAK",
@@ -169,7 +194,7 @@ const Signals = () => {
       userImageUrl: "/luduvigo.png",
     },
     {
-      user: "stephen.lens",
+      user: "stephen.nad",
       action: "Bought",
       amount: 10,
       token: "CHOG",
@@ -177,7 +202,7 @@ const Signals = () => {
       userImageUrl: "/stephen.png",
     },
     {
-      user: "fester.lens",
+      user: "fester.nad",
       action: "Sold",
       amount: 5,
       token: "DAK",
@@ -237,7 +262,7 @@ const Signals = () => {
     <div className="w-full min-h-screen bg-gray-50 pt-16 lg:pt-0">
       <div className="px-2 sm:px-4 py-4 sm:py-6">
         {/* Token Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           {tokens.map((token) => (
             <div
               key={token.symbol}
