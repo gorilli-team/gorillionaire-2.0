@@ -19,6 +19,9 @@ const GeneratedSignalSchema = new mongoose.Schema({
   events: {
     type: Array,
   },
+  confidenceScore: {
+    type: String,
+  },
   created_at: {
     type: Date,
     default: Date.now,

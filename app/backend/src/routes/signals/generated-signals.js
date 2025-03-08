@@ -11,39 +11,27 @@ router.get("/", async (req, res) => {
       } else if (signal?.signal_text?.startsWith("SELL")) {
         signal.type = "Sell";
       }
+      //find in signal.signal_text conains Confidence Score of 9.75
+      const confidenceScore = signal.signal_text.match(
+        /Confidence Score of (\d+\.\d+)/
+      );
+      if (confidenceScore) {
+        signal.confidenceScore = confidenceScore[1];
+      }
       signal.level = "Conservative";
       if (
         signal.events &&
         Array.isArray(signal.events) &&
         signal.events.length > 0
       ) {
-        signal.events = signal.events[0]
-          .split("\n\n")
-          .filter((event) => event.trim())
-          .map((event) => {
-            if (event.toLowerCase().includes("spike")) {
-              const token = event.match(/DAK|YAKI|CHOG/)[0];
-              return `🔥 ${token} spike`;
-            }
-            if (event.toLowerCase().includes("transfer")) {
-              const amountMatch = event.match(/\d+(\.\d+)?/);
-              const rawAmount = BigInt(amountMatch ? amountMatch[0] : "0");
-              const amount = Number(rawAmount) / Math.pow(10, 18);
-              const token = event.match(/DAK|YAKI|CHOG/)[0];
-              let formattedAmount;
-              if (amount >= 1000000) {
-                formattedAmount = (amount / 1000000).toFixed(1) + "M";
-              } else if (amount >= 1000) {
-                formattedAmount = (amount / 1000).toFixed(1) + "K";
-              } else {
-                formattedAmount = amount.toFixed(2);
-              }
-              return `💸 ${formattedAmount} ${token} transfer`;
-            }
-            return event;
+        signal.events = signal.events[0].split("\n\n").map((event) => {
+          const splitEvents = event.split("\n");
+          const splitEvents2 = splitEvents.map((splitEvent) => {
+            return splitEvent.split("\n\n");
           });
-      } else {
-        console.log("NO EVENTS");
+          return splitEvents2;
+        });
+        signal.events = signal.events.flat();
       }
     });
     res.json(signals);

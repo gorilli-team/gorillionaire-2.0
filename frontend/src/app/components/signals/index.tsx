@@ -409,11 +409,11 @@ const Signals = () => {
                         Yes
                       </button>
                     </div>
-                    <div className="flex items-center">
-                      {signal.events.map((event, idx) => (
+                    <div className="flex flex-wrap items-center gap-2">
+                      {signal.events.slice(0, 7).map((event, idx) => (
                         <div
                           key={idx}
-                          className="text-xs bg-gray-100 px-2 py-1 rounded-full mt-2 mr-2"
+                          className="text-xs bg-gray-100 px-2 py-1 rounded-full whitespace-normal break-words"
                         >
                           {event}
                         </div>
