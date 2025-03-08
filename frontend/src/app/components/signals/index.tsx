@@ -32,6 +32,7 @@ type TradeSignal = {
   signal_text: string;
   events: string[];
   risk: "Moderate" | "Aggressive" | "Conservative";
+  confidenceScore: string;
   created_at: string;
 };
 
@@ -97,6 +98,16 @@ const formatNumber = (num: number): string => {
     );
   } else {
     return num.toLocaleString("en-US", { maximumFractionDigits: 1 });
+  }
+};
+
+const mapConfidenceScoreToRisk = (confidenceScore: string) => {
+  if (Number(confidenceScore) >= 9) {
+    return "Conservative";
+  } else if (Number(confidenceScore) >= 8.5) {
+    return "Moderate";
+  } else {
+    return "Aggressive";
   }
 };
 
@@ -220,9 +231,18 @@ const Signals = () => {
         );
         const data = await response.json();
         if (data && Array.isArray(data)) {
-          const firstFiveSignals = data.slice(0, 5);
-          const otherSignals = data.slice(5);
-          setTradeSignals(firstFiveSignals);
+          const buySignals = data
+            .filter((signal) => signal.type === "Buy")
+            .slice(0, 5);
+          const sellSignals = data
+            .filter((signal) => signal.type === "Sell")
+            .slice(0, 5);
+          //remove the buy signals from the data buySignals and sellSignals
+          const otherSignals = data.filter(
+            (signal) =>
+              !buySignals.includes(signal) && !sellSignals.includes(signal)
+          );
+          setTradeSignals(buySignals.concat(sellSignals));
           setPastSignals(otherSignals);
         }
       } catch (error) {
@@ -247,7 +267,7 @@ const Signals = () => {
 
   return (
     <div className="w-full min-h-screen bg-gray-50 pt-16 lg:pt-0">
-      <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-6">
+      <div className="px-2 sm:px-4 py-4 sm:py-6">
         {/* Token Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           {tokens.map((token) => (
@@ -336,8 +356,8 @@ const Signals = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
           <div className="bg-white rounded-lg shadow p-4">
             <div className="mb-4 flex items-center">
-              <span className="text-yellow-500 text-2xl mr-2">🪙</span>
-              <span className="font-bold text-2xl">Buy</span>
+              <span className="text-yellow-500 text-2xl mr-2">💰</span>
+              <span className="font-bold text-2xl">Buy Signals</span>
             </div>
 
             <div className="space-y-6">
@@ -367,14 +387,17 @@ const Signals = () => {
                       </div>
                       <span
                         className={`text-xs px-2 py-1 rounded ${
-                          signal.risk === "Moderate"
+                          mapConfidenceScoreToRisk(signal.confidenceScore) ===
+                          "Moderate"
                             ? "bg-yellow-100 text-yellow-800"
-                            : signal.risk === "Conservative"
+                            : mapConfidenceScoreToRisk(
+                                signal.confidenceScore
+                              ) === "Conservative"
                             ? "bg-green-100 text-green-800"
                             : "bg-red-100 text-red-800"
                         }`}
                       >
-                        {signal.risk}
+                        {mapConfidenceScoreToRisk(signal.confidenceScore)}
                       </span>
                     </div>
 
@@ -410,7 +433,7 @@ const Signals = () => {
                       </button>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
-                      {signal.events.slice(0, 7).map((event, idx) => (
+                      {signal.events.slice(0, 4).map((event, idx) => (
                         <div
                           key={idx}
                           className="text-xs bg-gray-100 px-2 py-1 rounded-full whitespace-normal break-words"
@@ -454,8 +477,8 @@ const Signals = () => {
 
           <div className="bg-white rounded-lg shadow p-4">
             <div className="mb-4 flex items-center">
-              <span className="text-gray-500 text-2xl mr-2">💰</span>
-              <span className="font-bold text-2xl">Sell</span>
+              <span className="text-gray-500 text-2xl mr-2">💸</span>
+              <span className="font-bold text-2xl">Sell Signals</span>
             </div>
 
             <div className="space-y-6">
@@ -469,28 +492,33 @@ const Signals = () => {
                     <div className="flex justify-between items-center mb-3">
                       <div className="flex items-center">
                         <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0 relative mr-2">
-                          {/* <Image
-                            src={findTokenImage(signal.token) || ""}
-                            alt={signal.token}
+                          <Image
+                            src={
+                              fetchImageFromSignalText(signal.signal_text) || ""
+                            }
+                            alt={signal.signal_text || "signal image"}
                             width={24}
                             height={24}
                             className="object-cover rounded-full"
-                          /> */}
+                          />
                         </div>
                         <span className="font-medium">
-                          Sell {signal.amount} {signal.token}?
+                          {signal.signal_text}
                         </span>
                       </div>
                       <span
                         className={`text-xs px-2 py-1 rounded ${
-                          signal.risk === "Moderate"
+                          mapConfidenceScoreToRisk(signal.confidenceScore) ===
+                          "Moderate"
                             ? "bg-yellow-100 text-yellow-800"
-                            : signal.risk === "Conservative"
+                            : mapConfidenceScoreToRisk(
+                                signal.confidenceScore
+                              ) === "Conservative"
                             ? "bg-green-100 text-green-800"
                             : "bg-red-100 text-red-800"
                         }`}
                       >
-                        {signal.risk}
+                        {mapConfidenceScoreToRisk(signal.confidenceScore)}
                       </span>
                     </div>
 
@@ -513,13 +541,8 @@ const Signals = () => {
                         No
                       </button>
                       <button
-                        className={`px-3 py-1 rounded-full text-sm border ${
-                          selectedOptions[
-                            `${signal.type}-${signal.amount}-${signal.token}`
-                          ] === "Yes"
-                            ? "bg-blue-500 text-white border-blue-500"
-                            : "bg-white border-gray-300"
-                        }`}
+                        className={`px-3 py-1 rounded-full text-sm border
+                         bg-blue-500 text-white border-blue-500`}
                         onClick={() =>
                           handleOptionSelect(
                             `${signal.type}-${signal.amount}-${signal.token}`,
@@ -530,31 +553,19 @@ const Signals = () => {
                         Yes
                       </button>
                     </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="col-span-2">
-                        <div className="flex items-center text-xs text-orange-500">
-                          {/* <span>
-                            🔥 Spike: {signal.spikes.amount} transfers
-                          </span> */}
-                        </div>
-                      </div>
-
-                      {/* {signal.transfers.map((transfer, idx) => (
+                    <div className="flex flex-wrap items-center gap-2">
+                      {signal.events.slice(0, 4).map((event, idx) => (
                         <div
                           key={idx}
-                          className="flex items-center text-xs text-gray-500"
+                          className="text-xs bg-gray-100 px-2 py-1 rounded-full whitespace-normal break-words"
                         >
-                          <span>
-                            💸 {transfer.amount} {transfer.token} transfer
-                          </span>
+                          {event}
                         </div>
-                      ))} */}
+                      ))}
                     </div>
-
-                    {/* <div className="text-xs text-gray-400 mt-2">
-                      {signal.timeAgo}
-                    </div> */}
+                    <div className="text-xs text-gray-400 mt-2">
+                      {getTimeAgo(signal.created_at)}
+                    </div>
                   </div>
                 ))}
             </div>
@@ -563,39 +574,56 @@ const Signals = () => {
 
         {pastSignals.length > 0 && (
           <div className="mb-6">
-            <div className="flex items-center mb-4">
-              <span className="text-gray-500 mr-2">🕰️</span>
-              <span className="font-medium text-lg">Past Signals</span>
-            </div>
-
             <div className="bg-white rounded-lg shadow p-4">
-              {pastSignals.map((signal, index) => (
-                <div
-                  key={index}
-                  className="flex justify-between items-center bg-gray-50 m-4 p-4 rounded-lg"
-                >
-                  <div className="flex items-center">
-                    <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0 relative mr-2">
-                      <Image
-                        src={fetchImageFromSignalText(signal.signal_text) || ""}
-                        alt={signal.signal_text || "signal image"}
-                        width={24}
-                        height={24}
-                        className="object-cover rounded-full"
-                      />
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="font-medium">{signal.signal_text}</span>
-                      <span className="text-xs text-gray-400">
-                        {getTimeAgo(signal.created_at)}
+              <div className="flex items-center m-4 px-4">
+                <span className="text-yellow-500 text-2xl mr-2">🕰️</span>
+                <span className="font-bold text-2xl">Past Signals</span>
+              </div>
+              <div>
+                {pastSignals.map((signal, index) => (
+                  <div
+                    key={index}
+                    className="flex flex-col bg-gray-50 m-4 p-4 rounded-lg"
+                  >
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center">
+                        <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0 relative mr-2">
+                          <Image
+                            src={
+                              fetchImageFromSignalText(signal.signal_text) || ""
+                            }
+                            alt={signal.signal_text || "signal image"}
+                            width={24}
+                            height={24}
+                            className="object-cover rounded-full"
+                          />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="font-medium">
+                            {signal.signal_text}
+                          </span>
+                          <span className="text-xs text-gray-400">
+                            {getTimeAgo(signal.created_at)}
+                          </span>
+                        </div>
+                      </div>
+                      <span className="text-xs px-2 py-1 rounded bg-gray-200 text-gray-700">
+                        Expired
                       </span>
                     </div>
+                    <div className="flex flex-wrap items-center gap-2 mt-3">
+                      {signal.events.slice(0, 4).map((event, idx) => (
+                        <div
+                          key={idx}
+                          className="text-xs bg-gray-100 px-2 py-1 rounded-full whitespace-normal break-words"
+                        >
+                          {event}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <span className="text-xs px-2 py-1 rounded bg-gray-200 text-gray-700">
-                    Expired
-                  </span>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         )}

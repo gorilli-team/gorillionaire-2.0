@@ -43,7 +43,10 @@ function combineDocuments(docs) {
 
 function initializeServices() {
   const embeddings = new OpenAIEmbeddings({ openAIApiKey: OPENAI_API_KEY });
-  const llm = new ChatOpenAI({ openAIApiKey: OPENAI_API_KEY, temperature: 0 });
+  const llm = new ChatOpenAI({
+    openAIApiKey: OPENAI_API_KEY,
+    temperature: 0.5,
+  });
 
   const client = createClient(SUPABASE_URL, SUPABASE_API_KEY);
   const vectorStore = new SupabaseVectorStore(embeddings, {
@@ -121,7 +124,7 @@ export async function generateSignal() {
     console.log(`\n[${timestamp}] Generating trading signal...`);
 
     const answer = await getTradingSignal(
-      "Give me the best trading signal you can deduce from the context you have, do not repeat yourself, every signal must be different from the previous one, we want to make money."
+      "Give me the best trading signal you can deduce from the context you have. Before generating the signal, flip a fair coin (50-50 chance) - if heads, generate a BUY signal, if tails, generate a SELL signal. Make sure the signal is different from previous ones. Remember that both BUY and SELL signals are equally important for making money in trading. Base your signal on the actual market data and events in the context."
     );
 
     console.log(`[${timestamp}] TRADING SIGNAL:`);

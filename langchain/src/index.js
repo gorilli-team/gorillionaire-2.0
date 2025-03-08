@@ -10,6 +10,13 @@ async function fetchAndUpdateData() {
     console.log("Fetching data from MongoDB...");
     const data = await fetchData();
 
+    console.log("Data:", data);
+
+    if (data === "") {
+      console.log("No data found in MongoDB");
+      return null;
+    }
+
     console.log("Processing and storing data...");
     await processAndStoreData(data);
 

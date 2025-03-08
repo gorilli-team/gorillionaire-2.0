@@ -30,23 +30,29 @@ export async function fetchData() {
     const spikes = db.collection("spikes");
     const transfers = db.collection("transfers");
 
-    const twentyFourHoursAgo = Math.floor(Date.now() / 1000) - 24 * 60 * 60;
+    const oneHourAgo = Math.floor(Date.now() / 1000) - 60 * 60;
 
     const spikesDocuments = await spikes
       .find({
         blockTimestamp: {
-          $gte: twentyFourHoursAgo,
+          $gte: oneHourAgo,
         },
       })
+      .sort({ blockTimestamp: -1 })
       .toArray();
 
     const transfersDocuments = await transfers
       .find({
         blockTimestamp: {
-          $gte: twentyFourHoursAgo,
+          $gte: oneHourAgo,
         },
       })
+      .sort({ blockTimestamp: -1 })
       .toArray();
+
+    if (spikesDocuments.length === 0 && transfersDocuments.length === 0) {
+      return "";
+    }
 
     //merge the two arrays, add type information, and sort them by blockTimestamp
     const mergedDocuments = [
