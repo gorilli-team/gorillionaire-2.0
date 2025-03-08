@@ -290,32 +290,28 @@ const Signals = () => {
         <div className="mb-6 overflow-hidden relative bg-white rounded-lg shadow">
           <div className="ticker-container py-3 px-2">
             <div className="ticker">
-              {[...recentTrades, ...recentTrades, ...recentTrades].map(
-                (trade, index) => (
-                  <div key={index} className="ticker-item ml-4">
-                    {/* <div className="flex items-center space-x-2">
-                      <div className="w-6 h-6 rounded-full bg-gray-200 overflow-hidden flex-shrink-0"></div>
-                      <span className="text-sm text-gray-700">
-                        {trade.user}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        {trade.timeAgo}
-                      </span>
-                    </div>
-                    <div className="flex items-center mt-1">
-                      <span
-                        className={`text-sm ${
-                          trade.action === "Bought"
-                            ? "text-green-500"
-                            : "text-red-500"
-                        }`}
-                      >
-                        {trade.action} {trade.amount}k {trade.token}
-                      </span>
-                    </div> */}
+              {[...recentTrades].map((trade, index) => (
+                <div key={index} className="ticker-item ml-4">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-6 h-6 rounded-full bg-gray-200 overflow-hidden flex-shrink-0"></div>
+                    <span className="text-sm text-gray-700">{trade.user}</span>
+                    <span className="text-xs text-gray-500">
+                      {trade.timeAgo}
+                    </span>
                   </div>
-                )
-              )}
+                  <div className="flex items-center mt-1">
+                    <span
+                      className={`text-sm ${
+                        trade.action === "Bought"
+                          ? "text-green-500"
+                          : "text-red-500"
+                      }`}
+                    >
+                      {trade.action} {trade.amount}k {trade.token}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
