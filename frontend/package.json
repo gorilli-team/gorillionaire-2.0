@@ -11,6 +11,7 @@
   "dependencies": {
     "@coinbase/onchainkit": "^0.36.9",
     "ethers": "^6.13.5",
+    "flowbite-react": "^0.10.2",
     "gorillionaire-frontend": "file:",
     "next": "15.1.6",
     "pino-pretty": "^13.0.0",
