@@ -1,132 +1,98 @@
-const { ethers } = require('ethers');
+const axios = require('axios');
 const PriceData = require('../models/PriceData');
 
-const UNISWAP_V2_PAIR_ABI = [
-  'function getReserves() external view returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast)',
-  'function token0() external view returns (address)',
-  'function token1() external view returns (address)',
-  'function price0CumulativeLast() external view returns (uint)',
-  'function price1CumulativeLast() external view returns (uint)'
-];
-
 const TOKENS = [
-  // {
-  //   symbol: 'CHOG',
-  //   pairAddress: '0xaD04207Ce0EF3c718a4Fd8cAA85c5297ED1d56B9',  // CHOG-USDC pair on Monad testnet
-  //   isToken0: true
-  // },
   {
-    symbol: 'MOYAKI',
-    pairAddress: '0x3aE6D8A282D67893e17AA70ebFFb33EE5aa65893',  // MOYAKI-USDC pair on Monad testnet
-    isToken0: true
+    symbol: 'YAKI',
+    address: '0xfe140e1dCe99Be9F4F15d657CD9b7BF622270C50',
+    networkId: 10143 
   },
-  // {
-  //   symbol: 'MOLANDAK',
-  //   pairAddress: '0xf4d2888d29D722226FafA5d9B24F9164c092421E',  // MOLANDAK-USDC pair on Monad testnet
-  //   isToken0: true
-  // }
+  {
+    symbol: 'DAK',
+    address: '0x0F0BDEbF0F83cD1EE3974779Bcb7315f9808c714',
+    networkId: 10143 
+  },
+  {
+    symbol: 'CHOG',
+    address: '0xE0590015A873bF326bd645c3E1266d4db41C4E6B',
+    networkId: 10143 
+  }
 ];
 
 class PriceOracle {
-  constructor(rpcUrl, timeWindow = 3600) {
-    this.provider = new ethers.JsonRpcProvider(rpcUrl);
-    this.timeWindow = timeWindow;
+  constructor(apiKey) {
+    this.apiKey = apiKey;
+    this.baseUrl = 'https://graph.codex.io/graphql';
   }
 
-  async getTWAP(pairAddress, isToken0) {
-    console.log(`\nGetting TWAP for pair ${pairAddress} (isToken0: ${isToken0})`);
-    
-    const pair = new ethers.Contract(pairAddress, UNISWAP_V2_PAIR_ABI, this.provider);
-    console.log('Contract instance created');
-
-    // Validate that this is a valid pair contract
+  async getTokenPrices(tokens) {
     try {
-      const [reserve0, reserve1] = await pair.getReserves();
-      console.log(`Pair reserves: ${reserve0}, ${reserve1}`);
-      
-      if (reserve0.toString() === '0' && reserve1.toString() === '0') {
-        throw new Error('Pair has no liquidity');
+      const response = await axios.post(
+        this.baseUrl,
+        {
+          query: `
+            {
+              getTokenPrices(
+                inputs: [
+                  ${tokens.map(token => `{
+                    address: "${token.address}",
+                    networkId: ${token.networkId}
+                  }`).join(',')}
+                ]
+              ) {
+                address
+                networkId
+                priceUsd
+                timestamp
+                confidence
+                poolAddress
+              }
+            }
+          `
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': this.apiKey
+          }
+        }
+      );
+
+      console.log({data: response.data.data.getTokenPrices})
+
+      if (response.data.errors) {
+        throw new Error(response.data.errors[0].message);
       }
 
-      const token0 = await pair.token0();
-      const token1 = await pair.token1();
-      console.log(`Pair tokens: ${token0} (token0), ${token1} (token1)`);
+      return response.data.data.getTokenPrices;
     } catch (error) {
-      console.error('Failed to validate pair contract:', error);
-      throw new Error(`Invalid or uninitialized pair contract: ${error.message}`);
+      console.error('Error fetching token prices:', error);
+      throw error;
     }
-    
-    const currentBlock = await this.provider.getBlockNumber();
-    console.log(`Current block number: ${currentBlock}`);
-    
-    const currentCumulative = isToken0 
-      ? await pair.price0CumulativeLast()
-      : await pair.price1CumulativeLast();
-    console.log(`Current cumulative price: ${currentCumulative}`);
-    
-    const pastBlock = await this.findBlockFromTime(currentBlock, this.timeWindow);
-    console.log(`Past block number (${this.timeWindow} seconds ago): ${pastBlock}`);
-    
-    const pastCumulative = isToken0
-      ? await pair.price0CumulativeLast({ blockTag: pastBlock })
-      : await pair.price1CumulativeLast({ blockTag: pastBlock });
-    console.log(`Past cumulative price: ${pastCumulative}`);
-    
-    const priceDiff = currentCumulative - pastCumulative;
-    console.log(`Price difference: ${priceDiff}`);
-    
-    const timeElapsed = this.timeWindow;
-    console.log(`Time elapsed: ${timeElapsed} seconds`);
-    
-    const price = priceDiff / timeElapsed / (10 ** 18);
-    console.log(`Calculated TWAP price: ${price}`);
-
-    return { price, blockNumber: currentBlock };
-  }
-
-  async findBlockFromTime(currentBlock, secondsAgo) {
-    const currentBlockData = await this.provider.getBlock(currentBlock);
-    if (!currentBlockData) throw new Error('Could not get current block');
-    
-    const targetTimestamp = currentBlockData.timestamp - secondsAgo;
-    
-    let left = 0;
-    let right = currentBlock;
-    
-    while (left < right) {
-      const mid = Math.floor((left + right) / 2);
-      const midBlock = await this.provider.getBlock(mid);
-      if (!midBlock) continue;
-      
-      if (midBlock.timestamp < targetTimestamp) {
-        left = mid + 1;
-      } else {
-        right = mid;
-      }
-    }
-    
-    return left;
   }
 
   async updatePrices() {
-    for (const token of TOKENS) {
-      try {
-        const { price, blockNumber } = await this.getTWAP(token.pairAddress, token.isToken0);
+    try {
+      const prices = await this.getTokenPrices(TOKENS);
+      
+      for (const priceData of prices) {
+        console.log({priceData})
+        const token = TOKENS.find(t => t.address.toLowerCase() === priceData.address.toLowerCase());
+        if (!token) continue;
 
-        console.log(price, blockNumber);
-        
         await PriceData.create({
           tokenSymbol: token.symbol,
-          price,
-          blockNumber,
-          pairAddress: token.pairAddress,
-          timeWindowSeconds: this.timeWindow
+          price: parseFloat(priceData.priceUsd),
+          timestamp: new Date(priceData.timestamp * 1000),
+          blockNumber: 0, // We don't get block numbers from Codex API
+          address: priceData.poolAddress,
         });
-        
-        console.log(`Updated price for ${token.symbol}: $${price}`);
-      } catch (error) {
-        console.error(`Error updating price for ${token.symbol}:`, error);
+
+        console.log(`Updated price for ${token.symbol}: $${priceData.priceUsd}`);
       }
+    } catch (error) {
+      console.error('Error updating prices:', error);
+      throw error;
     }
   }
 }

@@ -4,7 +4,7 @@ const priceDataSchema = new mongoose.Schema({
   tokenSymbol: {
     type: String,
     required: true,
-    enum: ['CHOG', 'MOYAKI', 'MOLANDAK']
+    enum: ['CHOG', 'YAKI', 'DAK']
   },
   price: {
     type: Number,
@@ -18,14 +18,10 @@ const priceDataSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  pairAddress: {
+  address: {
     type: String,
     required: true
   },
-  timeWindowSeconds: {
-    type: Number,
-    required: true
-  }
 });
 
 // Create compound index for efficient queries
