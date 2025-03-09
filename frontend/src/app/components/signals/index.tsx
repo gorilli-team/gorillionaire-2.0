@@ -6,7 +6,7 @@ import { trackedTokens } from "@/app/shared/tokenData";
 import { useAccount, useReadContracts, useBalance } from "wagmi";
 import { erc20Abi, isAddress } from "viem";
 import { getTimeAgo } from "@/app/utils/time";
-
+import { LoadingOverlay } from "../ui/LoadingSpinner";
 type Token = {
   symbol: string;
   name: string;
@@ -215,6 +215,8 @@ const Signals = () => {
   const [tradeSignals, setTradeSignals] = useState<TradeSignal[]>([]);
   const [pastSignals, setPastSignals] = useState<TradeSignal[]>([]);
 
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     const fetchSignals = async () => {
       try {
@@ -236,6 +238,7 @@ const Signals = () => {
           );
           setTradeSignals(buySignals.concat(sellSignals));
           setPastSignals(otherSignals);
+          setIsLoading(false);
         }
       } catch (error) {
         console.error("Error fetching past signals:", error);
@@ -256,6 +259,10 @@ const Signals = () => {
       [signalId]: option,
     });
   };
+
+  if (isLoading) {
+    return <LoadingOverlay />;
+  }
 
   return (
     <div className="w-full min-h-screen bg-gray-50 pt-16 lg:pt-0">
