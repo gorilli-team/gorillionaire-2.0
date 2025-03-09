@@ -7,7 +7,6 @@ const crypto = require("crypto");
 //track user signin
 router.post("/signin", async (req, res) => {
   try {
-    console.log("signin", req.body);
     const { address } = req.body;
     if (!address) {
       return res.status(400).json({ error: "No address provided" });

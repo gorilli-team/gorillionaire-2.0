@@ -30,6 +30,36 @@ const Leaderboard = () => {
   const onPageChange = (page: number) => setCurrentPage(page);
   const onActivitiesPageChange = (page: number) => setActivitiesPage(page);
 
+  const investors = useMemo<Investor[]>(() => [], []);
+
+  const fetchLeaderboard = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/activity/track/leaderboard`
+      );
+      const data = await response.json();
+      console.log("leaderboard", data);
+    } catch (error) {
+      console.error("Error fetching leaderboard:", error);
+    }
+  };
+
+  const fetchMe = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/activity/track/me?address=${address}`
+      );
+      const data = await response.json();
+      console.log("me", data);
+    } catch (error) {
+      console.error("Error fetching leaderboard:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchLeaderboard();
+    fetchMe();
+  }, []);
 
   useEffect(() => {
     setFilteredInvestors(investors);
@@ -48,27 +78,7 @@ const Leaderboard = () => {
     setCurrentPage(1); // Reset to first page when search changes
   }, [searchTerm, investors]);
 
-  const activities = useMemo<Activity[]>(
-    () => [
-      { action: "Bought", amount: "20k", token: "DAK", date: "13/04/2024" },
-      { action: "Bought", amount: "7k", token: "CHOG", date: "11/04/2024" },
-      { action: "Sold", amount: "10k", token: "YAKI", date: "10/04/2024" },
-      { action: "Sold", amount: "2k", token: "DAK", date: "09/04/2024" },
-      { action: "Bought", amount: "12k", token: "YAKI", date: "01/04/2024" },
-      { action: "Sold", amount: "5k", token: "DAK", date: "22/03/2024" },
-      { action: "Bought", amount: "20k", token: "CHOG", date: "21/03/2024" },
-      { action: "Bought", amount: "9k", token: "YAKI", date: "21/03/2024" },
-      { action: "Sold", amount: "5k", token: "DAK", date: "17/03/2024" },
-      { action: "Bought", amount: "20k", token: "DAK", date: "13/03/2024" },
-      { action: "Sold", amount: "15k", token: "YAKI", date: "10/03/2024" },
-      { action: "Bought", amount: "20k", token: "CHOG", date: "21/03/2024" },
-      { action: "Bought", amount: "9k", token: "YAKI", date: "21/03/2024" },
-      { action: "Sold", amount: "5k", token: "DAK", date: "17/03/2024" },
-      { action: "Bought", amount: "20k", token: "DAK", date: "13/03/2024" },
-      { action: "Sold", amount: "15k", token: "YAKI", date: "10/03/2024" },
-    ],
-    []
-  );
+  const activities = useMemo<Activity[]>(() => [], []);
 
   // Pagination logic for investors
   const itemsPerPage = 10;
