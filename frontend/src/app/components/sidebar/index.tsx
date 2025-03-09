@@ -16,7 +16,7 @@ export default function Sidebar({
   const router = useRouter();
 
   const handleGorillionaireClick = () => {
-    router.push("/");
+    router.push("https://gorillionai.re");
   };
 
   const handlePageChange = (page: string) => {
