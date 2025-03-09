@@ -10,8 +10,6 @@ import { getTimeAgo } from "@/app/utils/time";
 type Token = {
   symbol: string;
   name: string;
-  price: number;
-  priceChange: number;
   imageUrl: string | undefined;
   totalHolding: number;
 };
@@ -35,6 +33,14 @@ type TradeSignal = {
   risk: "Moderate" | "Aggressive" | "Conservative";
   confidenceScore: string;
   created_at: string;
+};
+
+// Pyth price feed type
+type PythPriceData = {
+  symbol: string;
+  price: number;
+  prevPrice: number;
+  priceChange: number;
 };
 
 const MONAD_CHAIN_ID = 10143;
@@ -88,6 +94,9 @@ const Signals = () => {
   const [dakBalance, setDakBalance] = useState<number>(0);
   const [monBalance, setMonBalance] = useState<number>(0);
 
+  // State for price data from backend
+  const [priceData, setPriceData] = useState<Record<string, PythPriceData>>({}); // eslint-disable-line @typescript-eslint/no-unused-vars
+
   // Get native MON balance
   const { data: monBalanceData } = useBalance({
     address,
@@ -108,6 +117,64 @@ const Signals = () => {
         },
       ]),
   });
+
+  // Fetch price data from our backend
+  // useEffect(() => {
+  //   const fetchPriceData = async () => {
+  //     try {
+  //       const response = await fetch("/api/events/prices");
+  //       const data = await response.json();
+
+  //       if (data.success && data.data) {
+  //         const newPriceData: Record<string, PythPriceData> = {};
+
+  //         // Group prices by token symbol and get the latest two prices for each token
+  //         const pricesByToken = data.data.reduce((acc: any, price: any) => {
+  //           if (!acc[price.tokenSymbol]) {
+  //             acc[price.tokenSymbol] = [];
+  //           }
+  //           acc[price.tokenSymbol].push(price);
+  //           return acc;
+  //         }, {});
+
+  //         // Calculate price changes and create price data objects
+  //         Object.entries(pricesByToken).forEach(
+  //           ([symbol, prices]: [string, any]) => {
+  //             const sortedPrices = prices.sort(
+  //               (a: any, b: any) => b.timestamp - a.timestamp
+  //             );
+  //             const currentPrice = sortedPrices[0]?.price || 0;
+  //             const prevPrice = sortedPrices[1]?.price || currentPrice;
+  //             const priceChange =
+  //               prevPrice > 0
+  //                 ? ((currentPrice - prevPrice) / prevPrice) * 100
+  //                 : 0;
+
+  //             newPriceData[symbol] = {
+  //               symbol,
+  //               price: currentPrice,
+  //               prevPrice: prevPrice,
+  //               priceChange: parseFloat(priceChange.toFixed(2)),
+  //             };
+  //           }
+  //         );
+
+  //         setPriceData(newPriceData);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching price data:", error);
+  //     }
+  //   };
+
+  //   // Fetch price data immediately
+  //   fetchPriceData();
+
+  //   // Set up interval to fetch price data every 30 seconds
+  //   const intervalId = setInterval(fetchPriceData, 30000);
+
+  //   // Clean up interval on component unmount
+  //   return () => clearInterval(intervalId);
+  // }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (monBalanceData) {
@@ -130,32 +197,24 @@ const Signals = () => {
       symbol: "MON",
       name: "Monad",
       totalHolding: monBalance,
-      price: 1507.38,
-      priceChange: 2,
       imageUrl: fetchImageFromSignalText("MON"),
     },
     {
       symbol: "DAK",
       name: "Molandak",
       totalHolding: dakBalance,
-      price: 1507.38,
-      priceChange: 2,
       imageUrl: fetchImageFromSignalText("DAK"),
     },
     {
       symbol: "YAKI",
       name: "Moyaki",
       totalHolding: moyakiBalance,
-      price: 2923.52,
-      priceChange: -5,
       imageUrl: fetchImageFromSignalText("YAKI"),
     },
     {
       symbol: "CHOG",
       name: "Chog",
       totalHolding: chogBalance,
-      price: 1007.97,
-      priceChange: 2,
       imageUrl: fetchImageFromSignalText("CHOG"),
     },
   ];
@@ -212,8 +271,6 @@ const Signals = () => {
   ];
 
   const [tradeSignals, setTradeSignals] = useState<TradeSignal[]>([]);
-
-  //eslint-disable-next-line
   const [pastSignals, setPastSignals] = useState<TradeSignal[]>([]);
 
   useEffect(() => {
@@ -296,16 +353,16 @@ const Signals = () => {
                     </div>
                   </div> */}
                 </div>
-                {/* <div className="flex flex-col items-end">
-                  <span
+                <div className="flex flex-col items-end">
+                  {/* <span
                     className={`text-sm ${
                       token.priceChange >= 0 ? "text-green-500" : "text-red-500"
                     }`}
                   >
                     {token.priceChange >= 0 ? "+" : ""}
                     {token.priceChange}% (last 24h)
-                  </span>
-                </div> */}
+                  </span> */}
+                </div>
               </div>
             </div>
           ))}
@@ -434,31 +491,6 @@ const Signals = () => {
                     <div className="text-xs text-gray-400 mt-2">
                       {getTimeAgo(signal.created_at)}
                     </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      {/* <div className="col-span-2">
-                        <div className="flex items-center text-xs text-orange-500">
-                          <span>
-                            🔥 Spike: {signal.spikes.amount} transfers
-                          </span>
-                        </div>
-                      </div> */}
-                      {/* 
-                      {signal.transfers.map((transfer, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-center text-xs text-gray-500"
-                        >
-                          <span>
-                            💸 {transfer.amount} {transfer.token} transfer
-                          </span>
-                        </div>
-                      ))} */}
-                    </div>
-
-                    {/* <div className="text-xs text-gray-400 mt-2">
-                      {signal.timeAgo}
-                    </div> */}
                   </div>
                 ))}
             </div>

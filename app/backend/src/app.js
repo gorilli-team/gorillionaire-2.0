@@ -28,6 +28,7 @@ app.use("/events/listings", require("./routes/events/listings"));
 app.use("/events/transfers", require("./routes/events/transfers"));
 app.use("/events/prices", require("./routes/events/prices"));
 app.use("/trade", require("./routes/trade/0x"));
+app.use("/pyth", require("./routes/pyth/mon-price"));
 //app.use("/events/price-feeds", require("./routes/events/price-feeds"));
 app.use(
   "/signals/generated-signals",
