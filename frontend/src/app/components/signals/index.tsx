@@ -416,7 +416,7 @@ const Signals = () => {
                       </button>
                       <button
                         className={`px-3 py-1 rounded-full text-sm border
-                         bg-blue-500 text-white border-blue-500`}
+                         bg-violet-700 text-white border-violet-900`}
                         onClick={() =>
                           handleOptionSelect(
                             `${signal.type}-${signal.amount}-${signal.token}`,
@@ -512,7 +512,7 @@ const Signals = () => {
                       </button>
                       <button
                         className={`px-3 py-1 rounded-full text-sm border
-                         bg-blue-500 text-white border-blue-500`}
+                        bg-violet-700 text-white border-violet-900`}
                         onClick={() =>
                           handleOptionSelect(
                             `${signal.type}-${signal.amount}-${signal.token}`,
