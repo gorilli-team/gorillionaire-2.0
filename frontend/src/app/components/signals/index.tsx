@@ -118,64 +118,6 @@ const Signals = () => {
       ]),
   });
 
-  // Fetch price data from our backend
-  // useEffect(() => {
-  //   const fetchPriceData = async () => {
-  //     try {
-  //       const response = await fetch("/api/events/prices");
-  //       const data = await response.json();
-
-  //       if (data.success && data.data) {
-  //         const newPriceData: Record<string, PythPriceData> = {};
-
-  //         // Group prices by token symbol and get the latest two prices for each token
-  //         const pricesByToken = data.data.reduce((acc: any, price: any) => {
-  //           if (!acc[price.tokenSymbol]) {
-  //             acc[price.tokenSymbol] = [];
-  //           }
-  //           acc[price.tokenSymbol].push(price);
-  //           return acc;
-  //         }, {});
-
-  //         // Calculate price changes and create price data objects
-  //         Object.entries(pricesByToken).forEach(
-  //           ([symbol, prices]: [string, any]) => {
-  //             const sortedPrices = prices.sort(
-  //               (a: any, b: any) => b.timestamp - a.timestamp
-  //             );
-  //             const currentPrice = sortedPrices[0]?.price || 0;
-  //             const prevPrice = sortedPrices[1]?.price || currentPrice;
-  //             const priceChange =
-  //               prevPrice > 0
-  //                 ? ((currentPrice - prevPrice) / prevPrice) * 100
-  //                 : 0;
-
-  //             newPriceData[symbol] = {
-  //               symbol,
-  //               price: currentPrice,
-  //               prevPrice: prevPrice,
-  //               priceChange: parseFloat(priceChange.toFixed(2)),
-  //             };
-  //           }
-  //         );
-
-  //         setPriceData(newPriceData);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching price data:", error);
-  //     }
-  //   };
-
-  //   // Fetch price data immediately
-  //   fetchPriceData();
-
-  //   // Set up interval to fetch price data every 30 seconds
-  //   const intervalId = setInterval(fetchPriceData, 30000);
-
-  //   // Clean up interval on component unmount
-  //   return () => clearInterval(intervalId);
-  // }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
   useEffect(() => {
     if (monBalanceData) {
       setMonBalance(Number(monBalanceData.formatted));

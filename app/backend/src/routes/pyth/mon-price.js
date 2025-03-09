@@ -24,7 +24,7 @@ const getMonPrice = async () => {
         res.on("end", () => {
           try {
             const parsedData = JSON.parse(data);
-            console.log("Received price data:", parsedData);
+            // console.log("Received price data:", parsedData);
 
             if (parsedData && parsedData.length > 0) {
               // Extract price from the response
@@ -47,7 +47,7 @@ const getMonPrice = async () => {
 };
 
 router.get("/mon-price", async (req, res) => {
-  console.log("Getting MON price...");
+  // console.log("Getting MON price...");
   try {
     const price = await getMonPrice();
     res.json({ price });
