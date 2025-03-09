@@ -9,7 +9,6 @@ const userActivitySchema = new mongoose.Schema(
     },
     nonce: {
       type: String,
-      required: true,
     },
     points: {
       type: Number,
@@ -18,6 +17,17 @@ const userActivitySchema = new mongoose.Schema(
     lastSignIn: {
       type: Date,
       default: Date.now,
+    },
+    activitiesList: [
+      {
+        name: String,
+        points: Number,
+        date: Date,
+      },
+    ],
+    streak: {
+      type: Number,
+      default: 0,
     },
     isRewarded: {
       type: Boolean,

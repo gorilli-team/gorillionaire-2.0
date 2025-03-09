@@ -31,8 +31,7 @@ app.use("/trade", require("./routes/trade/0x"));
 app.use("/pyth", require("./routes/pyth/mon-price"));
 //app.use("/events/price-feeds", require("./routes/events/price-feeds"));
 
-// Register signin routes
-app.use("/activity/signin", require("./routes/activity/signin"));
+app.use("/activity/track", require("./routes/activity/track"));
 app.use(
   "/signals/generated-signals",
   require("./routes/signals/generated-signals")
