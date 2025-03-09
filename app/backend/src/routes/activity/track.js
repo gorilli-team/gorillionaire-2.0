@@ -140,6 +140,9 @@ router.get("/me", async (req, res) => {
     const userActivity = await UserActivity.findOne({
       address: address.toLowerCase(),
     });
+    userActivity.activitiesList.sort((a, b) => {
+      return new Date(b.date) - new Date(a.date);
+    });
     res.json(userActivity);
   } catch (error) {
     console.error("Error fetching user activity:", error);
