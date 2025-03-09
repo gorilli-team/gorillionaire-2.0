@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { Pagination } from "flowbite-react";
-
+import { useAccount } from "wagmi";
 interface Investor {
   rank: number;
   username: string;
@@ -25,20 +25,11 @@ const Leaderboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredInvestors, setFilteredInvestors] = useState<Investor[]>([]);
 
+  const { address } = useAccount();
+
   const onPageChange = (page: number) => setCurrentPage(page);
   const onActivitiesPageChange = (page: number) => setActivitiesPage(page);
 
-  const investors = useMemo<Investor[]>(() => [], []);
-
-  const fetchLeaderboard = async () => {
-    const response = await fetch("/api/leaderboard");
-    const data = await response.json();
-    setFilteredInvestors(data);
-  };
-
-  useEffect(() => {
-    fetchLeaderboard();
-  }, []);
 
   useEffect(() => {
     setFilteredInvestors(investors);
