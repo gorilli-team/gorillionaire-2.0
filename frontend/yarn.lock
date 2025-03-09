@@ -520,18 +520,6 @@
   resolved "https://registry.npmjs.org/@humanwhocodes/retry/-/retry-0.4.1.tgz"
   integrity sha512-c7hNEllBlenFTHBky65mhq8WD2kbN9Q6gk0bTk8lSBvc554jpXSkST1iePudpt7+A/AQvuHs9EMqjHDXMY1lrA==
 
-"@img/sharp-darwin-x64@0.33.5":
-  version "0.33.5"
-  resolved "https://registry.npmjs.org/@img/sharp-darwin-x64/-/sharp-darwin-x64-0.33.5.tgz"
-  integrity sha512-fyHac4jIc1ANYGRDxtiqelIbdWkIuQaI84Mv45KvGRRxSAa7o7d1ZKAOBaYbnepLC1WqxfpimdeWfvqqSGwR2Q==
-  optionalDependencies:
-    "@img/sharp-libvips-darwin-x64" "1.0.4"
-
-"@img/sharp-libvips-darwin-x64@1.0.4":
-  version "1.0.4"
-  resolved "https://registry.npmjs.org/@img/sharp-libvips-darwin-x64/-/sharp-libvips-darwin-x64-1.0.4.tgz"
-  integrity sha512-xnGR8YuZYfJGmWPvmlunFaWJsb9T/AO2ykoP3Fz/0X5XV2aoYBPkX6xqCQvUTKKiLddarLaxpzNe+b1hjeWHAQ==
-
 "@isaacs/cliui@^8.0.2":
   version "8.0.2"
   resolved "https://registry.npmjs.org/@isaacs/cliui/-/cliui-8.0.2.tgz"
@@ -893,10 +881,10 @@
   dependencies:
     fast-glob "3.3.1"
 
-"@next/swc-darwin-x64@15.1.6":
+"@next/swc-darwin-arm64@15.1.6":
   version "15.1.6"
-  resolved "https://registry.npmjs.org/@next/swc-darwin-x64/-/swc-darwin-x64-15.1.6.tgz"
-  integrity sha512-x1jGpbHbZoZ69nRuogGL2MYPLqohlhnT9OCU6E6QFewwup+z+M6r8oU47BTeJcWsF2sdBahp5cKiAcDbwwK/lg==
+  resolved "https://registry.npmjs.org/@next/swc-darwin-arm64/-/swc-darwin-arm64-15.1.6.tgz"
+  integrity sha512-u7lg4Mpl9qWpKgy6NzEkz/w0/keEHtOybmIl0ykgItBxEM5mYotS5PmqTpo+Rhg8FiOiWgwr8USxmKQkqLBCrw==
 
 "@noble/ciphers@^1.0.0", "@noble/ciphers@1.2.1":
   version "1.2.1"
@@ -3631,6 +3619,11 @@ eyes@^0.1.8:
   resolved "https://registry.npmjs.org/eyes/-/eyes-0.1.8.tgz"
   integrity sha512-GipyPsXO1anza0AOZdy69Im7hGFCNB7Y/NGjDlZGJ3GJJLtwNSb2vrzYrTYJRrRloVx7pl+bhUaTB8yiccPvFQ==
 
+fancy-canvas@2.1.0:
+  version "2.1.0"
+  resolved "https://registry.npmjs.org/fancy-canvas/-/fancy-canvas-2.1.0.tgz"
+  integrity sha512-nifxXJ95JNLFR2NgRV4/MxVP45G9909wJTEKz5fg/TZS20JJZA6hfgRVh/bC9bwl2zBtBNcYPjiBE4njQHVBwQ==
+
 fast-copy@^3.0.0, fast-copy@^3.0.2:
   version "3.0.2"
   resolved "https://registry.npmjs.org/fast-copy/-/fast-copy-3.0.2.tgz"
@@ -3940,11 +3933,13 @@ gopd@^1.0.1, gopd@^1.2.0:
     ethers "^6.13.5"
     flowbite-react "^0.10.2"
     gorillionaire-frontend "file:"
+    lightweight-charts "^5.0.3"
     next "15.1.6"
     pino-pretty "^13.0.0"
     react "^19.0.0"
     react-dom "^19.0.0"
     recharts "^2.15.1"
+    viem "^2.23.8"
     wagmi "^2.14.9"
 
 graceful-fs@^4.2.4:
@@ -4559,6 +4554,13 @@ libphonenumber-js@^1.10.31, libphonenumber-js@^1.10.44:
   version "1.12.5"
   resolved "https://registry.npmjs.org/libphonenumber-js/-/libphonenumber-js-1.12.5.tgz"
   integrity sha512-DOjiaVjjSmap12ztyb4QgoFmUe/GbgnEXHu+R7iowk0lzDIjScvPAm8cK9RYTEobbRb0OPlwlZUGTTJPJg13Kw==
+
+lightweight-charts@^5.0.3:
+  version "5.0.3"
+  resolved "https://registry.npmjs.org/lightweight-charts/-/lightweight-charts-5.0.3.tgz"
+  integrity sha512-/ve4wbdwAJqaexZ07HZ1bb36ZeI03ZEcqd2ttAXAcbX7/csbPqueBZmF2/jF0dPsWNvelUP9qzDR//o9625OqQ==
+  dependencies:
+    fancy-canvas "2.1.0"
 
 lilconfig@^3.0.0, lilconfig@^3.1.3:
   version "3.1.3"

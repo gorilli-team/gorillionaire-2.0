@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Token from "../token/index";
+import PriceChart from "../price-chart";
 import {
   trackedTokens,
   fetchAllTokens,
@@ -14,6 +15,11 @@ interface TokenStats {
   totalEvents: number;
   trackedSince: string;
   trackingTime: string;
+}
+
+interface PriceData {
+  time: string;
+  value: number;
 }
 
 const untrackedTokens: TokenData[] = [
@@ -52,6 +58,8 @@ const untrackedTokens: TokenData[] = [
 const Tokens = () => {
   const router = useRouter();
   const [tokenStats, setTokenStats] = useState<TokenStats[]>([]);
+  const [selectedToken, setSelectedToken] = useState<TokenData | null>(null);
+  const [priceData, setPriceData] = useState<PriceData[]>([]);
 
   useEffect(() => {
     const getTokens = async () => {
@@ -67,6 +75,31 @@ const Tokens = () => {
     getTokens();
   }, []);
 
+  useEffect(() => {
+    const fetchPriceData = async () => {
+      if (!selectedToken) return;
+      
+      try {
+        const response = await fetch(`/api/prices?symbol=${selectedToken.symbol}`);
+        const data = await response.json();
+        
+        if (data.success && data.data) {
+          // Transform the data into the format expected by the chart
+          const chartData = data.data.map((item: any) => ({
+            time: new Date(item.timestamp).toISOString().split('T')[0], // Format: YYYY-MM-DD
+            value: item.price
+          }));
+          
+          setPriceData(chartData);
+        }
+      } catch (error) {
+        console.error("Error fetching price data:", error);
+      }
+    };
+
+    fetchPriceData();
+  }, [selectedToken]);
+
   // Merge static data with dynamic stats
   const trackedTokensWithStats = trackedTokens.map((token) => {
     const stats = tokenStats.find((t) => t.name === token.name);
@@ -78,8 +111,8 @@ const Tokens = () => {
     };
   });
 
-  const handleTokenClick = (address: string) => {
-    router.push(`/tokens/${address}`);
+  const handleTokenClick = (token: TokenData) => {
+    setSelectedToken(token);
   };
 
   return (
@@ -104,12 +137,21 @@ const Tokens = () => {
             </div>
           </a>
         </div>
+
+        {selectedToken && priceData.length > 0 && (
+          <div className="mb-8">
+            <PriceChart data={priceData} tokenSymbol={selectedToken.symbol} />
+          </div>
+        )}
+
         <div className="grid grid-cols-3 gap-8">
           {trackedTokensWithStats.map((token: TokenData, index: number) => (
             <div
               key={index}
-              className="bg-white shadow-md rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200"
-              onClick={() => handleTokenClick(token.address)}
+              className={`bg-white shadow-md rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200 ${
+                selectedToken?.address === token.address ? 'ring-2 ring-blue-500' : ''
+              }`}
+              onClick={() => handleTokenClick(token)}
             >
               <Token
                 name={token.name}
@@ -127,8 +169,10 @@ const Tokens = () => {
           {untrackedTokens.map((token: TokenData, index: number) => (
             <div
               key={index}
-              className="bg-white shadow-md rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200"
-              onClick={() => handleTokenClick(token.symbol)}
+              className={`bg-white shadow-md rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200 ${
+                selectedToken?.address === token.address ? 'ring-2 ring-blue-500' : ''
+              }`}
+              onClick={() => handleTokenClick(token)}
             >
               <Token
                 name={token.name}
