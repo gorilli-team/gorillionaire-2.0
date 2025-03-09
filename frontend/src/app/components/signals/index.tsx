@@ -35,14 +35,6 @@ type TradeSignal = {
   created_at: string;
 };
 
-// Pyth price feed type
-type PythPriceData = {
-  symbol: string;
-  price: number;
-  prevPrice: number;
-  priceChange: number;
-};
-
 const MONAD_CHAIN_ID = 10143;
 
 const fetchImageFromSignalText = (signalText: string) => {
@@ -93,9 +85,6 @@ const Signals = () => {
   const [chogBalance, setChogBalance] = useState<number>(0);
   const [dakBalance, setDakBalance] = useState<number>(0);
   const [monBalance, setMonBalance] = useState<number>(0);
-
-  // State for price data from backend
-  const [priceData, setPriceData] = useState<Record<string, PythPriceData>>({}); // eslint-disable-line @typescript-eslint/no-unused-vars
 
   // Get native MON balance
   const { data: monBalanceData } = useBalance({
@@ -268,29 +257,30 @@ const Signals = () => {
     <div className="w-full min-h-screen bg-gray-50 pt-16 lg:pt-0">
       <div className="px-2 sm:px-4 py-4 sm:py-6">
         {/* Token Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          {tokens.map((token) => (
-            <div
-              key={token.symbol}
-              className="bg-white rounded-lg shadow p-4 flex items-center"
-            >
-              <div className="flex items-center space-x-3 w-full">
-                <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 relative">
-                  <Image
-                    src={token.imageUrl || ""}
-                    alt={token.name || "token image"}
-                    width={128}
-                    height={128}
-                    className="object-cover rounded-full"
-                  />
-                </div>
-                <div className="flex flex-col flex-grow">
-                  <span className="text-sm">{token.name}</span>
-                  <span className="text-xl font-bold">
-                    {formatNumber(token.totalHolding)}{" "}
-                    <span className="text-xl font-bold">{token.symbol}</span>
-                  </span>
-                  {/* <div className="flex justify-between items-center">
+        {address && (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            {tokens.map((token) => (
+              <div
+                key={token.symbol}
+                className="bg-white rounded-lg shadow p-4 flex items-center"
+              >
+                <div className="flex items-center space-x-3 w-full">
+                  <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 relative">
+                    <Image
+                      src={token.imageUrl || ""}
+                      alt={token.name || "token image"}
+                      width={128}
+                      height={128}
+                      className="object-cover rounded-full"
+                    />
+                  </div>
+                  <div className="flex flex-col flex-grow">
+                    <span className="text-sm">{token.name}</span>
+                    <span className="text-xl font-bold">
+                      {formatNumber(token.totalHolding)}{" "}
+                      <span className="text-xl font-bold">{token.symbol}</span>
+                    </span>
+                    {/* <div className="flex justify-between items-center">
                     <div className="flex items-baseline">
                       <span className="text-sm">
                         Price:{" "}
@@ -301,9 +291,9 @@ const Signals = () => {
                       <span className="text-sm ml-1">$</span>
                     </div>
                   </div> */}
-                </div>
-                <div className="flex flex-col items-end">
-                  {/* <span
+                  </div>
+                  <div className="flex flex-col items-end">
+                    {/* <span
                     className={`text-sm ${
                       token.priceChange >= 0 ? "text-green-500" : "text-red-500"
                     }`}
@@ -311,11 +301,12 @@ const Signals = () => {
                     {token.priceChange >= 0 ? "+" : ""}
                     {token.priceChange}% (last 24h)
                   </span> */}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* Recent Trades - Animated Ticker */}
         <div className="mb-6 overflow-hidden relative bg-white rounded-lg shadow">
