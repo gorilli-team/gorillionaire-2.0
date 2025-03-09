@@ -27,7 +27,11 @@ router.get('/', async (req, res) => {
 // Trigger price update
 router.get('/update', async (req, res) => {
   try {
-    const oracle = new PriceOracle(process.env.MONAD_RPC_URL);
+    if (!process.env.CODEX_API_KEY) {
+      throw new Error('CODEX_API_KEY environment variable is not set');
+    }
+
+    const oracle = new PriceOracle(process.env.CODEX_API_KEY);
     await oracle.updatePrices();
     res.json({ success: true, message: 'Prices updated successfully' });
   } catch (error) {
