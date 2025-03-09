@@ -41,34 +41,37 @@ export default function Header() {
   return (
     <header className="h-16 px-6 flex items-center justify-between border-b border-gray-300 bg-gray-100">
       <div className="flex items-center justify-end space-x-4 flex-1 my-3 ml-4">
-        <div
-          className={`flex items-center gap-2 bg-violet-100  px-3 py-1.5 rounded-lg transition-colors duration-500 ml-auto sm:ml-0 ${
-            isFlashing ? "bg-violet-300" : "bg-violet-100"
-          }`}
-        >
-          <div className="items-end space-x-2 sm:items-start">
-            <span className="text-md font-medium text-violet-900">
-              MON PRICE
-            </span>
-            <span
-              className={`text-md font-bold text-violet-900 transition-transform duration-500 ${
-                isFlashing ? "scale-110" : "scale-100"
-              }`}
-            >
-              ${monPriceFormatted}
-            </span>
+        {monPriceFormatted !== "0.00" && (
+          <div
+            className={`flex items-center gap-2 bg-violet-100  px-3 py-1.5 rounded-lg transition-colors duration-500 ml-auto sm:ml-0 ${
+              isFlashing ? "bg-violet-300" : "bg-violet-100"
+            }`}
+          >
+            <div className="items-end space-x-2 sm:items-start">
+              <span className="text-md font-medium text-violet-900">
+                MON PRICE
+              </span>
+              <span
+                className={`text-md font-bold text-violet-900 transition-transform duration-500 ${
+                  isFlashing ? "scale-110" : "scale-100"
+                }`}
+              >
+                ${monPriceFormatted}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-1 ml-2">
+              <span className="text-xs text-violet-900">Powered by</span>
+              <Image
+                src="/Pyth_Logotype_Dark.png"
+                alt="Pyth"
+                width={64}
+                height={16}
+                className="ml-1"
+              />
+            </div>
           </div>
-          <div className="flex items-center gap-1 ml-2">
-            <span className="text-xs text-violet-900">Powered by</span>
-            <Image
-              src="/Pyth_Logotype_Dark.png"
-              alt="Pyth"
-              width={64}
-              height={16}
-              className="ml-1"
-            />
-          </div>
-        </div>
+        )}
         {ready && authenticated ? (
           <div className="flex items-center gap-4">
             {user?.wallet && (
