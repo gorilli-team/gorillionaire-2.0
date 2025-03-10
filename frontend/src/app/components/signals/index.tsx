@@ -1,17 +1,41 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Image from "next/image";
 import { trackedTokens } from "@/app/shared/tokenData";
-import { useAccount, useReadContracts, useBalance } from "wagmi";
-import { erc20Abi, isAddress } from "viem";
+import {
+  useAccount,
+  useReadContracts,
+  useBalance,
+  useWriteContract,
+  useConfig,
+  useSignTypedData,
+  useSendTransaction,
+} from "wagmi";
+import { waitForTransactionReceipt } from "wagmi/actions";
+import {
+  concat,
+  erc20Abi,
+  isAddress,
+  numberToHex,
+  parseUnits,
+  size,
+} from "viem";
 import { getTimeAgo } from "@/app/utils/time";
 import { LoadingOverlay } from "../ui/LoadingSpinner";
+import {
+  MON_ADDRESS,
+  PERMIT2_ADDRESS,
+  WMONAD_ADDRESS,
+} from "@/app/utils/constants";
+
 type Token = {
   symbol: string;
   name: string;
   imageUrl: string | undefined;
   totalHolding: number;
+  decimals: number;
+  address: `0x${string}`;
 };
 
 type TradeEvent = {
@@ -37,16 +61,23 @@ type TradeSignal = {
 
 const MONAD_CHAIN_ID = 10143;
 
+const parseSignalText = (signalText: string) => {
+  const symbol = signalText.match(/CHOG|DAK|YAKI|MON/)?.[0];
+  const amount = Number(signalText.match(/\d+\.\d+/)?.[0]);
+
+  return { symbol, amount };
+};
+
 const fetchImageFromSignalText = (signalText: string) => {
   //find the first instance of one of the following words: CHOG, DAK, YAKI, MON
-  const token = signalText.match(/CHOG|DAK|YAKI|MON/)?.[0];
-  if (token === "CHOG") {
+  const { symbol } = parseSignalText(signalText);
+  if (symbol === "CHOG") {
     return "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/5d1206c2-042c-4edc-9f8b-dcef2e9e8f00/public";
-  } else if (token === "DAK") {
+  } else if (symbol === "DAK") {
     return "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/27759359-9374-4995-341c-b2636a432800/public";
-  } else if (token === "YAKI") {
+  } else if (symbol === "YAKI") {
     return "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/6679b698-a845-412b-504b-23463a3e1900/public";
-  } else if (token === "MON") {
+  } else if (symbol === "MON") {
     return "https://imagedelivery.net/cBNDGgkrsEA-b_ixIp9SkQ/I_t8rg_V_400x400.jpg/public";
   } else {
     //return placeholder image/ no token
@@ -81,6 +112,11 @@ const mapConfidenceScoreToRisk = (confidenceScore: string) => {
 
 const Signals = () => {
   const { address } = useAccount();
+  const { writeContractAsync } = useWriteContract();
+  const { signTypedDataAsync } = useSignTypedData();
+  const { sendTransactionAsync } = useSendTransaction();
+  const wagmiConfig = useConfig();
+
   const [moyakiBalance, setMoyakiBalance] = useState<number>(0);
   const [chogBalance, setChogBalance] = useState<number>(0);
   const [dakBalance, setDakBalance] = useState<number>(0);
@@ -115,7 +151,6 @@ const Signals = () => {
 
   useEffect(() => {
     if (data && data.length >= 3) {
-      console.log("balances", data);
       // Convert BigInt to number, dividing by 10^18 for proper token amount
       setDakBalance(Number((data[0].result as bigint) / BigInt(10 ** 18)));
       setMoyakiBalance(Number((data[1].result as bigint) / BigInt(10 ** 18)));
@@ -123,32 +158,43 @@ const Signals = () => {
     }
   }, [data]);
 
-  const tokens: Token[] = [
-    {
-      symbol: "MON",
-      name: "Monad",
-      totalHolding: monBalance,
-      imageUrl: fetchImageFromSignalText("MON"),
-    },
-    {
-      symbol: "DAK",
-      name: "Molandak",
-      totalHolding: dakBalance,
-      imageUrl: fetchImageFromSignalText("DAK"),
-    },
-    {
-      symbol: "YAKI",
-      name: "Moyaki",
-      totalHolding: moyakiBalance,
-      imageUrl: fetchImageFromSignalText("YAKI"),
-    },
-    {
-      symbol: "CHOG",
-      name: "Chog",
-      totalHolding: chogBalance,
-      imageUrl: fetchImageFromSignalText("CHOG"),
-    },
-  ];
+  const tokens: Token[] = useMemo(
+    () => [
+      {
+        symbol: "MON",
+        name: "Monad",
+        totalHolding: monBalance,
+        imageUrl: fetchImageFromSignalText("MON"),
+        decimals: 18,
+        address: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      },
+      {
+        symbol: "DAK",
+        name: "Molandak",
+        totalHolding: dakBalance,
+        imageUrl: fetchImageFromSignalText("DAK"),
+        decimals: 18,
+        address: "0x0F0BDEbF0F83cD1EE3974779Bcb7315f9808c714",
+      },
+      {
+        symbol: "YAKI",
+        name: "Moyaki",
+        totalHolding: moyakiBalance,
+        imageUrl: fetchImageFromSignalText("YAKI"),
+        decimals: 18,
+        address: "0xfe140e1dCe99Be9F4F15d657CD9b7BF622270C50",
+      },
+      {
+        symbol: "CHOG",
+        name: "Chog",
+        totalHolding: chogBalance,
+        imageUrl: fetchImageFromSignalText("CHOG"),
+        decimals: 18,
+        address: "0xE0590015A873bF326bd645c3E1266d4db41C4E6B",
+      },
+    ],
+    [monBalance, dakBalance, moyakiBalance, chogBalance]
+  );
 
   const recentTrades: TradeEvent[] = [
     {
@@ -242,12 +288,121 @@ const Signals = () => {
     Record<string, string>
   >({});
 
-  const handleOptionSelect = (signalId: string, option: string) => {
-    setSelectedOptions({
-      ...selectedOptions,
-      [signalId]: option,
-    });
-  };
+  const onYes = useCallback(
+    async (token: Token, amount: number, type: "Buy" | "Sell") => {
+      if (!address) return;
+
+      // for sells we need to convert percentage to aamount, for buys change gets handled backend/side
+      const sellAmount =
+        type === "Sell" ? (token.totalHolding * amount) / 100 : amount;
+
+      const params = new URLSearchParams({
+        token: token.symbol,
+        amount: sellAmount.toString(),
+        type: type.toLowerCase(),
+        userAddress: address,
+      });
+
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/trade/0x-quote?${params.toString()}`
+      );
+      const quote = await res.json();
+
+      if (!quote) return;
+
+      // Different flow if sell token is native token
+      if (quote.sellToken.toLowerCase() === MON_ADDRESS.toLowerCase()) {
+        const txHash = await sendTransactionAsync({
+          account: address,
+          gas: quote?.transaction.gas
+            ? BigInt(quote.transaction.gas)
+            : undefined,
+          to: quote?.transaction.to,
+          data: quote.transaction.data,
+          value: BigInt(quote.transaction.value),
+          gasPrice: quote?.transaction.gasPrice
+            ? BigInt(quote.transaction.gasPrice)
+            : undefined,
+        });
+
+        console.log("Transaction sent:", txHash);
+        return;
+      }
+
+      if (quote.issues && quote.issues.allowance !== null) {
+        try {
+          const hash = await writeContractAsync({
+            abi: erc20Abi,
+            address: type === "Sell" ? token.address : WMONAD_ADDRESS,
+            functionName: "approve",
+            args: [
+              PERMIT2_ADDRESS,
+              parseUnits(sellAmount.toString(), token.decimals),
+            ],
+          });
+
+          await waitForTransactionReceipt(wagmiConfig, {
+            hash,
+            confirmations: 1,
+          });
+        } catch (error) {
+          console.log("Error approving Permit2:", error);
+        }
+      }
+
+      const transaction = quote?.transaction;
+      const signature = await signTypedDataAsync(quote?.permit2.eip712);
+      const signatureLengthInHex = numberToHex(size(signature), {
+        signed: false,
+        size: 32,
+      });
+      transaction.data = concat([
+        transaction.data,
+        signatureLengthInHex,
+        signature,
+      ]);
+
+      const hash = await sendTransactionAsync({
+        account: address,
+        gas: !!quote.transaction.gas
+          ? BigInt(quote.transaction.gas)
+          : undefined,
+        to: quote.transaction.to,
+        data: quote.transaction.data,
+        chainId: MONAD_CHAIN_ID,
+      });
+
+      console.log("Transaction sent:", hash);
+    },
+    [
+      address,
+      sendTransactionAsync,
+      signTypedDataAsync,
+      wagmiConfig,
+      writeContractAsync,
+    ]
+  );
+
+  const handleOptionSelect = useCallback(
+    (signalId: string, option: "Yes" | "No") => {
+      setSelectedOptions({
+        ...selectedOptions,
+        [signalId]: option,
+      });
+
+      if (option === "Yes") {
+        const signal = tradeSignals.find((s) => s._id === signalId);
+        if (!signal) return;
+
+        const { symbol, amount } = parseSignalText(signal.signal_text);
+        const token = tokens.find((t) => symbol === t.symbol);
+        if (!token) return;
+
+        onYes(token, amount, signal.type);
+      }
+    },
+    [tradeSignals, selectedOptions, onYes, tokens]
+  );
 
   if (isLoading) {
     return <LoadingOverlay />;
@@ -390,30 +545,18 @@ const Signals = () => {
                     <div className="flex space-x-2 mb-3">
                       <button
                         className={`px-3 py-1 rounded-full text-sm border ${
-                          selectedOptions[
-                            `${signal.type}-${signal.amount}-${signal.token}`
-                          ] === "No"
+                          selectedOptions[signal._id] === "No"
                             ? "bg-gray-200 border-gray-300"
                             : "bg-white border-gray-300"
                         }`}
-                        onClick={() =>
-                          handleOptionSelect(
-                            `${signal.type}-${signal.amount}-${signal.token}`,
-                            "No"
-                          )
-                        }
+                        onClick={() => handleOptionSelect(signal._id, "No")}
                       >
                         No
                       </button>
                       <button
                         className={`px-3 py-1 rounded-full text-sm border
                          bg-violet-700 text-white border-violet-900`}
-                        onClick={() =>
-                          handleOptionSelect(
-                            `${signal.type}-${signal.amount}-${signal.token}`,
-                            "Yes"
-                          )
-                        }
+                        onClick={() => handleOptionSelect(signal._id, "Yes")}
                       >
                         Yes
                       </button>
@@ -486,30 +629,18 @@ const Signals = () => {
                     <div className="flex space-x-2 mb-3">
                       <button
                         className={`px-3 py-1 rounded-full text-sm border ${
-                          selectedOptions[
-                            `${signal.type}-${signal.amount}-${signal.token}`
-                          ] === "No"
+                          selectedOptions[signal._id] === "No"
                             ? "bg-gray-200 border-gray-300"
                             : "bg-white border-gray-300"
                         }`}
-                        onClick={() =>
-                          handleOptionSelect(
-                            `${signal.type}-${signal.amount}-${signal.token}`,
-                            "No"
-                          )
-                        }
+                        onClick={() => handleOptionSelect(signal._id, "No")}
                       >
                         No
                       </button>
                       <button
                         className={`px-3 py-1 rounded-full text-sm border
                         bg-violet-700 text-white border-violet-900`}
-                        onClick={() =>
-                          handleOptionSelect(
-                            `${signal.type}-${signal.amount}-${signal.token}`,
-                            "Yes"
-                          )
-                        }
+                        onClick={() => handleOptionSelect(signal._id, "Yes")}
                       >
                         Yes
                       </button>
