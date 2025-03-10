@@ -7,6 +7,7 @@ import { useAccount, useReadContracts, useBalance } from "wagmi";
 import { erc20Abi, isAddress } from "viem";
 import { getTimeAgo } from "@/app/utils/time";
 import { LoadingOverlay } from "../ui/LoadingSpinner";
+
 type Token = {
   symbol: string;
   name: string;
@@ -157,7 +158,7 @@ const Signals = () => {
       amount: 10,
       token: "CHOG",
       timeAgo: "19s ago",
-      userImageUrl: "/arthur.png",
+      userImageUrl: "/avatar_1.png",
     },
     {
       user: "imfrancis.nad",
@@ -165,7 +166,7 @@ const Signals = () => {
       amount: 5,
       token: "YAKI",
       timeAgo: "14s ago",
-      userImageUrl: "/francis.png",
+      userImageUrl: "/avatar_2.png",
     },
     {
       user: "nfthomas.nad",
@@ -173,7 +174,7 @@ const Signals = () => {
       amount: 5,
       token: "YAKI",
       timeAgo: "9s ago",
-      userImageUrl: "/thomas.png",
+      userImageUrl: "/avatar_3.png",
     },
     {
       user: "luduvigo.nad",
@@ -181,7 +182,7 @@ const Signals = () => {
       amount: 20,
       token: "DAK",
       timeAgo: "35s ago",
-      userImageUrl: "/luduvigo.png",
+      userImageUrl: "/avatar_4.png",
     },
     {
       user: "stephen.nad",
@@ -189,7 +190,7 @@ const Signals = () => {
       amount: 10,
       token: "CHOG",
       timeAgo: "28s ago",
-      userImageUrl: "/stephen.png",
+      userImageUrl: "/avatar_5.png",
     },
     {
       user: "fester.nad",
@@ -197,7 +198,7 @@ const Signals = () => {
       amount: 5,
       token: "DAK",
       timeAgo: "11s ago",
-      userImageUrl: "/fester.png",
+      userImageUrl: "/avatar_6.png",
     },
   ];
 
@@ -280,27 +281,8 @@ const Signals = () => {
                       {formatNumber(token.totalHolding)}{" "}
                       <span className="text-xl font-bold">{token.symbol}</span>
                     </span>
-                    {/* <div className="flex justify-between items-center">
-                    <div className="flex items-baseline">
-                      <span className="text-sm">
-                        Price:{" "}
-                        {token.price.toLocaleString("en-US", {
-                          maximumFractionDigits: 2,
-                        })}
-                      </span>
-                      <span className="text-sm ml-1">$</span>
-                    </div>
-                  </div> */}
                   </div>
                   <div className="flex flex-col items-end">
-                    {/* <span
-                    className={`text-sm ${
-                      token.priceChange >= 0 ? "text-green-500" : "text-red-500"
-                    }`}
-                  >
-                    {token.priceChange >= 0 ? "+" : ""}
-                    {token.priceChange}% (last 24h)
-                  </span> */}
                   </div>
                 </div>
               </div>
@@ -308,32 +290,54 @@ const Signals = () => {
           </div>
         )}
 
-        {/* Recent Trades - Animated Ticker */}
+        {/* IMPROVED RECENT TRADES TICKER */}
         <div className="mb-6 overflow-hidden relative bg-white rounded-lg shadow">
-          <div className="ticker-container py-3 px-2">
-            <div className="ticker">
-              {[...recentTrades].map((trade, index) => (
-                <div key={index} className="ticker-item ml-4">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-6 h-6 rounded-full bg-gray-200 overflow-hidden flex-shrink-0"></div>
-                    <span className="text-sm text-gray-700">{trade.user}</span>
-                    <span className="text-xs text-gray-500">
-                      {trade.timeAgo}
-                    </span>
+          <div className="py-2 px-3">
+            <div className="ticker-wrapper">
+              <div className="ticker-track">
+                {[...recentTrades, ...recentTrades, ...recentTrades].map((trade, index) => (
+                  <div key={index} className="ticker-item">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 relative border border-gray-200">
+                        {trade.userImageUrl && (
+                          <Image
+                            src={trade.userImageUrl}
+                            alt={`${trade.user} avatar`}
+                            width={32}
+                            height={32}
+                            className="object-cover"
+                          />
+                        )}
+                      </div>
+                      <div className="flex flex-col">
+                        <div className="flex items-center">
+                          <span className="text-sm font-bold">{trade.user}</span>
+                        </div>
+                        <div className="flex items-center">
+                          <span className="mr-1">
+                            {trade.action === "Bought" ? "💰" : "💸"}
+                          </span>
+                          <span className="text-sm mr-1">
+                            {trade.action}
+                          </span>
+                          <span
+                            className={`text-sm font-bold ${
+                              trade.action === "Bought"
+                                ? "text-green-500"
+                                : "text-red-500"
+                            }`}
+                          >
+                            {trade.amount}k {trade.token}
+                          </span>
+                          <span className="text-xs text-gray-500 ml-2">
+                            {trade.timeAgo}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center mt-1">
-                    <span
-                      className={`text-sm ${
-                        trade.action === "Bought"
-                          ? "text-green-500"
-                          : "text-red-500"
-                      }`}
-                    >
-                      {trade.action} {trade.amount}k {trade.token}
-                    </span>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -387,37 +391,55 @@ const Signals = () => {
                       </span>
                     </div>
 
-                    <div className="flex space-x-2 mb-3">
-                      <button
-                        className={`px-3 py-1 rounded-full text-sm border ${
-                          selectedOptions[
+                    <div className="flex items-center mb-3">
+                      <div className="inline-flex rounded-full border border-gray-300 overflow-hidden">
+                        <button
+                          className={`px-3 py-1 text-sm flex items-center justify-center w-16 ${
+                            selectedOptions[
+                              `${signal.type}-${signal.amount}-${signal.token}`
+                            ] === "No"
+                              ? "bg-gray-200 text-gray-700"
+                              : "bg-white text-gray-500"
+                          }`}
+                          onClick={() =>
+                            handleOptionSelect(
+                              `${signal.type}-${signal.amount}-${signal.token}`,
+                              "No"
+                            )
+                          }
+                        >
+                          <span>No</span>
+                          {selectedOptions[
                             `${signal.type}-${signal.amount}-${signal.token}`
-                          ] === "No"
-                            ? "bg-gray-200 border-gray-300"
-                            : "bg-white border-gray-300"
-                        }`}
-                        onClick={() =>
-                          handleOptionSelect(
-                            `${signal.type}-${signal.amount}-${signal.token}`,
-                            "No"
-                          )
-                        }
-                      >
-                        No
-                      </button>
-                      <button
-                        className={`px-3 py-1 rounded-full text-sm border
-                         bg-violet-700 text-white border-violet-900`}
-                        onClick={() =>
-                          handleOptionSelect(
-                            `${signal.type}-${signal.amount}-${signal.token}`,
-                            "Yes"
-                          )
-                        }
-                      >
-                        Yes
-                      </button>
+                          ] === "No" && (
+                            <span className="ml-1">•</span>
+                          )}
+                        </button>
+                        <button
+                          className={`px-3 py-1 text-sm flex items-center justify-center w-16 ${
+                            selectedOptions[
+                              `${signal.type}-${signal.amount}-${signal.token}`
+                            ] === "Yes" || !selectedOptions[`${signal.type}-${signal.amount}-${signal.token}`]
+                              ? "bg-violet-700 text-white"
+                              : "bg-white text-gray-500"
+                          }`}
+                          onClick={() =>
+                            handleOptionSelect(
+                              `${signal.type}-${signal.amount}-${signal.token}`,
+                              "Yes"
+                            )
+                          }
+                        >
+                          <span>Yes</span>
+                          {selectedOptions[
+                            `${signal.type}-${signal.amount}-${signal.token}`
+                          ] === "Yes" && (
+                            <span className="ml-1">•</span>
+                          )}
+                        </button>
+                      </div>
                     </div>
+
                     <div className="flex flex-wrap items-center gap-2">
                       {signal.events.slice(0, 4).map((event, idx) => (
                         <div
@@ -483,37 +505,55 @@ const Signals = () => {
                       </span>
                     </div>
 
-                    <div className="flex space-x-2 mb-3">
-                      <button
-                        className={`px-3 py-1 rounded-full text-sm border ${
-                          selectedOptions[
+                    <div className="flex items-center mb-3">
+                      <div className="inline-flex rounded-full border border-gray-300 overflow-hidden">
+                        <button
+                          className={`px-3 py-1 text-sm flex items-center justify-center w-16 ${
+                            selectedOptions[
+                              `${signal.type}-${signal.amount}-${signal.token}`
+                            ] === "No"
+                              ? "bg-gray-200 text-gray-700"
+                              : "bg-white text-gray-500"
+                          }`}
+                          onClick={() =>
+                            handleOptionSelect(
+                              `${signal.type}-${signal.amount}-${signal.token}`,
+                              "No"
+                            )
+                          }
+                        >
+                          <span>No</span>
+                          {selectedOptions[
                             `${signal.type}-${signal.amount}-${signal.token}`
-                          ] === "No"
-                            ? "bg-gray-200 border-gray-300"
-                            : "bg-white border-gray-300"
-                        }`}
-                        onClick={() =>
-                          handleOptionSelect(
-                            `${signal.type}-${signal.amount}-${signal.token}`,
-                            "No"
-                          )
-                        }
-                      >
-                        No
-                      </button>
-                      <button
-                        className={`px-3 py-1 rounded-full text-sm border
-                        bg-violet-700 text-white border-violet-900`}
-                        onClick={() =>
-                          handleOptionSelect(
-                            `${signal.type}-${signal.amount}-${signal.token}`,
-                            "Yes"
-                          )
-                        }
-                      >
-                        Yes
-                      </button>
+                          ] === "No" && (
+                            <span className="ml-1">•</span>
+                          )}
+                        </button>
+                        <button
+                          className={`px-3 py-1 text-sm flex items-center justify-center w-16 ${
+                            selectedOptions[
+                              `${signal.type}-${signal.amount}-${signal.token}`
+                            ] === "Yes" || !selectedOptions[`${signal.type}-${signal.amount}-${signal.token}`]
+                              ? "bg-violet-700 text-white"
+                              : "bg-white text-gray-500"
+                          }`}
+                          onClick={() =>
+                            handleOptionSelect(
+                              `${signal.type}-${signal.amount}-${signal.token}`,
+                              "Yes"
+                            )
+                          }
+                        >
+                          <span>Yes</span>
+                          {selectedOptions[
+                            `${signal.type}-${signal.amount}-${signal.token}`
+                          ] === "Yes" && (
+                            <span className="ml-1">•</span>
+                          )}
+                        </button>
+                      </div>
                     </div>
+
                     <div className="flex flex-wrap items-center gap-2">
                       {signal.events.slice(0, 4).map((event, idx) => (
                         <div
@@ -590,33 +630,46 @@ const Signals = () => {
         )}
       </div>
 
-      {/* CSS for ticker animation */}
+     {/* CSS for ticker animation */}
       <style jsx>{`
-        .ticker-container {
+        .ticker-wrapper {
+          position: relative;
           overflow: hidden;
+          height: 70px; /* Increased height for better vertical spacing */
           width: 100%;
-          height: 60px;
-        }
-
-        .ticker {
           display: flex;
+          align-items: center; /* Center content vertically */
+        }
+        
+        .ticker-track {
+          display: flex;
+          position: absolute;
           white-space: nowrap;
-          animation: ticker 30s linear infinite;
+          will-change: transform;
+          animation: ticker 25s linear infinite;
+          align-items: center; /* Center items vertically */
+          width: auto; /* Allow content to determine width */
         }
-
+        
         .ticker-item {
-          display: inline-block;
           flex-shrink: 0;
+          padding: 0 24px;
+          display: flex;
+          align-items: center;
+          height: 100%; /* Take full height of container */
+          border-right: 1px solid #e5e7eb; /* Add gray border between items */
         }
-
+        
+        .ticker-item:last-child {
+          border-right: 1px solid #e5e7eb; /* Add border to last item too */
+        }
+        
         @keyframes ticker {
           0% {
             transform: translateX(0);
           }
           100% {
-            transform: translateX(
-              -33.33%
-            ); /* Move by 1/3 to ensure smooth loop with tripled content */
+            transform: translateX(-50%);
           }
         }
       `}</style>

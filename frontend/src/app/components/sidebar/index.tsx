@@ -25,19 +25,18 @@ export default function Sidebar({
   };
 
   return (
-    <aside className="w-64 text-gray-800 flex flex-col">
+    <aside className="w-64 text-gray-800 flex flex-col bg-white h-full min-h-screen border-r border-gray-200">
       <div
-        className="h-16 text-xl font-bold flex items-center ps-4 cursor-pointer"
+        className="h-16 text-xl font-bold flex items-center ps-6 lg:ps-6 cursor-pointer"
         onClick={handleGorillionaireClick}
       >
         <Image
-          src="/gorillionaire.jpg"
+          src="/logolight.svg"
           alt="logo-gorillionaire"
-          width={48}
-          height={48}
-          className="rounded-full"
+          width={180}
+          height={180}
+          className="rounded-full ml-[30px] lg:ml-0" // Added 30px margin left only on mobile
         />
-        <span className="ps-2">Gorillionaire</span>
       </div>
       <nav className="flex-1 p-4">
         <ul className="space-y-2">
@@ -59,7 +58,7 @@ export default function Sidebar({
               }`}
               onClick={() => handlePageChange("Tokens")}
             >
-              <i className="fa-regular fa-newspaper pr-2"></i>
+              <i className="fa-solid fa-coins pr-2"></i>
               <span>Tokens</span>
             </button>
           </li>
@@ -82,7 +81,7 @@ export default function Sidebar({
               }`}
               onClick={() => handlePageChange("Trades")}
             >
-              <i className="fa-solid fa-robot pr-2"></i>
+              <i className="fa-solid fa-money-bill-transfer pr-2"></i>
               <span>Trades</span>
             </button>
           </li>

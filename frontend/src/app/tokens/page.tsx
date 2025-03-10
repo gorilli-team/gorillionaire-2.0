@@ -10,7 +10,7 @@ const TokensPage = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-gray-100 text-gray-800">
+    <div className="flex min-h-screen h-screen bg-gray-100 text-gray-800 overflow-hidden">
       {/* Mobile menu button */}
       <button
         className="lg:hidden fixed top-4 left-4 z-20 p-2 rounded-md bg-gray-200"
@@ -38,7 +38,8 @@ const TokensPage = () => {
       {/* Sidebar with mobile responsiveness */}
       <div
         className={`
-        fixed lg:relative
+        fixed lg:static
+        h-screen
         ${
           isMobileMenuOpen
             ? "translate-x-0"
@@ -62,9 +63,11 @@ const TokensPage = () => {
         />
       )}
 
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col overflow-auto">
         <Header />
-        <TokensComponent />
+        <main className="flex-1 overflow-y-auto">
+          <TokensComponent />
+        </main>
       </div>
     </div>
   );

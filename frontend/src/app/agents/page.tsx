@@ -9,11 +9,15 @@ const AgentsPage = () => {
   const [selectedPage, setSelectedPage] = useState("Agents");
 
   return (
-    <div className="flex h-screen bg-gray-100 text-gray-800">
-      <Sidebar selectedPage={selectedPage} setSelectedPage={setSelectedPage} />
-      <div className="flex-1 flex flex-col">
+    <div className="flex min-h-screen h-screen bg-gray-100 text-gray-800 overflow-hidden">
+      <div className="h-screen">
+        <Sidebar selectedPage={selectedPage} setSelectedPage={setSelectedPage} />
+      </div>
+      <div className="flex-1 flex flex-col overflow-auto">
         <Header />
-        <AgentsComponent />
+        <main className="flex-1 overflow-y-auto">
+          <AgentsComponent />
+        </main>
       </div>
     </div>
   );
