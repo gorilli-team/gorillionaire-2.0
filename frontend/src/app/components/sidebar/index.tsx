@@ -31,13 +31,12 @@ export default function Sidebar({
         onClick={handleGorillionaireClick}
       >
         <Image
-          src="/gorillionaire.jpg"
+          src="/logolight.svg"
           alt="logo-gorillionaire"
-          width={48}
-          height={48}
+          width={180}
+          height={180}
           className="rounded-full"
         />
-        <span className="ps-2">Gorillionaire</span>
       </div>
       <nav className="flex-1 p-4">
         <ul className="space-y-2">
@@ -59,7 +58,7 @@ export default function Sidebar({
               }`}
               onClick={() => handlePageChange("Tokens")}
             >
-              <i className="fa-regular fa-newspaper pr-2"></i>
+              <i className="fa-solid fa-coins pr-2"></i>
               <span>Tokens</span>
             </button>
           </li>
@@ -82,7 +81,7 @@ export default function Sidebar({
               }`}
               onClick={() => handlePageChange("Trades")}
             >
-              <i className="fa-solid fa-robot pr-2"></i>
+              <i className="fa-solid fa-money-bill-transfer pr-2"></i>
               <span>Trades</span>
             </button>
           </li>
