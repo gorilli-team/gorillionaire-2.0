@@ -112,6 +112,11 @@ router.get("/leaderboard", async (req, res) => {
       UserActivity.countDocuments(),
     ]);
 
+    //add rank to each user
+    users.forEach((user, index) => {
+      user.rank = index + 1;
+    });
+
     res.json({
       users,
       pagination: {

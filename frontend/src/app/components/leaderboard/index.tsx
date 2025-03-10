@@ -1,15 +1,15 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { Pagination } from "flowbite-react";
 import { useAccount } from "wagmi";
+import Image from "next/image";
+
 interface Investor {
   rank: number;
-  username: string;
-  avatar: string;
-  signals: number;
-  value: number;
-  performance: number;
+  address: string;
+  points: number;
+  activitiesList: Activity[];
 }
 
 interface Activity {
@@ -24,13 +24,13 @@ const Leaderboard = () => {
   const [activitiesPage, setActivitiesPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredInvestors, setFilteredInvestors] = useState<Investor[]>([]);
+  const [investors, setInvestors] = useState<Investor[]>([]);
+  const [activities, setActivities] = useState<Activity[]>([]);
 
   const { address } = useAccount();
 
   const onPageChange = (page: number) => setCurrentPage(page);
   const onActivitiesPageChange = (page: number) => setActivitiesPage(page);
-
-  const investors = useMemo<Investor[]>(() => [], []);
 
   const fetchLeaderboard = async () => {
     try {
@@ -39,46 +39,55 @@ const Leaderboard = () => {
       );
       const data = await response.json();
       console.log("leaderboard", data);
+      setInvestors(data.users || []);
     } catch (error) {
       console.error("Error fetching leaderboard:", error);
+      setInvestors([]);
     }
   };
 
   const fetchMe = async () => {
     try {
+      if (!address) return;
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/activity/track/me?address=${address}`
       );
       const data = await response.json();
       console.log("me", data);
+      setActivities(data?.activitiesList || []);
     } catch (error) {
-      console.error("Error fetching leaderboard:", error);
+      console.error("Error fetching user activity:", error);
+      setActivities([]);
     }
   };
 
+  // Fetch data when component mounts and when address changes
   useEffect(() => {
     fetchLeaderboard();
     fetchMe();
-  }, []);
 
-  useEffect(() => {
-    setFilteredInvestors(investors);
-  }, [investors]);
+    // Set up an interval to refresh data every 30 seconds
+    const interval = setInterval(() => {
+      fetchLeaderboard();
+      fetchMe();
+    }, 30000);
 
-  // Filter investors based on search term
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval);
+  }, [address]);
+
+  // Update filtered investors when investors or search term changes
   useEffect(() => {
     if (searchTerm.trim() === "") {
       setFilteredInvestors(investors);
     } else {
       const filtered = investors.filter((investor) =>
-        investor.username.toLowerCase().includes(searchTerm.toLowerCase())
+        investor.address.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setFilteredInvestors(filtered);
     }
     setCurrentPage(1); // Reset to first page when search changes
   }, [searchTerm, investors]);
-
-  const activities = useMemo<Activity[]>(() => [], []);
 
   // Pagination logic for investors
   const itemsPerPage = 10;
@@ -157,17 +166,14 @@ const Leaderboard = () => {
                   <tr className="text-left text-sm text-gray-500 border-b">
                     <th className="pb-2 font-medium">RANK</th>
                     <th className="pb-2 font-medium">INVESTOR</th>
-                    <th className="pb-2 font-medium text-center">
-                      ACCEPTED SIGNALS
-                    </th>
-                    <th className="pb-2 font-medium">TOTAL VALUE</th>
-                    <th className="pb-2 font-medium">OVERALL PERFORMANCE</th>
+                    <th className="pb-2 font-medium">ACTIVITIES</th>
+                    <th className="pb-2 font-medium">POINTS</th>
                   </tr>
                 </thead>
                 <tbody>
                   {currentInvestors.map((investor) => (
                     <tr
-                      key={investor.rank}
+                      key={investor.address}
                       className="border-b border-gray-100"
                     >
                       <td className="py-4 h-16 text-gray-700">
@@ -175,32 +181,34 @@ const Leaderboard = () => {
                       </td>
                       <td className="py-4 h-16">
                         <div className="flex items-center">
-                          <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mr-2">
-                            {investor.avatar}
+                          <div className="w-8 h-8 rounded-full flex items-center justify-center mr-2 overflow-hidden">
+                            <Image
+                              src={`/avatar_${investor.rank % 6}.png`}
+                              alt="User Avatar"
+                              width={32}
+                              height={32}
+                              className="w-full h-full object-cover"
+                            />
                           </div>
                           <span className="text-gray-700 font-bold">
-                            {investor.username}
+                            {investor.address}
                           </span>
                         </div>
                       </td>
                       <td className="py-4 h-16 text-center text-gray-700">
-                        {investor.signals}
+                        {investor.activitiesList.length}
                       </td>
                       <td className="py-4 h-16 text-gray-700">
-                        ${" "}
-                        {investor.value.toLocaleString("en-US", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}
+                        {investor.points}
                       </td>
                       <td className="py-4 h-16">
-                        <span
+                        {/* <span
                           className={`text-green-${
                             investor.performance >= 10 ? "500" : "400"
                           }`}
                         >
                           + {investor.performance}%
-                        </span>
+                        </span> */}
                       </td>
                     </tr>
                   ))}
