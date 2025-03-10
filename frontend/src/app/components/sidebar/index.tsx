@@ -25,7 +25,7 @@ export default function Sidebar({
   };
 
   return (
-    <aside className="w-64 text-gray-800 flex flex-col">
+    <aside className="w-64 text-gray-800 flex flex-col bg-white h-full border-r border-gray-200">
       <div
         className="h-16 text-xl font-bold flex items-center ps-4 cursor-pointer"
         onClick={handleGorillionaireClick}
