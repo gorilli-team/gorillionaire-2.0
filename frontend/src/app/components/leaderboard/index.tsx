@@ -74,7 +74,7 @@ const Leaderboard = () => {
 
     // Cleanup interval on component unmount
     return () => clearInterval(interval);
-  }, [address]);
+  }, [address]); //eslint-disable-line
 
   // Update filtered investors when investors or search term changes
   useEffect(() => {
