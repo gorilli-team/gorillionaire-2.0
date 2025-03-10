@@ -42,9 +42,6 @@ router.post("/signin", async (req, res) => {
       const twoDaysAgo = new Date();
       oneDayAgo.setDate(oneDayAgo.getDate() - 1);
       twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
-      console.log("lastSignIn", lastSignIn);
-      console.log("oneDayAgo", oneDayAgo);
-      console.log("twoDaysAgo", twoDaysAgo);
 
       if (lastSignIn < twoDaysAgo) {
         // More than 48 hours ago - reset streak to 1
@@ -115,6 +112,11 @@ router.get("/leaderboard", async (req, res) => {
       UserActivity.countDocuments(),
     ]);
 
+    //add rank to each user
+    users.forEach((user, index) => {
+      user.rank = index + 1;
+    });
+
     res.json({
       users,
       pagination: {
@@ -140,9 +142,11 @@ router.get("/me", async (req, res) => {
     const userActivity = await UserActivity.findOne({
       address: address.toLowerCase(),
     });
-    userActivity.activitiesList.sort((a, b) => {
-      return new Date(b.date) - new Date(a.date);
-    });
+    if (userActivity && userActivity.activitiesList) {
+      userActivity?.activitiesList.sort((a, b) => {
+        return new Date(b.date) - new Date(a.date);
+      });
+    }
     res.json(userActivity);
   } catch (error) {
     console.error("Error fetching user activity:", error);

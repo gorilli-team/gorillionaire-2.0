@@ -23,8 +23,8 @@ export async function processAndStoreData(text) {
     }
 
     const splitter = new RecursiveCharacterTextSplitter({
-      chunkSize: 350,
-      chunkOverlap: 50,
+      chunkSize: 50,
+      chunkOverlap: 0,
     });
 
     const output = await splitter.createDocuments([text]);

@@ -11,3 +11,138 @@ body{
     color: white !important;
     border-color: #3b82f6 !important;
   }
+
+  .ticker-wrapper {
+    position: relative;
+    overflow: hidden;
+    height: 70px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+  }
+  
+  .ticker-track {
+    display: flex;
+    position: absolute;
+    white-space: nowrap;
+    will-change: transform;
+    animation: ticker 25s linear infinite;
+    align-items: center;
+    width: auto;
+  }
+  
+  .ticker-item {
+    flex-shrink: 0;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    border-right: 1px solid #e5e7eb;
+  }
+  
+  /* Make ticker items more compact on mobile */
+  @media (max-width: 640px) {
+    .ticker-item {
+      padding: 0 12px;
+    }
+    
+    .ticker-wrapper {
+      height: 60px;
+    }
+  }
+  
+  @keyframes ticker {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+  
+  /* Fix for token cards on mobile */
+  @media (max-width: 640px) {
+    .bg-white.rounded-lg.shadow.p-4.flex.items-center {
+      padding: 0.75rem;
+    }
+  
+    /* Make token images smaller on mobile */
+    .w-16.h-16.rounded-full {
+      width: 3rem;
+      height: 3rem;
+    }
+  
+    /* Fix spacing in signal cards */
+    .border-b.pb-4.last\:border-b-0.last\:pb-0 {
+      padding-bottom: 1rem;
+    }
+    
+    /* More compact event tags on mobile */
+    .text-xs.bg-gray-100.px-2.py-1.rounded-full {
+      padding: 0.25rem 0.5rem;
+      margin-top: 0.5rem;
+    }
+  }
+  
+  /* Better padding for mobile main content */
+  @media (max-width: 768px) {
+    .w-full.min-h-screen.bg-gray-50.pt-16 {
+      padding-top: 4rem;
+    }
+    
+    .px-2.sm\:px-4.py-4.sm\:py-6 {
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
+      padding-top: 0.75rem;
+      padding-bottom: 0.75rem;
+    }
+    
+    /* More compact gap for token grid */
+    .grid.grid-cols-1.md\:grid-cols-4.gap-4.mb-6 {
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    
+    /* More compact main signals grid */
+    .grid.grid-cols-1.lg\:grid-cols-2.gap-4.mb-6 {
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+  }
+
+  html, body {
+    height: 100%;
+  }
+  
+  /* Force the sidebar to take full height */
+  .min-h-screen {
+    min-height: 100vh;
+  }
+  
+  /* Full height sidebar even when content is short */
+  @media (min-width: 1024px) {
+    .sidebar-container {
+      height: 100vh !important;
+      position: sticky;
+      top: 0;
+    }
+  }
+  
+  /* Ensure the logo doesn't get overlapped by the mobile menu button */
+  @media (max-width: 1023px) {
+    .mobile-menu-button {
+      top: 10px;
+      left: 10px;
+      width: 32px;
+      height: 32px;
+    }
+    
+    .mobile-menu-button svg {
+      width: 18px;
+      height: 18px;
+    }
+    
+    .logo-container {
+      padding-left: 3rem;
+    }
+  }
