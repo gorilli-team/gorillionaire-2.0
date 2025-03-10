@@ -31,9 +31,6 @@ export async function fetchData() {
     const transfers = db.collection("transfers");
     const pricedatas = db.collection("pricedatas");
 
-    // const oneHourAgoUNIX = Math.floor(Date.now() / 1000) - 60 * 60;
-    // const oneHourAgoISO = new Date();
-    // oneHourAgoISO.setUTCDate(oneHourAgoISO.getUTCDate() - 1);
     const oneDayAgoUNIX = Math.floor(Date.now() / 1000) - 24 * 60 * 60;
     const oneDayAgoISO = new Date();
     oneDayAgoISO.setUTCDate(oneDayAgoISO.getUTCDate() - 1);
@@ -42,7 +39,6 @@ export async function fetchData() {
       .find({
         blockTimestamp: {
           $gte: oneDayAgoUNIX,
-          // $gte: oneHourAgoUNIX,
         },
       })
       .sort({ blockTimestamp: -1 })
@@ -52,7 +48,6 @@ export async function fetchData() {
       .find({
         blockTimestamp: {
           $gte: oneDayAgoUNIX,
-          // $gte: oneHourAgoUNIX,
         },
       })
       .sort({ blockTimestamp: -1 })
@@ -62,7 +57,6 @@ export async function fetchData() {
       .find({
         timestamp: {
           $gte: oneDayAgoISO,
-          // $gte: oneHourAgoISO,
         },
       })
       .sort({ blockTimestamp: -1 })
