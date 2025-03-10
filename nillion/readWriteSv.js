@@ -4,16 +4,23 @@ dotenv.config();
 import { SecretVaultWrapper } from 'secretvaults';
 import { v4 as uuidv4 } from 'uuid';
 import { orgConfig } from './orgConfig.js';
+import { fetchData } from './mongodb.js';
 
 const SCHEMA_ID = process.env.COLLECTION_SCHEMA_ID;
 
-const signalData = [
-    {
-        created_at: '2025-03-10T12:30:38.720+00:00',
-        signal_text: { '%allot': "SELL YAKI 25.00% with a Confidence Score of 8.79." },
-        events: { '%allot': '💰 YAKI was worth 0.0127$ on 2025-03-09\n\n💰 YAKI was worth 0.0127$ on 2025-03-09' }
-    }
-]
+const rawSignalData = await fetchData();
+
+const formattedSignalData = rawSignalData.map((doc) => {
+
+    let rawCreatedAt = new Date(doc.created_at);
+    let formattedCreatedAt = rawCreatedAt.toISOString();
+
+    return ({
+        created_at: formattedCreatedAt,
+        signal_text: {'%allot': doc.signal_text},
+        events: { '%allot': doc.events}
+    })
+})
 
 async function main() {
     try {
@@ -24,7 +31,7 @@ async function main() {
       );
       await collection.init();
   
-    //   const dataWritten = await collection.writeToNodes(signalData);
+    //   const dataWritten = await collection.writeToNodes(formattedSignalData);
     //   console.log('dataWritten', dataWritten);
   
     //   const newIds = [
@@ -36,7 +43,7 @@ async function main() {
       console.log('📚 total records:', dataRead.length);
       console.log(
         '📚 Read new records:',
-        dataRead.slice(0, signalData.length)
+        dataRead.slice(0, formattedSignalData.length)
       );
     } catch (error) {
       console.error('❌ Failed to use SecretVaultWrapper:', error.message);
