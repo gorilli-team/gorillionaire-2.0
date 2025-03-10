@@ -409,7 +409,7 @@ const Signals = () => {
   }
 
   return (
-    <div className="w-full min-h-screen bg-gray-50 pt-16 lg:pt-0">
+    <div className="w-full min-h-screen bg-gray-50 pt-2 lg:pt-0">
       <div className="px-2 sm:px-4 py-4 sm:py-6">
         {/* Token Stats */}
         {address && (

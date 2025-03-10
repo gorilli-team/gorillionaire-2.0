@@ -35,7 +35,7 @@ export default function Sidebar({
           alt="logo-gorillionaire"
           width={180}
           height={180}
-          className="rounded-full ml-[30px] lg:ml-0" // Added 30px margin left only on mobile
+          className="rounded-full ml-[40px] lg:ml-0" // Added 40px margin left only on mobile
         />
       </div>
       <nav className="flex-1 p-4">
