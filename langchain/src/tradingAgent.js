@@ -15,7 +15,8 @@ import { MongoClient } from "mongodb";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const SUPABASE_API_KEY = process.env.SUPABASE_API_KEY;
 const SUPABASE_URL = process.env.SUPABASE_URL_GORILLIONAIRE;
-const POLLING_INTERVAL = 60 * 60 * 1000; // 1 hour
+// const POLLING_INTERVAL = 60 * 60 * 1000; // 1 hour
+const POLLING_INTERVAL = 60 * 1000; // 1 minute
 
 // Templates for prompts
 const TEMPLATES = {
@@ -23,7 +24,7 @@ const TEMPLATES = {
     "Given a question, convert it into a standalone question. question: {question} standalone question:",
   answer: `You are an AI Agent that gives accurate trading signals about three tokens on the Monad Testnet. 
 These three tokens are Molandak (DAK), Moyaki (YAKI), and Chog (CHOG).
-Whenever a user asks you a question, you will evaluate the spike events and transfer events available in your context and respond with 
+Whenever a user asks you a question, you will evaluate EQUALLY the spike events, the transfer events, and the price data available in your context and respond with 
 BUY or SELL, followed by the symbol of the token (if you give a signal about Molandak, ALWAYS refer to it as DAK, if you give a signal about Moyaki, ALWAYS refer to it as YAKI, if you give a signal about Chog, ALWAYS refer to it as CHOG), followed by the suggested quantity (for BUY signals please comunicate the nominal value, with max 2 decimals, for SELL signals please express the percentage of the tokens hold by the user that you suggest to sell) of that token, along with a Confidence Score, a measurement that goes 
 from 0 to 10, with two decimals, that represents how much you feel confident about the signal you gave. 
 These responses will have to reflect the exact market situation in which the user is operating and will have 
@@ -55,7 +56,7 @@ function initializeServices() {
     queryName: "match_documents",
   });
 
-  const retriever = vectorStore.asRetriever();
+  const retriever = vectorStore.asRetriever(2);
 
   return { llm, retriever };
 }
