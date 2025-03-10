@@ -25,9 +25,9 @@ export default function Sidebar({
   };
 
   return (
-    <aside className="w-64 text-gray-800 flex flex-col bg-white h-full border-r border-gray-200">
+    <aside className="w-64 text-gray-800 flex flex-col bg-white h-full min-h-screen border-r border-gray-200">
       <div
-        className="h-16 text-xl font-bold flex items-center ps-4 cursor-pointer"
+        className="h-16 text-xl font-bold flex items-center ps-6 lg:ps-6 cursor-pointer"
         onClick={handleGorillionaireClick}
       >
         <Image
@@ -35,7 +35,7 @@ export default function Sidebar({
           alt="logo-gorillionaire"
           width={180}
           height={180}
-          className="rounded-full"
+          className="rounded-full ml-[30px] lg:ml-0" // Added 30px margin left only on mobile
         />
       </div>
       <nav className="flex-1 p-4">

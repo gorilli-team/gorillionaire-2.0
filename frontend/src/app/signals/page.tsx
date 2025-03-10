@@ -11,13 +11,13 @@ const SignalsPage = () => {
 
   return (
     <div className="flex min-h-screen bg-gray-100 text-gray-800">
-      {/* Mobile menu button */}
+      {/* Mobile menu button - positioned differently to avoid overlap */}
       <button
-        className="lg:hidden fixed top-4 left-4 z-40 p-2 rounded-md bg-gray-200"
+        className="lg:hidden fixed top-3 left-3 z-40 p-2 rounded-full bg-white shadow-md border border-gray-200"
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
       >
         <svg
-          className="w-6 h-6"
+          className="w-5 h-5" // Made the icon smaller
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -35,10 +35,11 @@ const SignalsPage = () => {
         </svg>
       </button>
 
-      {/* Sidebar with mobile responsiveness */}
+      {/* Sidebar - ensure full height and proper display on all screens */}
       <div
         className={`
         fixed lg:static
+        h-screen min-h-screen
         ${
           isMobileMenuOpen
             ? "translate-x-0"
@@ -48,6 +49,7 @@ const SignalsPage = () => {
         z-30 lg:z-0
         bg-white
         shadow-xl lg:shadow-none
+        lg:flex lg:flex-col
       `}
       >
         <Sidebar
