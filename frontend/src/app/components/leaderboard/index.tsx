@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Pagination } from "flowbite-react";
 import { useAccount } from "wagmi";
 import Image from "next/image";
+import { getTimeAgo } from "@/app/utils/time";
 
 interface Investor {
   rank: number;
@@ -271,7 +272,7 @@ const LeaderboardComponent = () => {
                             </div>
                           </td>
                           <td className="py-3 sm:py-4 h-14 sm:h-16 text-right text-gray-500">
-                            {activity.date}
+                            {getTimeAgo(activity.date)}
                           </td>
                         </tr>
                       ))
