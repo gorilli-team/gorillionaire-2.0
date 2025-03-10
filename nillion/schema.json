@@ -1,0 +1,38 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Gorillionaire - Generated Signals",
+    "type": "array",
+    "items": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string",
+          "format": "uuid",
+          "coerce": true
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "signal_text": {
+          "type": "object",
+          "properties": {
+            "%share": {
+                "type": "string"
+            }
+          },
+          "required": ["%share"]
+        },
+        "events": {
+          "type": "object",
+          "properties": {
+            "%share": {
+                "type": "string"
+            }
+          },
+          "required": ["%share"]
+        }
+      },
+      "required": ["_id", "created_at", "signal_text", "events"]
+    }
+  }
