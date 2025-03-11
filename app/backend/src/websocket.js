@@ -14,7 +14,7 @@ function initWebSocketServer(server) {
     console.log(`WebSocket connection established: ${pathname}`);
 
     // Extract token name from URL path
-    // Expected format: /events/token/TokenName
+    // Expected format: /events/token/TokenName or /events/notifications
     const pathParts = pathname.split("/");
     if (
       pathParts.length >= 4 &&
@@ -36,6 +36,20 @@ function initWebSocketServer(server) {
       );
 
       console.log(`Client subscribed to token: ${tokenName}`);
+    } else if (pathname === "/events/notifications") {
+      // Store client with notifications subscription
+      clients.set(ws, { notifications: true });
+
+      // Send confirmation message
+      ws.send(
+        JSON.stringify({
+          type: "CONNECTION_ESTABLISHED",
+          message: "Subscribed to notifications",
+          timestamp: new Date().toISOString(),
+        })
+      );
+
+      console.log("Client subscribed to notifications");
     } else {
       ws.send(
         JSON.stringify({
@@ -117,7 +131,30 @@ function broadcastEvent(tokenName, event) {
   console.log(`Event broadcast to ${recipientCount} clients`);
 }
 
+// Function to broadcast notifications to subscribed clients
+function broadcastNotification(notification) {
+  console.log("Broadcasting notification:", notification);
+
+  let recipientCount = 0;
+
+  clients.forEach((client, ws) => {
+    if (ws.readyState === WebSocket.OPEN && client.notifications) {
+      ws.send(
+        JSON.stringify({
+          type: "NOTIFICATION",
+          data: notification,
+          timestamp: new Date().toISOString(),
+        })
+      );
+      recipientCount++;
+    }
+  });
+
+  console.log(`Notification broadcast to ${recipientCount} clients`);
+}
+
 module.exports = {
   initWebSocketServer,
   broadcastEvent,
+  broadcastNotification,
 };

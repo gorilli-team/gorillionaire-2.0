@@ -3,7 +3,7 @@ const router = express.Router();
 const { ethers } = require("ethers");
 const UserActivity = require("../../models/UserActivity");
 const Intent = require("../../models/Intent");
-
+const { broadcastNotification } = require("../../websocket");
 //track user signin
 router.post("/signin", async (req, res) => {
   try {
@@ -133,6 +133,12 @@ router.post("/trade-points", async (req, res) => {
     intent.status = "completed";
     intent.txHash = txHash;
     await intent.save();
+
+    //broadcast notification to all clients
+    broadcastNotification({
+      type: "NOTIFICATION",
+      data: intent.toObject(),
+    });
 
     res.json({ message: "Points added" });
   } catch (error) {
