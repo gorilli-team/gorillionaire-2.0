@@ -1,5 +1,3 @@
-//add a route to our backend that will receive the transfer data and store it in the database
-
 const express = require("express");
 const router = express.Router();
 const Spike = require("../../models/Spike");
