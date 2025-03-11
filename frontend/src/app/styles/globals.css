@@ -146,3 +146,16 @@ body{
       padding-left: 3rem;
     }
   }
+
+  ::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+  }
+  
+  * {
+    scrollbar-width: none;
+  }
+  
+  * {
+    -ms-overflow-style: none;
+  }
