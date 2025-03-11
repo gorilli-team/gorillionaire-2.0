@@ -51,25 +51,6 @@ export default function Header() {
     );
   }
 
-  const handleShowAllNotifications = () => {
-    // Show last 3 notifications if there are any
-    if (notifications.length > 0) {
-      notifications.slice(0, 3).forEach((notification, index) => {
-        setTimeout(() => {
-          showCustomNotification(
-            notification.message || JSON.stringify(notification),
-            notification.title || `Notification ${index + 1}`
-          );
-        }, index * 500); // Stagger notifications
-      });
-    } else {
-      toast('No notifications yet', {
-        position: "bottom-right",
-        autoClose: 3000,
-      });
-    }
-  };
-
   // Handle wallet connection/disconnection and address updates
   useEffect(() => {
     if (!ready) return; // Wait for Privy to be ready
@@ -223,18 +204,7 @@ export default function Header() {
         {/* Left space for mobile hamburger menu */}
         <div className="w-8 h-8 lg:hidden"></div>
         
-        <div className="flex items-center justify-end space-x-4 flex-1 my-3 ml-auto">
-          {/* Notification Button */}
-          <button
-            onClick={handleShowAllNotifications}
-            className="px-2 py-1 text-xs sm:text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 relative"
-            aria-label="Show notifications"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-            </svg>
-          </button>
-
+        <div className="flex items-center justify-end space-x-4 flex-1 my-3 ml-auto"> 
           <div className="hidden md:block">
             <LeaderboardBadge />
           </div>
