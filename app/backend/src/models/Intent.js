@@ -1,11 +1,6 @@
 const mongoose = require("mongoose");
 
 const IntentSchema = new mongoose.Schema({
-  id: {
-    type: String,
-    required: true,
-    unique: true,
-  },
   userAddress: {
     type: String,
     required: true,
