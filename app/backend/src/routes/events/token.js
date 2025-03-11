@@ -23,8 +23,6 @@ router.get("/", async (req, res) => {
       },
     ]);
 
-    console.log(tokenStats);
-
     const spikeStats = await Spike.aggregate([
       {
         $group: {
@@ -36,8 +34,6 @@ router.get("/", async (req, res) => {
         },
       },
     ]);
-
-    console.log(spikeStats);
 
     const tokensWithStats = tokenStats.map((token) => {
       // Find matching spike stats for this token
