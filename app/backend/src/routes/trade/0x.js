@@ -4,6 +4,17 @@ const ethers = require("ethers");
 const PriceOracle = require("../../services/PriceOracle");
 const Intent = require("../../models/Intent");
 
+const LIMIT = 20;
+router.get("/completed", async (req, res) => {
+  const { page = 1, limit = LIMIT } = req.query;
+  const intents = await Intent.find({ status: "completed" })
+    .sort({ createdAt: -1 })
+    .skip((page - 1) * limit)
+    .limit(limit);
+
+  res.json(intents);
+});
+
 const MON_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const WMONAD_ADDRESS = "0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701";
 const MONAD_CHAIN_ID = 10143;
@@ -60,7 +71,7 @@ async function buildPriceRequest(tokenSymbol, amount, type, userAddress) {
     "0x-version": "v2",
   };
 
-  return { priceParams, headers, usdValue };
+  return { priceParams, headers, usdValue, tokenPrice };
 }
 
 async function getPrice(token, amount, type) {
@@ -78,12 +89,8 @@ async function getPrice(token, amount, type) {
 }
 
 async function getQuote(token, amount, type, userAddress) {
-  const { priceParams, headers, usdValue } = await buildPriceRequest(
-    token,
-    amount,
-    type,
-    userAddress
-  );
+  const { priceParams, headers, usdValue, tokenPrice } =
+    await buildPriceRequest(token, amount, type, userAddress);
 
   const priceResponse = await fetch(
     "https://api.0x.org/swap/permit2/quote?" + priceParams.toString(),
@@ -91,10 +98,17 @@ async function getQuote(token, amount, type, userAddress) {
   );
 
   const res = await priceResponse.json();
+  if (!res.transaction) {
+    throw new Error("No transaction data found");
+  }
 
   const intentObject = new Intent({
     userAddress: userAddress,
+    tokenSymbol: token,
+    tokenAmount: amount,
+    tokenPrice: tokenPrice,
     usdValue: usdValue,
+    action: type,
     timestamp: Date.now(),
     data: res.transaction.data,
     status: "pending",

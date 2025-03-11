@@ -413,17 +413,20 @@ const Signals = () => {
         confirmations: 1,
       });
 
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/activity/trade-points`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          address,
-          txHash: hash,
-          intentId: quote.intentId,
-        }),
-      });
+      await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/activity/track/trade-points`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            address,
+            txHash: hash,
+            intentId: quote.intentId,
+          }),
+        }
+      );
     },
     [
       address,
