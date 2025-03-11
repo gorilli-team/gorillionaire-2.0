@@ -48,9 +48,9 @@ Through the OpenAI Embeddings, all the chunks are translated into their vector r
 ### Signal generation
 The trading signals are generated through the combination of three smaller chains into one major prompt chain. The components of the chain are the following:
 - **Standalone question**: this prompt is responsible for summing up the input prompt, which contains all the details about the signals to be generated, into a single standalone question. This way, it will be easier for the LLM (OpenAI) to match the input prompt with the chunks of events that will represents the context for the generated signal.<br>
-<br>
+
 - **Retriever**: this prompt is responsible for running the match_documents function on the Supabase database, for retrieving exactly 2 documents that best match the standalone question. This process is made by comparing the vector representations of both the standalone question and the chunk of events stored on Supabase.<br>
-<br>
+
 - **Answer**: this prompt is responsible for generating the trading signal. The response will take the original question (not the standalone one), and the context, which will be a unique string composed by the 2 documents retrived in the previous step, and will generate a trading signal based on the instructions outlined in the answer template. All the generated signals are then stored in the "generated-signals" collection on MongoDB.<br>
 <br>
 
