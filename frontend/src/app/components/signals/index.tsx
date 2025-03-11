@@ -57,9 +57,14 @@ type TradeSignal = {
   risk: "Moderate" | "Aggressive" | "Conservative";
   confidenceScore: string;
   created_at: string;
+  userSignal?: {
+    choice: "Yes" | "No";
+  };
 };
 
 const MONAD_CHAIN_ID = 10143;
+const MAX_SIGNALS = 5;
+const SIGNAL_EXPIRATION_TIME = 3 * 24 * 60 * 60 * 1000;
 
 const parseSignalText = (signalText: string) => {
   const symbol = signalText.match(/CHOG|DAK|YAKI|MON/)?.[0];
@@ -250,29 +255,45 @@ const Signals = () => {
   const [tradeSignals, setTradeSignals] = useState<TradeSignal[]>([]);
   const [pastSignals, setPastSignals] = useState<TradeSignal[]>([]);
 
+  useEffect(() => {
+    setPastSignals((sig) =>
+      sig.toSorted(
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      )
+    );
+  }, [pastSignals]);
+
+  useEffect(() => {
+    setTradeSignals((sig) =>
+      sig.toSorted(
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      )
+    );
+  }, [tradeSignals]);
+
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchSignals = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/signals/generated-signals`
+          `${process.env.NEXT_PUBLIC_API_URL}/signals/generated-signals?userAddress=${address}`
         );
         const data = await response.json();
         if (data && Array.isArray(data)) {
-          const buySignals = data
-            .filter((signal) => signal.type === "Buy")
-            .slice(0, 5);
-          const sellSignals = data
-            .filter((signal) => signal.type === "Sell")
-            .slice(0, 5);
-          //remove the buy signals from the data buySignals and sellSignals
-          const otherSignals = data.filter(
+          // pastSignals are signals that have a userSignal or that are 3 days old
+          const pastSignals = data.filter(
             (signal) =>
-              !buySignals.includes(signal) && !sellSignals.includes(signal)
+              signal.userSignal ||
+              new Date(signal.created_at) <
+                new Date(Date.now() - SIGNAL_EXPIRATION_TIME)
           );
-          setTradeSignals(buySignals.concat(sellSignals));
-          setPastSignals(otherSignals);
+          setTradeSignals(
+            data.filter((signal) => !pastSignals.includes(signal))
+          );
+          setPastSignals(pastSignals);
           setIsLoading(false);
         }
       } catch (error) {
@@ -281,12 +302,28 @@ const Signals = () => {
     };
 
     fetchSignals();
-  }, []);
+  }, [address]);
 
   // State for Yes/No buttons
   const [selectedOptions, setSelectedOptions] = useState<
     Record<string, string>
   >({});
+
+  const onNo = useCallback(
+    (signalId: string) => {
+      // Move signal to pastSignals
+      setPastSignals((prev) => {
+        const signal = tradeSignals.find((s) => s._id === signalId);
+        if (!signal) return prev;
+        return [{ ...signal, userSignal: { choice: "No" } }, ...prev];
+      });
+
+      setTradeSignals((prev) =>
+        prev.filter((signal) => signal._id !== signalId)
+      );
+    },
+    [tradeSignals]
+  );
 
   const onYes = useCallback(
     async (token: Token, amount: number, type: "Buy" | "Sell") => {
@@ -325,7 +362,24 @@ const Signals = () => {
             : undefined,
         });
 
-        console.log("Transaction sent:", txHash);
+        await waitForTransactionReceipt(wagmiConfig, {
+          hash: txHash,
+          confirmations: 1,
+        });
+        await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/activity/track/trade-points`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              address,
+              txHash,
+              intentId: quote.intentId,
+            }),
+          }
+        );
         return;
       }
 
@@ -372,7 +426,22 @@ const Signals = () => {
         chainId: MONAD_CHAIN_ID,
       });
 
-      console.log("Transaction sent:", hash);
+      await waitForTransactionReceipt(wagmiConfig, {
+        hash,
+        confirmations: 1,
+      });
+
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/activity/trade-points`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          address,
+          txHash: hash,
+          intentId: quote.intentId,
+        }),
+      });
     },
     [
       address,
@@ -384,11 +453,26 @@ const Signals = () => {
   );
 
   const handleOptionSelect = useCallback(
-    (signalId: string, option: "Yes" | "No") => {
+    async (signalId: string, option: "Yes" | "No") => {
       setSelectedOptions({
         ...selectedOptions,
         [signalId]: option,
       });
+
+      await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/signals/generated-signals/user-signal`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userAddress: address,
+            signalId,
+            choice: option,
+          }),
+        }
+      );
 
       if (option === "Yes") {
         const signal = tradeSignals.find((s) => s._id === signalId);
@@ -399,9 +483,11 @@ const Signals = () => {
         if (!token) return;
 
         onYes(token, amount, signal.type);
+      } else {
+        onNo(signalId);
       }
     },
-    [tradeSignals, selectedOptions, onYes, tokens]
+    [tradeSignals, selectedOptions, onYes, onNo, tokens, address]
   );
 
   if (isLoading) {
@@ -508,6 +594,7 @@ const Signals = () => {
             <div className="space-y-6">
               {tradeSignals
                 .filter((signal) => signal.type === "Buy")
+                .slice(0, MAX_SIGNALS)
                 .map((signal, index) => (
                   <div
                     key={index}
@@ -605,6 +692,7 @@ const Signals = () => {
             <div className="space-y-6">
               {tradeSignals
                 .filter((signal) => signal.type === "Sell")
+                .slice(0, MAX_SIGNALS)
                 .map((signal, index) => (
                   <div
                     key={index}
@@ -729,9 +817,19 @@ const Signals = () => {
                           </span>
                         </div>
                       </div>
-                      <span className="text-xs px-2 py-1 rounded bg-gray-200 text-gray-700">
-                        Expired
-                      </span>
+                      {signal.userSignal?.choice === "Yes" ? (
+                        <span className="text-xs px-2 py-1 rounded bg-green-200 text-green-700">
+                          Accepted
+                        </span>
+                      ) : signal.userSignal?.choice === "No" ? (
+                        <span className="text-xs px-2 py-1 rounded bg-red-200 text-red-700">
+                          Rejected
+                        </span>
+                      ) : (
+                        <span className="text-xs px-2 py-1 rounded bg-gray-200 text-gray-700">
+                          Expired
+                        </span>
+                      )}
                     </div>
                     <div className="flex flex-wrap items-center gap-2 mt-3">
                       {signal.events.slice(0, 4).map((event, idx) => (

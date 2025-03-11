@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const ethers = require("ethers");
 const PriceOracle = require("../../services/PriceOracle");
+const Intent = require("../../models/Intent");
 
 const MON_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const WMONAD_ADDRESS = "0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701";
@@ -18,24 +19,25 @@ async function buildPriceRequest(tokenSymbol, amount, type, userAddress) {
   const tokenInfo = symbolToTokenInfo[tokenSymbol];
 
   // If "buy" I need to convert the amount passed (which is based in token) to MON amount
-  if (type === "buy") {
-    const codexOracle = new PriceOracle();
-    const prices = await codexOracle.getTokenPrices([
-      {
-        address: WMONAD_ADDRESS,
-        networkId: MONAD_CHAIN_ID,
-      },
-      {
-        address: tokenInfo.address,
-        networkId: MONAD_CHAIN_ID,
-      },
-    ]);
+  const codexOracle = new PriceOracle();
+  const prices = await codexOracle.getTokenPrices([
+    {
+      address: WMONAD_ADDRESS,
+      networkId: MONAD_CHAIN_ID,
+    },
+    {
+      address: tokenInfo.address,
+      networkId: MONAD_CHAIN_ID,
+    },
+  ]);
 
-    const monPrice = parseFloat(prices[0].priceUsd);
-    const tokenPrice = parseFloat(prices[1].priceUsd);
+  const monPrice = parseFloat(prices[0].priceUsd);
+  const tokenPrice = parseFloat(prices[1].priceUsd);
 
-    amount = (amount * tokenPrice) / monPrice;
-  }
+  const usdValue = amount * tokenPrice;
+
+  // if buy, convert amount to MON amount
+  if (type === "buy") amount = usdValue / monPrice;
 
   const priceParams = new URLSearchParams({
     chainId: MONAD_CHAIN_ID.toString(),
@@ -58,7 +60,7 @@ async function buildPriceRequest(tokenSymbol, amount, type, userAddress) {
     "0x-version": "v2",
   };
 
-  return { priceParams, headers };
+  return { priceParams, headers, usdValue };
 }
 
 async function getPrice(token, amount, type) {
@@ -76,7 +78,7 @@ async function getPrice(token, amount, type) {
 }
 
 async function getQuote(token, amount, type, userAddress) {
-  const { priceParams, headers } = await buildPriceRequest(
+  const { priceParams, headers, usdValue } = await buildPriceRequest(
     token,
     amount,
     type,
@@ -88,7 +90,18 @@ async function getQuote(token, amount, type, userAddress) {
     { headers }
   );
 
-  return await priceResponse.json();
+  const res = await priceResponse.json();
+
+  const intentObject = new Intent({
+    userAddress: userAddress,
+    usdValue: usdValue,
+    timestamp: Date.now(),
+    data: res.transaction.data,
+    status: "pending",
+  });
+  await intentObject.save();
+
+  return { ...res, intentId: intentObject._id };
 }
 
 router.get("/0x-quote", async (req, res) => {

@@ -62,8 +62,6 @@ class PriceOracle {
         }
       );
 
-      console.log({ data: response.data.data.getTokenPrices });
-
       if (response.data.errors) {
         throw new Error(response.data.errors[0].message);
       }

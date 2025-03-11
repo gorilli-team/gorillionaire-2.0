@@ -74,23 +74,29 @@ async function startServer() {
   }
 }
 
-function restartServer() {
+async function restartServer() {
   console.log("Attempting to restart server...");
 
-  // Close existing connections
-  mongoose.connection.close(() => {
+  try {
+    // Close existing connections
+    await mongoose.connection.close();
     console.log("MongoDB connection closed.");
 
     // Wait a bit before restarting
-    setTimeout(() => {
-      console.log("Restarting server...");
-      startServer().catch((error) => {
-        console.error("Failed to restart server:", error);
-        // If restart fails, wait longer and try again
-        setTimeout(restartServer, 10000);
-      });
-    }, 5000);
-  });
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+
+    console.log("Restarting server...");
+    try {
+      await startServer();
+    } catch (error) {
+      console.error("Failed to restart server:", error);
+      // If restart fails, wait longer and try again
+      setTimeout(restartServer, 10000);
+    }
+  } catch (error) {
+    console.error("Error during server restart:", error);
+    setTimeout(restartServer, 10000);
+  }
 }
 
 // Start the server and store the instance
