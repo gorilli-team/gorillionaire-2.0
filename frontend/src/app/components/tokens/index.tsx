@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Pagination } from "flowbite-react";
 import Image from "next/image";
+import { Time } from 'lightweight-charts';
 
 import Token from "../token/index";
+import PriceChart from "../price-chart";
 import {
   trackedTokens,
   fetchAllTokens,
@@ -19,6 +21,17 @@ interface TokenStats {
   totalEvents: number;
   trackedSince: string;
   trackingTime: string;
+}
+
+interface PriceData {
+  time: Time;
+  value: number;
+}
+
+interface ChartDataPoint {
+  time: number;
+  fullTime: string;
+  value: number;
 }
 
 interface UntrackedToken {
@@ -38,6 +51,8 @@ interface PaginationData {
 const Tokens = () => {
   const router = useRouter();
   const [tokenStats, setTokenStats] = useState<TokenStats[]>([]);
+  const [selectedToken, setSelectedToken] = useState<TokenData | null>(null);
+  const [priceData, setPriceData] = useState<PriceData[]>([]);
   const [untrackedTokens, setUntrackedTokens] = useState<UntrackedToken[]>([]);
   const [paginationData, setPaginationData] = useState<PaginationData>({
     total: 0,
@@ -91,6 +106,41 @@ const Tokens = () => {
   }, []);
 
   useEffect(() => {
+    const fetchPriceData = async () => {
+      if (!selectedToken) return;
+      
+      try {
+        const response = await fetch(`/api/prices?symbol=${selectedToken.symbol}`);
+        const data = await response.json();
+        
+        if (data.success && data.data) {
+          console.log({data: data.data});
+          // Transform the data into the format expected by the chart
+          const chartData = data.data.map((item: any) => {
+            const date = new Date(item.timestamp);
+            const timeValue = Math.floor(date.getTime() / 1000); // Convert to Unix timestamp (seconds)
+            return {
+              time: timeValue, // Use the timestamp directly which is compatible with Time type
+              value: item.price
+            };
+          });
+          
+          // Sort by timestamp to ensure proper ordering
+          chartData.sort((a: PriceData, b: PriceData) => 
+            (a.time as number) - (b.time as number)
+          );
+          
+          setPriceData(chartData);
+        }
+      } catch (error) {
+        console.error("Error fetching price data:", error);
+      }
+    };
+
+    fetchPriceData();
+  }, [selectedToken]);
+
+  useEffect(() => {
     getUntrackedTokens(1);
   }, []);
 
@@ -105,7 +155,11 @@ const Tokens = () => {
     };
   });
 
-  const handleTokenClick = (address: string) => {
+  const handleTokenClick = (token: TokenData) => {
+    setSelectedToken(token);
+  };
+
+  const navigateToTokenDetail = (address: string) => {
     router.push(`/tokens/${address}`);
   };
 
@@ -136,16 +190,16 @@ const Tokens = () => {
   return (
     <div className="w-full min-h-screen bg-gray-50 p-4 md:p-6 lg:p-8">
       <div className="container mx-auto">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+        <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Tracked Tokens</h2>
           <a
             href="https://t.me/monadsignals"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors w-full sm:w-auto"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18 1.897-.962 6.502-1.359 8.627-.168.9-.5 1.201-.82 1.23-.697.064-1.226-.461-1.901-.903-1.056-.692-1.653-1.123-2.678-1.799-1.185-.781-.417-1.21.258-1.911.177-.184 3.247-2.977 3.307-3.23.007-.032.015-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.139-5.062 3.345-.479.329-.913.489-1.302.481-.428-.009-1.252-.241-1.865-.44-.751-.244-1.349-.374-1.297-.789.027-.216.324-.437.893-.663 3.498-1.524 5.831-2.529 6.998-3.015 3.333-1.386 4.025-1.627 4.477-1.635.099-.002.321.023.465.141.119.098.152.228.166.331.016.122.037.384.021.591z" />
+              <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18 1.897-.962 6.502-1.359 8.627-.168.9-.5 1.201-.82 1.23-.697.064-1.226-.461-1.901-.903-1.056-.692-1.653-1.123-2.678-1.799-1.185-.781-.417-1.21.258-1.911.177-.184 3.247-2.977 3.307-3.23.007-.032.015-.15-.056-.212s-.041-.041-.249-.024c-.106.024-1.793 1.139-5.062 3.345-.479.329-.913.489-1.302.481-.428-.009-1.252-.241-1.865-.44-.751-.244-1.349-.374-1.297-.789.027-.216.324-.437.893-.663 3.498-1.524 5.831-2.529 6.998-3.015 3.333-1.386 4.025-1.627 4.477-1.635.099-.002.321.023.465.141.119.098.152.228.166.331.016.122.037.384.021.591z" />
             </svg>
             <div className="flex flex-col items-start text-sm">
               <span className="font-medium">Join Telegram Channel</span>
@@ -155,20 +209,41 @@ const Tokens = () => {
             </div>
           </a>
         </div>
+
+        {selectedToken && priceData.length > 0 && (
+          <div className="mb-8">
+            <PriceChart data={priceData} tokenSymbol={selectedToken.symbol} />
+          </div>
+        )}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
           {trackedTokensWithStats.map((token: TokenData, index: number) => (
             <div
               key={index}
-              className="bg-white shadow-md rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200"
-              onClick={() => handleTokenClick(token.address)}
+              className={`bg-white shadow-md rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200 ${
+                selectedToken?.address === token.address ? 'ring-2 ring-blue-500' : ''
+              }`}
             >
-              <Token
-                name={token.name}
-                symbol={token.symbol}
-                image={token.image}
-                trackedSince={token.trackedSince}
-                signalsGenerated={token.signalsGenerated}
-              />
+              <div onClick={() => handleTokenClick(token)}>
+                <Token
+                  name={token.name}
+                  symbol={token.symbol}
+                  image={token.image}
+                  trackedSince={token.trackedSince}
+                  signalsGenerated={token.signalsGenerated}
+                />
+              </div>
+              <div className="px-4 pb-4 flex justify-end">
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigateToTokenDetail(token.address);
+                  }}
+                  className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  View Details →
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -237,9 +312,20 @@ const Tokens = () => {
                           )}
                         </td>
                         <td className="py-4 h-12">
-                          <button className="px-4 py-2 text-xs font-medium text-white bg-violet-600 rounded-md hover:bg-violet-700">
-                            Want to track this token?
-                          </button>
+                          <div className="flex space-x-2">
+                            <button className="px-3 py-2 text-xs font-medium text-white bg-violet-600 rounded-md hover:bg-violet-700">
+                              Track Token
+                            </button>
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigateToTokenDetail(token.tokenAddress);
+                              }}
+                              className="px-3 py-2 text-xs font-medium text-blue-600 border border-blue-600 rounded-md hover:bg-blue-50"
+                            >
+                              View Details
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     )

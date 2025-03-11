@@ -4,9 +4,11 @@ import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import Sidebar from "../../components/sidebar";
 import Header from "../../components/header";
+import PriceChart from "../../components/price-chart";
 import { trackedTokens } from "@/app/shared/tokenData";
 import Image from "next/image";
 import { getTimeAgo } from "@/app/utils/time";
+import { Time } from "lightweight-charts";
 
 interface TokenData {
   address: string;
@@ -27,6 +29,11 @@ interface TokenEvent {
   impact: "HIGH" | "MEDIUM" | "LOW";
 }
 
+interface PriceData {
+  time: Time;
+  value: number;
+}
+
 export default function TokenPage() {
   const params = useParams();
   const [token, setToken] = useState<TokenData | null>(null);
@@ -41,6 +48,40 @@ export default function TokenPage() {
   const [eventsNumber, setEventsNumber] = useState(0);
   const [newEventIds, setNewEventIds] = useState<Set<string>>(new Set());
   const wsRef = useRef<WebSocket | null>(null);
+  
+  const [priceData, setPriceData] = useState<PriceData[]>([]);
+  const [priceLoading, setPriceLoading] = useState(false);
+
+  const fetchPriceData = async (symbol: string) => {
+    if (!symbol) return;
+    
+    try {
+      setPriceLoading(true);
+      const response = await fetch(`/api/prices?symbol=${symbol}`);
+      const data = await response.json();
+      
+      if (data.success && data.data) {
+        const chartData = data.data.map((item: any) => {
+          const date = new Date(item.timestamp);
+          const timeValue = Math.floor(date.getTime() / 1000);
+          return {
+            time: timeValue,
+            value: item.price
+          };
+        });
+        
+        chartData.sort((a: PriceData, b: PriceData) => 
+          (a.time as number) - (b.time as number)
+        );
+        
+        setPriceData(chartData);
+      }
+    } catch (error) {
+      console.error("Error fetching price data:", error);
+    } finally {
+      setPriceLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchTokenData = async () => {
@@ -61,8 +102,14 @@ export default function TokenPage() {
           tokenData.name === "Moyaki"
         ) {
           setToken(tokenData);
+          if (tokenData.symbol) {
+            fetchPriceData(tokenData.symbol);
+          }
         } else {
           setToken(tokenData);
+          if (tokenData.symbol) {
+            fetchPriceData(tokenData.symbol);
+          }
         }
       }
 
@@ -341,6 +388,36 @@ export default function TokenPage() {
     }
   };
 
+  const renderPriceChart = () => {
+    if (priceLoading) {
+      return (
+        <div className="bg-white rounded-lg shadow p-4 mb-6">
+          <h2 className="text-lg font-semibold mb-2">Price Chart</h2>
+          <div className="h-[300px] flex items-center justify-center">
+            <span>Loading price data...</span>
+          </div>
+        </div>
+      );
+    }
+
+    if (priceData.length === 0) {
+      return (
+        <div className="bg-white rounded-lg shadow p-4 mb-6">
+          <h2 className="text-lg font-semibold mb-2">Price Chart</h2>
+          <div className="h-[300px] flex items-center justify-center">
+            <span>No price data available</span>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="bg-white rounded-lg shadow p-4 mb-6">
+        <PriceChart data={priceData} tokenSymbol={token?.symbol || ""} />
+      </div>
+    );
+  };
+
   return (
     <div className="flex h-screen bg-gray-100 text-gray-800">
       <Sidebar selectedPage={selectedPage} setSelectedPage={setSelectedPage} />
@@ -390,6 +467,8 @@ export default function TokenPage() {
                 </div>
               </div>
             </div>
+
+            {renderPriceChart()}
 
             <div className="bg-white rounded-lg shadow-md p-6">
               <div className="flex items-center justify-between mb-6">
