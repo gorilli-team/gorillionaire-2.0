@@ -226,7 +226,15 @@ router.get("/me", async (req, res) => {
         return new Date(b.date) - new Date(a.date);
       });
     }
-    res.json(userActivity);
+    //get my rank
+    const rank = await UserActivity.find()
+      .sort({ points: -1 })
+      .skip(skip)
+      .limit(limit);
+    res.json({
+      userActivity,
+      rank,
+    });
   } catch (error) {
     console.error("Error fetching user activity:", error);
     res.status(500).json({ error: "Internal server error" });
