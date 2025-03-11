@@ -61,7 +61,7 @@ export default function Main({ selectedPage, setSelectedPage }: MainProps) {
 
   return (
     <main
-      className={`flex-1 overflow-y-auto bg-gray-200 ${styles.mainContent}`}
+      className={`flex-1 overflow-y-auto h-screen bg-gray-200 ${styles.mainContent}`}
     >
       {renderContent()}
     </main>

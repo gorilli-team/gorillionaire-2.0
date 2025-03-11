@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Pagination } from "flowbite-react";
 import { useAccount } from "wagmi";
 import Image from "next/image";
+import { getTimeAgo } from "@/app/utils/time";
 
 interface Investor {
   rank: number;
@@ -19,7 +20,7 @@ interface Activity {
   date: string;
 }
 
-const Leaderboard = () => {
+const LeaderboardComponent = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [activitiesPage, setActivitiesPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
@@ -126,11 +127,11 @@ const Leaderboard = () => {
   const emptyActivityRows = getEmptyRows(currentActivities, itemsPerPage);
 
   return (
-    <div className="bg-gray-100">
-      <div className="max-w-8xl mx-auto p-8 pt-4">
-        <div className="bg-white rounded-lg shadow-sm p-6 mt-4">
+    <div className="w-full bg-gray-100 px-2">
+      <div className="w-full mx-auto px-1 sm:px-4 md:px-6 pt-4">
+        <div className="bg-white rounded-lg shadow-sm p-1 sm:p-3 md:p-6 mt-4">
           {/* Search */}
-          <div className="mb-6">
+          <div className="mb-3 sm:mb-6 px-1 sm:px-0">
             <div className="relative">
               <input
                 type="text"
@@ -158,80 +159,72 @@ const Leaderboard = () => {
             </div>
           </div>
 
-          {/* Table with fixed height container */}
-          <div className="overflow-x-auto">
-            <div className="h-[680px] overflow-hidden">
-              <table className="w-full border-collapse">
-                <thead className="sticky top-0 bg-white z-10">
-                  <tr className="text-left text-sm text-gray-500 border-b">
-                    <th className="pb-2 font-medium">RANK</th>
-                    <th className="pb-2 font-medium">INVESTOR</th>
-                    <th className="pb-2 font-medium">ACTIVITIES</th>
-                    <th className="pb-2 font-medium">POINTS</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentInvestors.map((investor) => (
-                    <tr
-                      key={investor.address}
-                      className="border-b border-gray-100"
-                    >
-                      <td className="py-4 h-16 text-gray-700">
-                        {investor.rank}
-                      </td>
-                      <td className="py-4 h-16">
-                        <div className="flex items-center">
-                          <div className="w-8 h-8 rounded-full flex items-center justify-center mr-2 overflow-hidden">
-                            <Image
-                              src={`/avatar_${investor.rank % 6}.png`}
-                              alt="User Avatar"
-                              width={32}
-                              height={32}
-                              className="w-full h-full object-cover"
-                            />
+          {/* Table with reduced padding on mobile */}
+          <div className="overflow-x-auto -mx-1 sm:-mx-3 md:-mx-6">
+            <div className="px-1 sm:px-3 md:px-6">
+              <div className="h-[400px] sm:h-[500px] md:h-[600px] lg:h-[680px] overflow-auto">
+                <table className="w-full border-collapse">
+                  <thead className="sticky top-0 bg-white z-10">
+                    <tr className="text-left text-sm text-gray-500 border-b">
+                      <th className="pb-2 pr-1 sm:pr-2 font-medium">RANK</th>
+                      <th className="pb-2 pr-1 sm:pr-2 font-medium">INVESTOR</th>
+                      <th className="pb-2 pr-1 sm:pr-2 font-medium text-center">ACTIVITIES</th>
+                      <th className="pb-2 font-medium">POINTS</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentInvestors.map((investor) => (
+                      <tr
+                        key={investor.address}
+                        className="border-b border-gray-100"
+                      >
+                        <td className="py-3 sm:py-4 h-14 sm:h-16 text-gray-700 pr-1 sm:pr-2">
+                          {investor.rank}
+                        </td>
+                        <td className="py-3 sm:py-4 h-14 sm:h-16 pr-1 sm:pr-2">
+                          <div className="flex items-center">
+                            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center mr-2 overflow-hidden">
+                              <Image
+                                src={`/avatar_${investor.rank % 6}.png`}
+                                alt="User Avatar"
+                                width={32}
+                                height={32}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <span className="text-gray-700 font-bold truncate max-w-[100px] sm:max-w-[200px] md:max-w-full">
+                              {investor.address}
+                            </span>
                           </div>
-                          <span className="text-gray-700 font-bold">
-                            {investor.address}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="py-4 h-16 text-center text-gray-700">
-                        {investor.activitiesList.length}
-                      </td>
-                      <td className="py-4 h-16 text-gray-700">
-                        {investor.points}
-                      </td>
-                      <td className="py-4 h-16">
-                        {/* <span
-                          className={`text-green-${
-                            investor.performance >= 10 ? "500" : "400"
-                          }`}
-                        >
-                          + {investor.performance}%
-                        </span> */}
-                      </td>
-                    </tr>
-                  ))}
-                  {/* Empty rows to maintain fixed height when fewer items */}
-                  {emptyInvestorRows.map((_, index) => (
-                    <tr
-                      key={`empty-${index}`}
-                      className="border-b border-gray-100"
-                    >
-                      <td className="h-16"></td>
-                      <td className="h-16"></td>
-                      <td className="h-16"></td>
-                      <td className="h-16"></td>
-                      <td className="h-16"></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                        </td>
+                        <td className="py-3 sm:py-4 h-14 sm:h-16 text-center text-gray-700 pr-1 sm:pr-2">
+                          {investor.activitiesList.length}
+                        </td>
+                        <td className="py-3 sm:py-4 h-14 sm:h-16 text-gray-700">
+                          {investor.points}
+                        </td>
+                      </tr>
+                    ))}
+                    {/* Empty rows to maintain fixed height when fewer items */}
+                    {emptyInvestorRows.map((_, index) => (
+                      <tr
+                        key={`empty-${index}`}
+                        className="border-b border-gray-100"
+                      >
+                        <td className="h-14 sm:h-16"></td>
+                        <td className="h-14 sm:h-16"></td>
+                        <td className="h-14 sm:h-16"></td>
+                        <td className="h-14 sm:h-16"></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
 
-          <div className="mt-4 flex flex-col sm:flex-row items-center justify-between">
-            <span className="text-sm text-gray-500 mb-4 sm:mb-0 font-bold">
+          <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row items-center justify-between px-1 sm:px-0">
+            <span className="text-sm text-gray-500 mb-3 sm:mb-0 font-bold">
               <span className="font-normal">Showing</span>{" "}
               {filteredInvestors.length > 0 ? indexOfFirstInvestor + 1 : 0}-
               {Math.min(indexOfLastInvestor, filteredInvestors.length)}{" "}
@@ -250,64 +243,74 @@ const Leaderboard = () => {
         </div>
 
         {/* Activity Section */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mt-6">
-          <h2 className="text-xl font-medium mb-4">My activities</h2>
+        <div className="bg-white rounded-lg shadow-sm p-1 sm:p-3 md:p-6 mt-4 sm:mt-6 mb-6">
+          <h2 className="text-lg sm:text-xl font-medium mb-3 sm:mb-4 ml-1 sm:ml-0">My activities</h2>
 
-          {/* Activities table with fixed height */}
-          <div className="overflow-x-auto">
-            <div className="h-[680px] overflow-hidden">
-              <table className="w-full border-collapse">
-                <thead className="sticky top-0 bg-white z-10">
-                  <tr className="text-left text-sm text-gray-500 border-b">
-                    <th className="pb-2 font-medium">ACTIVITY</th>
-                    <th className="pb-2 font-medium text-right">DATE</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentActivities.map((activity, index) => (
-                    <tr key={index} className="border-b border-gray-100">
-                      <td className="py-4 h-16">
-                        <div className="flex items-center">
-                          <span className="text-yellow-500 mr-2">
-                            {activity.action === "Bought" ? "💰" : "💸"}
-                          </span>
-                          <span>
-                            {activity.action} {activity.amount} {activity.token}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="py-4 h-16 text-right text-gray-500">
-                        {activity.date}
-                      </td>
+          {/* Activities table with reduced padding on mobile */}
+          <div className="overflow-x-auto -mx-1 sm:-mx-3 md:-mx-6">
+            <div className="px-1 sm:px-3 md:px-6">
+              <div className="h-[300px] sm:h-[400px] md:h-[500px] lg:h-[680px] overflow-auto">
+                <table className="w-full border-collapse">
+                  <thead className="sticky top-0 bg-white z-10">
+                    <tr className="text-left text-sm text-gray-500 border-b">
+                      <th className="pb-2 font-medium">ACTIVITY</th>
+                      <th className="pb-2 font-medium text-right">DATE</th>
                     </tr>
-                  ))}
-                  {/* Empty rows to maintain fixed height when fewer items */}
-                  {emptyActivityRows.map((_, index) => (
-                    <tr
-                      key={`empty-activity-${index}`}
-                      className="border-b border-gray-100"
-                    >
-                      <td className="h-16"></td>
-                      <td className="h-16"></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {currentActivities.length > 0 ? (
+                      currentActivities.map((activity, index) => (
+                        <tr key={index} className="border-b border-gray-100">
+                          <td className="py-3 sm:py-4 h-14 sm:h-16">
+                            <div className="flex items-center">
+                              <span className="text-yellow-500 mr-2">
+                                {activity.action === "Bought" ? "💰" : "💸"}
+                              </span>
+                              <span className="truncate max-w-[120px] sm:max-w-[250px] md:max-w-full">
+                                {activity.action} {activity.amount} {activity.token}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="py-3 sm:py-4 h-14 sm:h-16 text-right text-gray-500">
+                            {getTimeAgo(activity.date)}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr className="border-b border-gray-100">
+                        <td colSpan={2} className="py-6 sm:py-8 text-center text-gray-500">
+                          No activities yet
+                        </td>
+                      </tr>
+                    )}
+                    {/* Empty rows to maintain fixed height when fewer items */}
+                    {emptyActivityRows.map((_, index) => (
+                      <tr
+                        key={`empty-activity-${index}`}
+                        className="border-b border-gray-100"
+                      >
+                        <td className="h-14 sm:h-16"></td>
+                        <td className="h-14 sm:h-16"></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
 
           {/* Activities Pagination centered */}
-          <div className="mt-2 flex flex-col sm:flex-row items-center justify-between">
-            <span className="text-sm text-gray-500 mb-4 sm:mb-0 font-bold">
+          <div className="mt-2 flex flex-col sm:flex-row items-center justify-between px-1 sm:px-0">
+            <span className="text-sm text-gray-500 mb-3 sm:mb-0 font-bold">
               <span className="font-normal">Showing</span>{" "}
-              {indexOfFirstActivity + 1}-
+              {activities.length > 0 ? indexOfFirstActivity + 1 : 0}-
               {Math.min(indexOfLastActivity, activities.length)}{" "}
               <span className="font-normal">of</span> {activities.length}
             </span>
             <div className="flex-grow flex justify-center">
               <Pagination
                 currentPage={activitiesPage}
-                totalPages={totalActivityPages}
+                totalPages={totalActivityPages > 0 ? totalActivityPages : 1}
                 onPageChange={onActivitiesPageChange}
                 showIcons={true}
               />
@@ -320,4 +323,4 @@ const Leaderboard = () => {
   );
 };
 
-export default Leaderboard;
+export default LeaderboardComponent;

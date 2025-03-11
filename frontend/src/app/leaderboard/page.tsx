@@ -10,10 +10,10 @@ const LeaderboardPage = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="flex bg-gray-100 text-gray-800">
-      {/* Mobile menu button */}
+    <div className="flex h-screen bg-gray-100 text-gray-800 overflow-hidden">
+      {/* Mobile menu button - adjusted positioning */}
       <button
-        className="lg:hidden fixed top-4 left-4 z-40 p-2 rounded-md bg-gray-200"
+        className="rounded-full lg:hidden fixed top-4 left-4 z-50 p-2 bg-gray-200"
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
       >
         <svg
@@ -35,20 +35,19 @@ const LeaderboardPage = () => {
         </svg>
       </button>
 
-      {/* Sidebar with mobile responsiveness */}
+      {/* Sidebar with adjusted width and positioning */}
       <div
         className={`
-        fixed lg:relative
-        ${
-          isMobileMenuOpen
-            ? "translate-x-0"
-            : "-translate-x-full lg:translate-x-0"
-        }
-        transition-transform duration-300 ease-in-out
-        z-30 lg:z-0
-        bg-white
-        shadow-xl lg:shadow-none
-      `}
+          fixed lg:static
+          w-64
+          h-full
+          ${isMobileMenuOpen ? "left-0" : "-left-64 lg:left-0"}
+          top-0
+          z-40 lg:z-0
+          bg-white
+          shadow-xl lg:shadow-none
+          transition-all duration-300 ease-in-out
+        `}
       >
         <Sidebar
           selectedPage={selectedPage}
@@ -56,17 +55,20 @@ const LeaderboardPage = () => {
         />
       </div>
 
-      {/* Overlay for mobile */}
+      {/* Overlay for mobile - increased z-index */}
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
 
-      <div className="flex-1 flex flex-col">
+      {/* Main content with adjusted width and positioning */}
+      <div className="lg:ml-0 flex-1 flex flex-col w-full overflow-hidden">
         <Header />
-        <LeaderboardComponent />
+        <div className="flex-1 overflow-auto pb-10">
+          <LeaderboardComponent />
+        </div>
       </div>
     </div>
   );
