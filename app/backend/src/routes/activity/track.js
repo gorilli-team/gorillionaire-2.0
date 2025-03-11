@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { ethers } = require("ethers");
 const UserActivity = require("../../models/UserActivity");
-const crypto = require("crypto");
+const Intent = require("../../models/Intent");
 
 //track user signin
 router.post("/signin", async (req, res) => {
@@ -62,6 +62,79 @@ router.post("/signin", async (req, res) => {
       await userActivity.save();
       res.json({ message: "User activity updated" });
     }
+  } catch (error) {
+    console.error("Error fetching points:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.post("/trade-points", async (req, res) => {
+  try {
+    const { address, txHash, intentId } = req.body;
+    if (!address || !txHash || !intentId) {
+      return res
+        .status(400)
+        .json({ error: "Missing required fields: address, txHash, intentId" });
+    }
+
+    const userActivity = await UserActivity.findOne({
+      address: address.toLowerCase(),
+    });
+
+    if (!userActivity) {
+      return res.status(400).json({ error: "User activity not found" });
+    }
+
+    //check if the txHash is already in the userActivity.activitiesList
+    if (
+      userActivity.activitiesList.some((activity) => activity.txHash === txHash)
+    ) {
+      return res.status(400).json({ error: "TxHash already exists" });
+    }
+
+    const intent = await Intent.findById(intentId);
+    if (!intent) {
+      return res.status(400).json({ error: "Intent not found" });
+    }
+
+    if (intent.status !== "pending") {
+      return res.status(400).json({ error: "Intent already completed" });
+    }
+    if (intent.userAddress !== address) {
+      return res.status(400).json({ error: "Intent not for this address" });
+    }
+
+    const provider = new ethers.JsonRpcProvider(
+      "https://testnet-rpc.monad.xyz"
+    );
+    const tx = await provider.getTransaction(txHash);
+    if (!tx) {
+      return res.status(400).json({ error: "Tx not found" });
+    }
+
+    if (!tx.data.includes(intent.data)) {
+      return res
+        .status(400)
+        .json({ error: "Intent not corresponding to tx data" });
+    }
+
+    //add the txHash to the userActivity.activitiesList
+    const points = Math.floor(intent.usdValue);
+    userActivity.activitiesList.push({
+      name: "Trade",
+      points: points,
+      date: new Date(),
+      txHash: txHash,
+    });
+    userActivity.points += points;
+    await userActivity.save();
+
+    //update intent status to completed
+    intent.status = "completed";
+    intent.txHash = txHash;
+    await intent.save();
+
+    res.json({ message: "Points added" });
   } catch (error) {
     console.error("Error fetching points:", error);
     res.status(500).json({ error: "Internal server error" });

@@ -60,6 +60,7 @@ type TradeSignal = {
 };
 
 const MONAD_CHAIN_ID = 10143;
+const MAX_SIGNALS = 5;
 
 const parseSignalText = (signalText: string) => {
   const symbol = signalText.match(/CHOG|DAK|YAKI|MON/)?.[0];
@@ -260,12 +261,8 @@ const Signals = () => {
         );
         const data = await response.json();
         if (data && Array.isArray(data)) {
-          const buySignals = data
-            .filter((signal) => signal.type === "Buy")
-            .slice(0, 5);
-          const sellSignals = data
-            .filter((signal) => signal.type === "Sell")
-            .slice(0, 5);
+          const buySignals = data.filter((signal) => signal.type === "Buy");
+          const sellSignals = data.filter((signal) => signal.type === "Sell");
           //remove the buy signals from the data buySignals and sellSignals
           const otherSignals = data.filter(
             (signal) =>
@@ -287,6 +284,16 @@ const Signals = () => {
   const [selectedOptions, setSelectedOptions] = useState<
     Record<string, string>
   >({});
+
+  const onNo = useCallback((signalId: string) => {
+    // Move signal to pastSignals
+    setTradeSignals((prev) => prev.filter((signal) => signal._id !== signalId));
+    setPastSignals((prev) => {
+      const signal = prev.find((s) => s._id === signalId);
+      if (!signal) return prev;
+      return [signal, ...prev];
+    });
+  }, []);
 
   const onYes = useCallback(
     async (token: Token, amount: number, type: "Buy" | "Sell") => {
@@ -326,6 +333,25 @@ const Signals = () => {
         });
 
         console.log("Transaction sent:", txHash);
+
+        await waitForTransactionReceipt(wagmiConfig, {
+          hash: txHash,
+          confirmations: 1,
+        });
+        await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/activity/track/trade-points`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              address,
+              txHash,
+              intentId: quote.intentId,
+            }),
+          }
+        );
         return;
       }
 
@@ -371,8 +397,24 @@ const Signals = () => {
         data: quote.transaction.data,
         chainId: MONAD_CHAIN_ID,
       });
-
       console.log("Transaction sent:", hash);
+
+      await waitForTransactionReceipt(wagmiConfig, {
+        hash,
+        confirmations: 1,
+      });
+
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/activity/trade-points`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          address,
+          txHash: hash,
+          intentId: quote.intentId,
+        }),
+      });
     },
     [
       address,
@@ -399,9 +441,11 @@ const Signals = () => {
         if (!token) return;
 
         onYes(token, amount, signal.type);
+      } else {
+        onNo(signalId);
       }
     },
-    [tradeSignals, selectedOptions, onYes, tokens]
+    [tradeSignals, selectedOptions, onYes, onNo, tokens]
   );
 
   if (isLoading) {
@@ -508,6 +552,7 @@ const Signals = () => {
             <div className="space-y-6">
               {tradeSignals
                 .filter((signal) => signal.type === "Buy")
+                .slice(0, MAX_SIGNALS)
                 .map((signal, index) => (
                   <div
                     key={index}
@@ -605,6 +650,7 @@ const Signals = () => {
             <div className="space-y-6">
               {tradeSignals
                 .filter((signal) => signal.type === "Sell")
+                .slice(0, MAX_SIGNALS)
                 .map((signal, index) => (
                   <div
                     key={index}
