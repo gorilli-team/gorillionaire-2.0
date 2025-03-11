@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Pagination } from "flowbite-react";
 import Image from "next/image";
-import { Time } from 'lightweight-charts';
+import { Time } from "lightweight-charts";
 
 import Token from "../token/index";
 import PriceChart from "../price-chart";
@@ -25,12 +25,6 @@ interface TokenStats {
 
 interface PriceData {
   time: Time;
-  value: number;
-}
-
-interface ChartDataPoint {
-  time: number;
-  fullTime: string;
   value: number;
 }
 
@@ -108,28 +102,33 @@ const Tokens = () => {
   useEffect(() => {
     const fetchPriceData = async () => {
       if (!selectedToken) return;
-      
+
       try {
-        const response = await fetch(`/api/prices?symbol=${selectedToken.symbol}`);
+        const response = await fetch(
+          `/api/prices?symbol=${selectedToken.symbol}`
+        );
         const data = await response.json();
-        
+
         if (data.success && data.data) {
-          console.log({data: data.data});
+          console.log({ data: data.data });
           // Transform the data into the format expected by the chart
-          const chartData = data.data.map((item: any) => {
-            const date = new Date(item.timestamp);
-            const timeValue = Math.floor(date.getTime() / 1000); // Convert to Unix timestamp (seconds)
-            return {
-              time: timeValue, // Use the timestamp directly which is compatible with Time type
-              value: item.price
-            };
-          });
-          
-          // Sort by timestamp to ensure proper ordering
-          chartData.sort((a: PriceData, b: PriceData) => 
-            (a.time as number) - (b.time as number)
+          const chartData = data.data.map(
+            (item: { timestamp: string; price: number }) => {
+              const date = new Date(item.timestamp);
+              const timeValue = Math.floor(date.getTime() / 1000); // Convert to Unix timestamp (seconds)
+              return {
+                time: timeValue, // Use the timestamp directly which is compatible with Time type
+                value: item.price,
+              };
+            }
           );
-          
+
+          // Sort by timestamp to ensure proper ordering
+          chartData.sort(
+            (a: PriceData, b: PriceData) =>
+              (a.time as number) - (b.time as number)
+          );
+
           setPriceData(chartData);
         }
       } catch (error) {
@@ -221,7 +220,9 @@ const Tokens = () => {
             <div
               key={index}
               className={`bg-white shadow-md rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200 border shadow-md  ${
-                selectedToken?.address === token.address ? 'ring-2 ring-blue-500' : ''
+                selectedToken?.address === token.address
+                  ? "ring-2 ring-blue-500"
+                  : ""
               }`}
             >
               <div onClick={() => handleTokenClick(token)}>
@@ -234,7 +235,7 @@ const Tokens = () => {
                 />
               </div>
               <div className="px-4 pb-4 flex justify-end items-center">
-                <button 
+                <button
                   onClick={(e) => {
                     e.stopPropagation();
                     navigateToTokenDetail(token.address);
@@ -242,8 +243,17 @@ const Tokens = () => {
                   className="text-sm bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-1.5 rounded-md font-medium flex items-center transition-colors"
                 >
                   View Details
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 ml-1"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 </button>
               </div>
@@ -319,7 +329,7 @@ const Tokens = () => {
                             <button className="px-3 py-2 text-xs font-medium text-white bg-violet-600 rounded-md hover:bg-violet-700 transition-colors">
                               Track Token
                             </button>
-                            <button 
+                            <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 navigateToTokenDetail(token.tokenAddress);
@@ -327,8 +337,17 @@ const Tokens = () => {
                               className="px-3 py-2 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors flex items-center"
                             >
                               View Details
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 ml-1" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-3.5 w-3.5 ml-1"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+                                  clipRule="evenodd"
+                                />
                               </svg>
                             </button>
                           </div>

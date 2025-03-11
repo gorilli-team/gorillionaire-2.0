@@ -48,32 +48,35 @@ export default function TokenPage() {
   const [eventsNumber, setEventsNumber] = useState(0);
   const [newEventIds, setNewEventIds] = useState<Set<string>>(new Set());
   const wsRef = useRef<WebSocket | null>(null);
-  
+
   const [priceData, setPriceData] = useState<PriceData[]>([]);
   const [priceLoading, setPriceLoading] = useState(false);
 
   const fetchPriceData = async (symbol: string) => {
     if (!symbol) return;
-    
+
     try {
       setPriceLoading(true);
       const response = await fetch(`/api/prices?symbol=${symbol}`);
       const data = await response.json();
-      
+
       if (data.success && data.data) {
-        const chartData = data.data.map((item: any) => {
-          const date = new Date(item.timestamp);
-          const timeValue = Math.floor(date.getTime() / 1000);
-          return {
-            time: timeValue,
-            value: item.price
-          };
-        });
-        
-        chartData.sort((a: PriceData, b: PriceData) => 
-          (a.time as number) - (b.time as number)
+        const chartData = data.data.map(
+          (item: { timestamp: string; price: number }) => {
+            const date = new Date(item.timestamp);
+            const timeValue = Math.floor(date.getTime() / 1000);
+            return {
+              time: timeValue,
+              value: item.price,
+            };
+          }
         );
-        
+
+        chartData.sort(
+          (a: PriceData, b: PriceData) =>
+            (a.time as number) - (b.time as number)
+        );
+
         setPriceData(chartData);
       }
     } catch (error) {
