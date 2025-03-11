@@ -64,7 +64,7 @@ type TradeSignal = {
 
 const MONAD_CHAIN_ID = 10143;
 const MAX_SIGNALS = 5;
-const SIGNAL_EXPIRATION_TIME = 3 * 24 * 60 * 60 * 1000;
+const SIGNAL_EXPIRATION_TIME = 10 * 24 * 60 * 60 * 1000;
 
 const parseSignalText = (signalText: string) => {
   const symbol = signalText.match(/CHOG|DAK|YAKI|MON/)?.[0];
@@ -156,10 +156,9 @@ const Signals = () => {
 
   useEffect(() => {
     if (data && data.length >= 3) {
-      // Convert BigInt to number, dividing by 10^18 for proper token amount
-      setDakBalance(Number((data[0].result as bigint) / BigInt(10 ** 18)));
-      setMoyakiBalance(Number((data[1].result as bigint) / BigInt(10 ** 18)));
-      setChogBalance(Number((data[2].result as bigint) / BigInt(10 ** 18)));
+      setDakBalance(Number(data[0].result) / 10 ** 18);
+      setMoyakiBalance(Number(data[1].result) / 10 ** 18);
+      setChogBalance(Number(data[2].result) / 10 ** 18);
     }
   }, [data]);
 
