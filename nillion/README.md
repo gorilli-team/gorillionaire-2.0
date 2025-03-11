@@ -41,7 +41,7 @@ The formatted signal is uploaded on the three nilDB nodes, which will each store
 This operation is looped every 30 minutes, ensuring the Nillion's Secret Vault is always up to date with the newly generated signals.
 
 
-[!Nillion's Secret Vault](./img/Nillion.png)
+![Nillion's Secret Vault](./img/Nillion.png)
 
 ## Bounty application
 This section of our projects applies for the Nillion's bounty at the following link:<br>
