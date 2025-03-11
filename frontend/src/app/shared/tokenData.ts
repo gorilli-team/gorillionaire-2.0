@@ -23,6 +23,14 @@ export const fetchAllTokens = async () => {
   return data;
 };
 
+export const fetchUntrackedTokens = async (page: number) => {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/events/listings?page=${page}&limit=10`
+  );
+  const data = await response.json();
+  return data;
+};
+
 export const trackedTokens: TokenData[] = [
   {
     id: 11,

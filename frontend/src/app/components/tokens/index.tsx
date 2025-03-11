@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from "react";
+import { Pagination } from "flowbite-react";
+import Image from "next/image";
+
 import Token from "../token/index";
 import {
   trackedTokens,
   fetchAllTokens,
+  fetchUntrackedTokens,
   TokenData,
 } from "@/app/shared/tokenData";
 import { useRouter } from "next/navigation";
+import { getTimeAgo } from "@/app/utils/time";
 
 interface TokenStats {
   name: string;
@@ -16,42 +21,60 @@ interface TokenStats {
   trackingTime: string;
 }
 
-const untrackedTokens: TokenData[] = [
-  {
-    id: 1,
-    name: "Wrapped Monad",
-    symbol: "MON",
-    supply: "93,415,274,755",
-    holders: 103039,
-    address: "0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701",
-    image:
-      "https://imagedelivery.net/cBNDGgkrsEA-b_ixIp9SkQ/I_t8rg_V_400x400.jpg/public",
-    isActive: false,
-    price: "$0.50",
-    volume: "$1.2M",
-    trackedSince: "Feb 20, 2025",
-    signalsGenerated: 127,
-  },
-  {
-    id: 2,
-    name: "ShMonad",
-    symbol: "ShMON",
-    supply: "27,937",
-    holders: 229794,
-    address: "0x1b4Cb47622705F0F67b6B18bBD1cB1a91fc77d37",
-    image:
-      "https://pbs.twimg.com/media/GjskgXhWsAA_N_L?format=png&name=240x240",
-    isActive: false,
-    price: "$0.50",
-    volume: "$1.2M",
-    trackedSince: "Feb 25, 2025",
-    signalsGenerated: 84,
-  },
-];
+interface UntrackedToken {
+  tokenName: string;
+  tokenAddress: string;
+  tokenSymbol: string;
+  blockTimestamp: string;
+}
+
+interface PaginationData {
+  total: number;
+  page: number;
+  limit: number;
+  pages: number;
+}
 
 const Tokens = () => {
   const router = useRouter();
   const [tokenStats, setTokenStats] = useState<TokenStats[]>([]);
+  const [untrackedTokens, setUntrackedTokens] = useState<UntrackedToken[]>([]);
+  const [paginationData, setPaginationData] = useState<PaginationData>({
+    total: 0,
+    page: 1,
+    limit: 25,
+    pages: 1,
+  });
+
+  const onPageChange = async (page: number) => {
+    await getUntrackedTokens(page);
+  };
+
+  const getUntrackedTokens = async (page: number = 1) => {
+    try {
+      console.log("getUntrackedTokens: page", page);
+      const fetchedUntrackedTokens = await fetchUntrackedTokens(page);
+      console.log("fetchedUntrackedTokens", fetchedUntrackedTokens);
+      setUntrackedTokens(fetchedUntrackedTokens?.listings || []);
+      setPaginationData(
+        fetchedUntrackedTokens?.pagination || {
+          total: 0,
+          page: page,
+          limit: 25,
+          pages: 1,
+        }
+      );
+    } catch (error) {
+      console.error("Error fetching untracked tokens:", error);
+      setUntrackedTokens([]);
+      setPaginationData({
+        total: 0,
+        page: page,
+        limit: 25,
+        pages: 1,
+      });
+    }
+  };
 
   useEffect(() => {
     const getTokens = async () => {
@@ -65,6 +88,10 @@ const Tokens = () => {
     };
 
     getTokens();
+  }, []);
+
+  useEffect(() => {
+    getUntrackedTokens(1);
   }, []);
 
   // Merge static data with dynamic stats
@@ -81,6 +108,30 @@ const Tokens = () => {
   const handleTokenClick = (address: string) => {
     router.push(`/tokens/${address}`);
   };
+
+  const getTokenColor = (address: string) => {
+    // Use the last 6 characters of the address as the color
+    return `#${address.slice(-6)}`;
+  };
+
+  const formatBlockTimestamp = (timestamp: string) => {
+    // Convert block timestamp (in seconds) to milliseconds and create ISO string
+    return new Date(parseInt(timestamp) * 1000).toISOString();
+  };
+
+  // Remove client-side pagination logic as we're using server-side pagination
+  const getEmptyRows = (
+    items: UntrackedToken[],
+    itemsPerPage: number
+  ): null[] => {
+    const currentItemCount = items.length;
+    if (currentItemCount < itemsPerPage) {
+      return Array(itemsPerPage - currentItemCount).fill(null);
+    }
+    return [];
+  };
+
+  const emptyRows = getEmptyRows(untrackedTokens, paginationData.limit);
 
   return (
     <div className="w-full min-h-screen bg-gray-50 p-8">
@@ -122,23 +173,115 @@ const Tokens = () => {
           ))}
         </div>
 
-        <h2 className="text-xl font-bold mt-8 mb-4">Untracked Tokens</h2>
-        <div className="grid grid-cols-3 gap-8">
-          {untrackedTokens.map((token: TokenData, index: number) => (
-            <div
-              key={index}
-              className="bg-white shadow-md rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200"
-              onClick={() => handleTokenClick(token.symbol)}
-            >
-              <Token
-                name={token.name}
-                symbol={token.symbol}
-                image={token.image}
-                trackedSince={token.trackedSince}
-                signalsGenerated={token.signalsGenerated}
+        <h2 className="text-xl font-bold mt-8 mb-4">New Tokens on Uniswap</h2>
+        <div className="bg-white rounded-lg shadow-sm p-6 mt-4">
+          <div className="overflow-x-auto">
+            <div className="overflow-hidden">
+              <table className="w-full border-collapse">
+                <thead className="sticky top-0 bg-white z-10">
+                  <tr className="text-left text-xs text-gray-500 border-b">
+                    <th className="pb-2 font-medium">TOKEN NAME</th>
+                    <th className="pb-2 font-medium">ADDRESS</th>
+                    <th className="pb-2 font-medium">LISTED SINCE</th>
+                    <th className="pb-2 font-medium">ACTIONS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {untrackedTokens.map(
+                    (token: UntrackedToken, index: number) => (
+                      <tr
+                        key={index}
+                        className="border-b border-gray-100 text-sm"
+                      >
+                        <td className="py-4 h-12">
+                          <div className="flex items-center space-x-2">
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden">
+                              <div
+                                className="w-full h-full bg-gray-300 rounded-full"
+                                style={{
+                                  backgroundColor: getTokenColor(
+                                    token.tokenAddress
+                                  ),
+                                }}
+                              ></div>
+                            </div>
+                            <span className="text-gray-700 font-medium">
+                              {token.tokenName}
+                            </span>
+                            <span className="text-gray-500">
+                              ({token.tokenSymbol})
+                            </span>
+                            <a
+                              href={`https://testnet.monadexplorer.com/token/${token.tokenAddress}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center hover:opacity-80 transition-opacity"
+                            >
+                              <Image
+                                src="/monad-explorer.png"
+                                alt="Monad Logo"
+                                className="w-6 h-6 rounded-md"
+                                width={24}
+                                height={24}
+                                priority={false}
+                              />
+                            </a>
+                          </div>
+                        </td>
+                        <td className="py-4 h-12 text-gray-700">
+                          {token.tokenAddress}
+                        </td>
+                        <td className="py-4 h-12">
+                          {getTimeAgo(
+                            formatBlockTimestamp(token.blockTimestamp)
+                          )}
+                        </td>
+                        <td className="py-4 h-12">
+                          <button className="px-4 py-2 text-xs font-medium text-white bg-violet-600 rounded-md hover:bg-violet-700">
+                            Want to track this token?
+                          </button>
+                        </td>
+                      </tr>
+                    )
+                  )}
+                  {/* Empty rows to maintain fixed height */}
+                  {emptyRows.map((_, index) => (
+                    <tr
+                      key={`empty-${index}`}
+                      className="border-b border-gray-100"
+                    >
+                      <td className="h-16"></td>
+                      <td className="h-16"></td>
+                      <td className="h-16"></td>
+                      <td className="h-16"></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Activities Pagination centered */}
+          <div className="mt-2 flex flex-col sm:flex-row items-center justify-between">
+            <span className="text-sm text-gray-500 mb-4 sm:mb-0 font-bold">
+              <span className="font-normal">Showing</span>{" "}
+              {(paginationData.page - 1) * paginationData.limit + 1}-
+              {Math.min(
+                paginationData.page * paginationData.limit,
+                paginationData.total
+              )}{" "}
+              <span className="font-normal">of</span> {paginationData.total}
+            </span>
+            <div className="flex-grow flex justify-center">
+              <Pagination
+                currentPage={paginationData.page}
+                totalPages={paginationData.pages}
+                onPageChange={onPageChange}
+                showIcons={true}
               />
             </div>
-          ))}
+            <div className="hidden sm:block sm:w-32"></div>
+          </div>
         </div>
       </div>
     </div>

@@ -81,7 +81,7 @@ router.get("/", async (req, res) => {
     const totalCount = await Listing.countDocuments({});
 
     const listings = await Listing.find({})
-      .sort({ timestamp: -1 })
+      .sort({ blockTimestamp: -1 })
       .skip(skip)
       .limit(limit);
 
