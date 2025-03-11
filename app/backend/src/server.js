@@ -1,8 +1,8 @@
 // server.js
-const express = require("express");
 const http = require("http");
 const app = require("./app");
 const { initWebSocketServer } = require("./websocket");
+const { initTokenHoldersCron } = require("./cron/blockvision");
 require("dotenv").config();
 const mongoose = require("mongoose");
 const PORT = process.env.PORT || 3001;
@@ -42,6 +42,9 @@ async function startServer() {
 
     // Initialize WebSocket server
     const wss = initWebSocketServer(server);
+
+    // Initialize token holders cron job
+    initTokenHoldersCron();
 
     // Start server
     server.listen(PORT, () => {
