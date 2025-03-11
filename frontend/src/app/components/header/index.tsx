@@ -29,7 +29,6 @@ export default function Header() {
 
   // WebSocket notification state
   const wsRef = useRef<WebSocket | null>(null);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   // Function to show notification
   const showCustomNotification = (message: string, title: string = "Notification") => {
@@ -117,7 +116,7 @@ export default function Header() {
           const notificationMessage = `${actionEmoji} ${action?.toUpperCase()} ${tokenAmount} ${tokenSymbol} @ $${tokenPrice ? tokenPrice.toFixed(2) : "N/A"}`;
     
           // Add to notifications list
-          setNotifications((prevNotifications) => [message, ...prevNotifications]);
+
     
           // Show toast notification with formatted message
           showCustomNotification(notificationMessage, "Trade Signal");

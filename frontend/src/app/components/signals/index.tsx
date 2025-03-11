@@ -47,6 +47,15 @@ type TradeEvent = {
   userImageUrl: string;
 };
 
+type ApiTrade = {
+  userAddress: string;
+  action: string;
+  tokenAmount: number;
+  tokenSymbol: string;
+  timestamp: string;
+  userImageUrl?: string;
+};
+
 type TradeSignal = {
   _id: string;
   type: "Buy" | "Sell";
@@ -210,10 +219,10 @@ const Signals = () => {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/trade/completed`
       );
-      const data = await response.json();
+      const data: ApiTrade[] = await response.json();
       console.log("Completed trades response:", data);
       
-      const formattedTrades = data.map((trade: any) => ({
+      const formattedTrades = data.map((trade: ApiTrade) => ({
         user: trade.userAddress,
         action: trade.action,
         amount: trade.tokenAmount,
@@ -234,56 +243,56 @@ const Signals = () => {
     }
   }, [address]);
 
-  const recentTrades: TradeEvent[] = [
-    {
-      user: "arthur457.nad",
-      action: "Sold",
-      amount: 10,
-      token: "CHOG",
-      timeAgo: "19s ago",
-      userImageUrl: "/avatar_1.png",
-    },
-    {
-      user: "imfrancis.nad",
-      action: "Bought",
-      amount: 5,
-      token: "YAKI",
-      timeAgo: "14s ago",
-      userImageUrl: "/avatar_2.png",
-    },
-    {
-      user: "nfthomas.nad",
-      action: "Sold",
-      amount: 5,
-      token: "YAKI",
-      timeAgo: "9s ago",
-      userImageUrl: "/avatar_3.png",
-    },
-    {
-      user: "luduvigo.nad",
-      action: "Bought",
-      amount: 20,
-      token: "DAK",
-      timeAgo: "35s ago",
-      userImageUrl: "/avatar_4.png",
-    },
-    {
-      user: "stephen.nad",
-      action: "Bought",
-      amount: 10,
-      token: "CHOG",
-      timeAgo: "28s ago",
-      userImageUrl: "/avatar_5.png",
-    },
-    {
-      user: "fester.nad",
-      action: "Sold",
-      amount: 5,
-      token: "DAK",
-      timeAgo: "11s ago",
-      userImageUrl: "/avatar_6.png",
-    },
-  ];
+  // const recentTrades: TradeEvent[] = [
+  //   {
+  //     user: "arthur457.nad",
+  //     action: "Sold",
+  //     amount: 10,
+  //     token: "CHOG",
+  //     timeAgo: "19s ago",
+  //     userImageUrl: "/avatar_1.png",
+  //   },
+  //   {
+  //     user: "imfrancis.nad",
+  //     action: "Bought",
+  //     amount: 5,
+  //     token: "YAKI",
+  //     timeAgo: "14s ago",
+  //     userImageUrl: "/avatar_2.png",
+  //   },
+  //   {
+  //     user: "nfthomas.nad",
+  //     action: "Sold",
+  //     amount: 5,
+  //     token: "YAKI",
+  //     timeAgo: "9s ago",
+  //     userImageUrl: "/avatar_3.png",
+  //   },
+  //   {
+  //     user: "luduvigo.nad",
+  //     action: "Bought",
+  //     amount: 20,
+  //     token: "DAK",
+  //     timeAgo: "35s ago",
+  //     userImageUrl: "/avatar_4.png",
+  //   },
+  //   {
+  //     user: "stephen.nad",
+  //     action: "Bought",
+  //     amount: 10,
+  //     token: "CHOG",
+  //     timeAgo: "28s ago",
+  //     userImageUrl: "/avatar_5.png",
+  //   },
+  //   {
+  //     user: "fester.nad",
+  //     action: "Sold",
+  //     amount: 5,
+  //     token: "DAK",
+  //     timeAgo: "11s ago",
+  //     userImageUrl: "/avatar_6.png",
+  //   },
+  // ];
 
   const [tradeSignals, setTradeSignals] = useState<TradeSignal[]>([]);
   const [pastSignals, setPastSignals] = useState<TradeSignal[]>([]);
