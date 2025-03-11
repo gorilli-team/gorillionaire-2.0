@@ -40,7 +40,7 @@ type Token = {
 
 type TradeEvent = {
   user: string;
-  action: "Bought" | "Sold";
+  action: string;
   amount: number;
   token: string;
   timeAgo: string;
@@ -129,6 +129,7 @@ const Signals = () => {
   const [chogBalance, setChogBalance] = useState<number>(0);
   const [dakBalance, setDakBalance] = useState<number>(0);
   const [monBalance, setMonBalance] = useState<number>(0);
+  const [completedTrades, setCompletedTrades] = useState<TradeEvent[]>([]);
 
   // Get native MON balance
   const { data: monBalanceData } = useBalance({
@@ -202,6 +203,36 @@ const Signals = () => {
     ],
     [monBalance, dakBalance, moyakiBalance, chogBalance]
   );
+  
+  const fetchCompletedTrades = async () => {
+    if (!address) return;
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/trade/completed`
+      );
+      const data = await response.json();
+      console.log("Completed trades response:", data);
+      
+      const formattedTrades = data.map((trade: any) => ({
+        user: trade.userAddress,
+        action: trade.action,
+        amount: trade.tokenAmount,
+        token: trade.tokenSymbol,
+        timeAgo: getTimeAgo(trade.timestamp),
+        userImageUrl: trade.userImageUrl || "/avatar_0.png",
+      }));
+  
+      setCompletedTrades(formattedTrades);
+    } catch (error) {
+      console.error("Error fetching completed trades:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (address) {
+      fetchCompletedTrades();
+    }
+  }, [address]);
 
   const recentTrades: TradeEvent[] = [
     {
@@ -521,7 +552,7 @@ const Signals = () => {
           <div className="py-2 px-3">
             <div className="ticker-wrapper">
               <div className="ticker-track">
-                {[...recentTrades, ...recentTrades, ...recentTrades].map(
+                {[...completedTrades, ...completedTrades, ...completedTrades].map(
                   (trade, index) => (
                     <div key={index} className="ticker-item">
                       <div className="flex items-center space-x-2">
@@ -544,12 +575,12 @@ const Signals = () => {
                           </div>
                           <div className="flex items-center">
                             <span className="mr-1">
-                              {trade.action === "Bought" ? "💰" : "💸"}
+                              {trade.action === "buy" ? "💰" : "💸"}
                             </span>
                             <span className="text-sm mr-1">{trade.action}</span>
                             <span
                               className={`text-sm font-bold ${
-                                trade.action === "Bought"
+                                trade.action === "buy"
                                   ? "text-green-500"
                                   : "text-red-500"
                               }`}
@@ -852,7 +883,7 @@ const Signals = () => {
           position: absolute;
           white-space: nowrap;
           will-change: transform;
-          animation: ticker 25s linear infinite;
+          animation: ticker 80s linear infinite;
           align-items: center; /* Center items vertically */
           width: auto; /* Allow content to determine width */
         }
