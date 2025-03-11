@@ -3,7 +3,6 @@ const router = express.Router();
 const ethers = require("ethers");
 const PriceOracle = require("../../services/PriceOracle");
 const Intent = require("../../models/Intent");
-const { v4: uuidv4 } = require("uuid");
 
 const MON_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const WMONAD_ADDRESS = "0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701";
@@ -94,7 +93,6 @@ async function getQuote(token, amount, type, userAddress) {
   const res = await priceResponse.json();
 
   const intentObject = new Intent({
-    id: uuidv4(),
     userAddress: userAddress,
     usdValue: usdValue,
     timestamp: Date.now(),

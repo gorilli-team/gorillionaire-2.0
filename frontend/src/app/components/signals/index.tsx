@@ -57,10 +57,14 @@ type TradeSignal = {
   risk: "Moderate" | "Aggressive" | "Conservative";
   confidenceScore: string;
   created_at: string;
+  userSignal?: {
+    choice: "Yes" | "No";
+  };
 };
 
 const MONAD_CHAIN_ID = 10143;
 const MAX_SIGNALS = 5;
+const SIGNAL_EXPIRATION_TIME = 3 * 24 * 60 * 60 * 1000;
 
 const parseSignalText = (signalText: string) => {
   const symbol = signalText.match(/CHOG|DAK|YAKI|MON/)?.[0];
@@ -257,19 +261,21 @@ const Signals = () => {
     const fetchSignals = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/signals/generated-signals`
+          `${process.env.NEXT_PUBLIC_API_URL}/signals/generated-signals?userAddress=${address}`
         );
         const data = await response.json();
         if (data && Array.isArray(data)) {
-          const buySignals = data.filter((signal) => signal.type === "Buy");
-          const sellSignals = data.filter((signal) => signal.type === "Sell");
-          //remove the buy signals from the data buySignals and sellSignals
-          const otherSignals = data.filter(
+          // pastSignals are signals that have a userSignal or that are 3 days old
+          const pastSignals = data.filter(
             (signal) =>
-              !buySignals.includes(signal) && !sellSignals.includes(signal)
+              signal.userSignal ||
+              new Date(signal.created_at) <
+                new Date(Date.now() - SIGNAL_EXPIRATION_TIME)
           );
-          setTradeSignals(buySignals.concat(sellSignals));
-          setPastSignals(otherSignals);
+          setTradeSignals(
+            data.filter((signal) => !pastSignals.includes(signal))
+          );
+          setPastSignals(pastSignals);
           setIsLoading(false);
         }
       } catch (error) {
@@ -278,7 +284,7 @@ const Signals = () => {
     };
 
     fetchSignals();
-  }, []);
+  }, [address]);
 
   // State for Yes/No buttons
   const [selectedOptions, setSelectedOptions] = useState<
@@ -331,8 +337,6 @@ const Signals = () => {
             ? BigInt(quote.transaction.gasPrice)
             : undefined,
         });
-
-        console.log("Transaction sent:", txHash);
 
         await waitForTransactionReceipt(wagmiConfig, {
           hash: txHash,
@@ -397,7 +401,6 @@ const Signals = () => {
         data: quote.transaction.data,
         chainId: MONAD_CHAIN_ID,
       });
-      console.log("Transaction sent:", hash);
 
       await waitForTransactionReceipt(wagmiConfig, {
         hash,
@@ -426,11 +429,26 @@ const Signals = () => {
   );
 
   const handleOptionSelect = useCallback(
-    (signalId: string, option: "Yes" | "No") => {
+    async (signalId: string, option: "Yes" | "No") => {
       setSelectedOptions({
         ...selectedOptions,
         [signalId]: option,
       });
+
+      await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/signals/generated-signals/user-signal`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userAddress: address,
+            signalId,
+            choice: option,
+          }),
+        }
+      );
 
       if (option === "Yes") {
         const signal = tradeSignals.find((s) => s._id === signalId);
@@ -445,7 +463,7 @@ const Signals = () => {
         onNo(signalId);
       }
     },
-    [tradeSignals, selectedOptions, onYes, onNo, tokens]
+    [tradeSignals, selectedOptions, onYes, onNo, tokens, address]
   );
 
   if (isLoading) {
@@ -775,9 +793,19 @@ const Signals = () => {
                           </span>
                         </div>
                       </div>
-                      <span className="text-xs px-2 py-1 rounded bg-gray-200 text-gray-700">
-                        Expired
-                      </span>
+                      {signal.userSignal?.choice === "Yes" ? (
+                        <span className="text-xs px-2 py-1 rounded bg-green-200 text-green-700">
+                          Accepted
+                        </span>
+                      ) : signal.userSignal?.choice === "No" ? (
+                        <span className="text-xs px-2 py-1 rounded bg-red-200 text-red-700">
+                          Rejected
+                        </span>
+                      ) : (
+                        <span className="text-xs px-2 py-1 rounded bg-gray-200 text-gray-700">
+                          Expired
+                        </span>
+                      )}
                     </div>
                     <div className="flex flex-wrap items-center gap-2 mt-3">
                       {signal.events.slice(0, 4).map((event, idx) => (
