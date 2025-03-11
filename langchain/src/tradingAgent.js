@@ -117,14 +117,33 @@ export async function getTradingSignal(question) {
   }
 }
 
-export async function generateSignal() {
+export async function generateBuySignal() {
   const timestamp = new Date().toISOString();
 
   try {
     console.log(`\n[${timestamp}] Generating trading signal...`);
 
     const answer = await getTradingSignal(
-      "Give me the best trading signal you can deduce from the context you have. Before generating the signal, flip a fair coin (50-50 chance) - if heads, generate a BUY signal, if tails, generate a SELL signal. Make sure the signal is different from previous ones. Remember that both BUY and SELL signals are equally important for making money in trading. Base your signal on the actual market data and events in the context."
+      "Give me the best trading signal you can deduce from the context you have. Make it a BUY signal. Make sure the signal is different from previous ones. Remember that both BUY and SELL signals are equally important for making money in trading. Base your signal on the actual market data and events in the context."
+    );
+
+    console.log(`[${timestamp}] TRADING SIGNAL:`);
+    console.log("-".repeat(50));
+    console.log(answer.signal.answer);
+    console.log("-".repeat(50));
+  } catch (error) {
+    console.error(`[${timestamp}] Error generating signal:`, error);
+  }
+}
+
+export async function generateSellSignal() {
+  const timestamp = new Date().toISOString();
+
+  try {
+    console.log(`\n[${timestamp}] Generating trading signal...`);
+
+    const answer = await getTradingSignal(
+      "Give me the best trading signal you can deduce from the context you have. Make it a SELL signal. Make sure the signal is different from previous ones. Remember that both BUY and SELL signals are equally important for making money in trading. Base your signal on the actual market data and events in the context."
     );
 
     console.log(`[${timestamp}] TRADING SIGNAL:`);
@@ -165,18 +184,22 @@ export function startSignalPolling(interval = POLLING_INTERVAL) {
     } seconds`
   );
 
-  generateSignal();
-  const intervalId = setInterval(generateSignal, interval);
+  generateBuySignal();
+  const intervalId = setInterval(generateBuySignal, interval);
+  generateSellSignal();
+  const intervalId2 = setInterval(generateSellSignal, interval);
 
   process.on("SIGINT", () => {
     console.log("\nStopping trading signal generator...");
     clearInterval(intervalId);
+    clearInterval(intervalId2);
     process.exit(0);
   });
 
   process.on("SIGTERM", () => {
     console.log("\nStopping trading signal generator...");
     clearInterval(intervalId);
+    clearInterval(intervalId2);
     process.exit(0);
   });
 }
