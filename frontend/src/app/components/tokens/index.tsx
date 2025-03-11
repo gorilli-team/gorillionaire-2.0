@@ -220,7 +220,7 @@ const Tokens = () => {
           {trackedTokensWithStats.map((token: TokenData, index: number) => (
             <div
               key={index}
-              className={`bg-white shadow-md rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200 ${
+              className={`bg-white shadow-md rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200 border shadow-md  ${
                 selectedToken?.address === token.address ? 'ring-2 ring-blue-500' : ''
               }`}
             >

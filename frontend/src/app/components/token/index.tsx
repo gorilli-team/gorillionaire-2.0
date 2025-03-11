@@ -29,7 +29,7 @@ const Token: React.FC<TokenProps> = ({
   };
 
   return (
-    <div className="bg-white text-black rounded-lg border shadow-md p-3 sm:p-4 w-full">
+    <div className="bg-white text-black rounded-lg p-3 sm:p-4 w-full">
       <div className="flex items-center justify-between mb-3 sm:mb-4">
         <div className="flex items-center gap-2 sm:gap-3">
           <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-700 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
