@@ -133,7 +133,15 @@ const PriceChart: React.FC<PriceChartProps> = ({ data, tokenSymbol }) => {
         timeScale: {
           borderVisible: false,
           timeVisible: true,
+          // Disable zooming functionality
+          rightOffset: 0,
+          barSpacing: 6,
+          rightBarStaysOnScroll: true,
+          lockVisibleTimeRangeOnResize: true,
         },
+        // Disable mouse wheel zooming and touch interaction for zooming
+        handleScroll: false,
+        handleScale: false,
       });
 
       // Create the line series

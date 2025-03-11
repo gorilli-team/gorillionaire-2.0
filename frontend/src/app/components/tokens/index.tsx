@@ -233,15 +233,18 @@ const Tokens = () => {
                   signalsGenerated={token.signalsGenerated}
                 />
               </div>
-              <div className="px-4 pb-4 flex justify-end">
+              <div className="px-4 pb-4 flex justify-end items-center">
                 <button 
                   onClick={(e) => {
                     e.stopPropagation();
                     navigateToTokenDetail(token.address);
                   }}
-                  className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                  className="text-sm bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-1.5 rounded-md font-medium flex items-center transition-colors"
                 >
-                  View Details →
+                  View Details
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
                 </button>
               </div>
             </div>
@@ -313,7 +316,7 @@ const Tokens = () => {
                         </td>
                         <td className="py-4 h-12">
                           <div className="flex space-x-2">
-                            <button className="px-3 py-2 text-xs font-medium text-white bg-violet-600 rounded-md hover:bg-violet-700">
+                            <button className="px-3 py-2 text-xs font-medium text-white bg-violet-600 rounded-md hover:bg-violet-700 transition-colors">
                               Track Token
                             </button>
                             <button 
@@ -321,9 +324,12 @@ const Tokens = () => {
                                 e.stopPropagation();
                                 navigateToTokenDetail(token.tokenAddress);
                               }}
-                              className="px-3 py-2 text-xs font-medium text-blue-600 border border-blue-600 rounded-md hover:bg-blue-50"
+                              className="px-3 py-2 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors flex items-center"
                             >
                               View Details
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                              </svg>
                             </button>
                           </div>
                         </td>
