@@ -68,7 +68,8 @@ const SIGNAL_EXPIRATION_TIME = 10 * 24 * 60 * 60 * 1000;
 
 const parseSignalText = (signalText: string) => {
   const symbol = signalText.match(/CHOG|DAK|YAKI|MON/)?.[0];
-  const amount = Number(signalText.match(/\d+\.\d+/)?.[0]);
+  const amountMatch = signalText.match(/\d+\.\d+/)?.[0];
+  const amount = amountMatch ? Number(amountMatch) : 0;
 
   return { symbol, amount };
 };
@@ -91,6 +92,8 @@ const fetchImageFromSignalText = (signalText: string) => {
 };
 
 const formatNumber = (num: number): string => {
+  if (isNaN(num)) return "0";
+  
   if (num >= 1_000_000) {
     return (
       (num / 1_000_000).toLocaleString("en-US", { maximumFractionDigits: 1 }) +
