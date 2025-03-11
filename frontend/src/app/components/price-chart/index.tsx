@@ -215,9 +215,25 @@ const PriceChart: React.FC<PriceChartProps> = ({ data, tokenSymbol }) => {
           }
           
           // Get price value at current crosshair position
-          const price = param.seriesData.get(lineSeries);
+          const seriesData = param.seriesData.get(lineSeries);
           
-          if (!price) {
+          if (!seriesData) {
+            toolTip.style.display = 'none';
+            return;
+          }
+          
+          // Handle different data formats - for AreaSeries we expect a number directly
+          let price: number;
+          if (typeof seriesData === 'number') {
+            price = seriesData;
+          } else if (seriesData && typeof seriesData === 'object' && 'value' in seriesData) {
+            price = (seriesData as { value: number }).value;
+          } else {
+            toolTip.style.display = 'none';
+            return;
+          }
+          
+          if (isNaN(price)) {
             toolTip.style.display = 'none';
             return;
           }
