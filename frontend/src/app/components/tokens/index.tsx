@@ -18,7 +18,8 @@ interface TokenStats {
 }
 
 interface PriceData {
-  time: string;
+  time: number;
+  fullTime: string;
   value: number;
 }
 
@@ -84,11 +85,20 @@ const Tokens = () => {
         const data = await response.json();
         
         if (data.success && data.data) {
+
+          console.log({data: data.data});
           // Transform the data into the format expected by the chart
-          const chartData = data.data.map((item: any) => ({
-            time: new Date(item.timestamp).toISOString().split('T')[0], // Format: YYYY-MM-DD
-            value: item.price
-          }));
+          const chartData = data.data.map((item: any) => {
+            const date = new Date(item.timestamp);
+            return {
+              time: Math.floor(date.getTime() / 1000), // Convert to Unix timestamp (seconds)
+              fullTime: date.toISOString(), // Keep full timestamp for tooltip/display
+              value: item.price
+            };
+          });
+          
+          // Sort by timestamp to ensure proper ordering
+          chartData.sort((a: PriceData, b: PriceData) => a.time - b.time);
           
           setPriceData(chartData);
         }

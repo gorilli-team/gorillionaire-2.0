@@ -2,10 +2,10 @@
 
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { IChartApi, createChart, ColorType, LineSeries } from 'lightweight-charts';
+import { IChartApi, createChart, ColorType, LineSeries, AreaSeries, Time } from 'lightweight-charts';
 
 interface PriceData {
-  time: string;
+  time: Time;
   value: number;
 }
 
@@ -49,33 +49,38 @@ const PriceChart: React.FC<PriceChartProps> = ({ data, tokenSymbol }) => {
       });
 
       // Create the line series
-      const lineSeries = chart.addSeries(LineSeries, {
-        color: '#2962FF',
-        lineWidth: 2,
-      });
+      const lineSeries = chart.addSeries(AreaSeries, { lineColor: '#2962FF', topColor: '#2962FF', bottomColor: 'rgba(41, 98, 255, 0.28)' });
 
       // Transform data to ensure proper time format and unique ascending timestamps
       const formattedData = data
         .map((item, index) => ({
-          time: item.time.split('T')[0], // Ensure we only use the date part
+          time: item.time as Time,
           value: item.value,
-          originalIndex: index // Keep track of original order for duplicate dates
+          originalIndex: index
         }))
-        // Remove duplicates by keeping the latest value for each date
+        // Remove duplicates by keeping the latest value for each timestamp
         .reduce((acc, curr) => {
-          acc[curr.time] = curr;
+          const key = typeof curr.time === 'number' ? curr.time : curr.time.toString();
+          acc[key] = curr;
           return acc;
         }, {} as Record<string, typeof data[0] & { originalIndex: number }>);
 
-      // Convert back to array and sort by time
+        console.log({formattedData});
+
+      // Convert back to array and sort by timestamp
       const uniqueSortedData = Object.values(formattedData)
         .sort((a, b) => {
-          const timeCompare = a.time.localeCompare(b.time);
+          // Convert both times to numbers for comparison
+          const timeA = typeof a.time === 'number' ? a.time : new Date(a.time.toString()).getTime();
+          const timeB = typeof b.time === 'number' ? b.time : new Date(b.time.toString()).getTime();
+          const timeCompare = timeA - timeB;
           return timeCompare === 0 ? a.originalIndex - b.originalIndex : timeCompare;
         })
         .map(({ time, value }) => ({ time, value }));
 
       // Set the data
+
+      console.log({uniqueSortedData});
       lineSeries.setData(uniqueSortedData);
 
       // Handle resize
