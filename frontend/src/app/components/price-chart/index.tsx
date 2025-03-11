@@ -82,6 +82,9 @@ const PriceChart: React.FC<PriceChartProps> = ({ data, tokenSymbol }) => {
 
       console.log({uniqueSortedData});
       lineSeries.setData(uniqueSortedData);
+      
+      // Fit all data points into the visible area
+      chart.timeScale().fitContent();
 
       // Handle resize
       const handleResize = () => {
