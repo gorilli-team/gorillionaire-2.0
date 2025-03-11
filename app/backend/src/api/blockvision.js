@@ -26,8 +26,6 @@ const retrieveTokenHolders = async ({
       },
     });
 
-    console.log("tokenName", tokenName);
-
     // Update existing record or create new one if it doesn't exist
     const updatedTokenHolders = await TokenHolders.findOneAndUpdate(
       { tokenAddress: contractAddress },
