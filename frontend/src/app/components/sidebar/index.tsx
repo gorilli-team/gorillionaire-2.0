@@ -14,7 +14,7 @@ export default function Sidebar({
   const router = useRouter();
 
   const handleGorillionaireClick = () => {
-    router.push("https://gorillionai.re");
+    window.location.reload();
   };
 
   const handlePageChange = (page: string) => {
@@ -102,19 +102,22 @@ export default function Sidebar({
       
       {/* Footer */}
       <div className="border-t border-gray-200 p-4">
-        <div className="space-y-3">
+        {/* Le due icone social in riga */}
+        <div className="flex flex-col space-y-3">
           <a 
             href="https://github.com/gorilli-team/gorillionaire" 
             target="_blank" 
             rel="noopener noreferrer"
             className="flex items-center px-3 py-2 rounded-lg hover:bg-gray-200 text-gray-600"
           >
-          <Image
-            src="/github.svg"
-            alt="Github"
-            width={30}
-            height={30}
-          />
+            <Image
+              src="/github.svg"
+              alt="Github"
+              width={30}
+              height={30}
+              className="mr-4"
+            />
+            <span>GitHub</span>
           </a>
           
           <a 
@@ -123,22 +126,24 @@ export default function Sidebar({
             rel="noopener noreferrer"
             className="flex items-center px-3 py-2 rounded-lg hover:bg-gray-200 text-gray-600"
           >
-          <Image
-            src="/twitter.svg"
-            alt="twitter"
-            width={30}
-            height={30}
-          />
+            <Image
+              src="/twitter.svg"
+              alt="X"
+              width={30}
+              height={30}
+              className="mr-4"
+            />
+            <span>X / Twitter</span>
           </a>
         </div>
         
-        <div className="flex items-center justify-center mt-4 text-xs text-gray-500">
+        <div className="flex items-center pl-3 mt-4 text-xs text-gray-500">
           <span className="mr-2">Powered by</span>
           <Image
             src="/Vector.svg"
             alt="Gorilli"
-            width={60}
-            height={60}
+            width={70}
+            height={70}
           />
         </div>
       </div>
