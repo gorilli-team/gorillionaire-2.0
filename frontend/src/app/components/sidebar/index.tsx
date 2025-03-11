@@ -102,41 +102,43 @@ export default function Sidebar({
       
       {/* Footer */}
       <div className="border-t border-gray-200 p-4">
-        {/* Le due icone social in riga */}
-        <div className="flex flex-col space-y-3">
-          <a 
-            href="https://github.com/gorilli-team/gorillionaire" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="flex items-center px-3 py-2 rounded-lg hover:bg-gray-200 text-gray-600"
-          >
-            <Image
-              src="/github.svg"
-              alt="Github"
-              width={30}
-              height={30}
-              className="mr-4"
-            />
-            <span>GitHub</span>
-          </a>
+        <ul className="space-y-2">
+          <li>
+            <a 
+              href="https://github.com/gorilli-team/gorillionaire" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 flex items-center"
+            >
+              <Image
+                src="/github.svg"
+                alt="Github"
+                width={28}
+                height={28}
+                className="pr-2"
+              />
+              <span>GitHub</span>
+            </a>
+          </li>
           
-          <a 
-            href="https://x.com/gorillionaireAI" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="flex items-center px-3 py-2 rounded-lg hover:bg-gray-200 text-gray-600"
-          >
-            <Image
-              src="/twitter.svg"
-              alt="X"
-              width={30}
-              height={30}
-              className="mr-4"
-            />
-            <span>X / Twitter</span>
-          </a>
-        </div>
-        
+          <li>
+            <a 
+              href="https://x.com/gorillionaireAI" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 flex items-center"
+            >
+              <Image
+                src="/twitter.svg"
+                alt="X"
+                width={28}
+                height={28}
+                className="pr-2"
+              />
+              <span>X / Twitter</span>
+            </a>
+          </li>
+        </ul>
         <div className="flex items-center pl-3 mt-4 text-xs text-gray-500">
           <span className="mr-2">Powered by</span>
           <Image
