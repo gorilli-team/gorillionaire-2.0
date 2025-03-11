@@ -1,6 +1,6 @@
 "use client";
 import { usePrivy } from "@privy-io/react-auth";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -8,23 +8,51 @@ import LeaderboardBadge from "../leaderboard_badge";
 
 export default function Header() {
   const { ready, authenticated, user, login, logout } = usePrivy();
-  // Then in your component:
   const [monPriceFormatted, setMonPriceFormatted] = useState<string>("0.00");
   const [isFlashing, setIsFlashing] = useState(false);
   const [userAddress, setUserAddress] = useState<string | null>(null);
 
+  // WebSocket notification state
+  const wsRef = useRef<WebSocket | null>(null);
+  const [notifications, setNotifications] = useState<any[]>([]);
+
   // Function to show notification
-  const showNotification = () => {
-    toast('🚀 Notification Test!', {
-      position: "bottom-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-      transition: Bounce,
-    });
+  const showCustomNotification = (message: string, title: string = "Notification") => {
+    toast.info(
+      <div>
+        <div className="font-bold">{title}</div>
+        <div>{message}</div>
+      </div>,
+      {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      }
+    );
+  }
+
+  const handleShowAllNotifications = () => {
+    // Show last 3 notifications if there are any
+    if (notifications.length > 0) {
+      notifications.slice(0, 3).forEach((notification, index) => {
+        setTimeout(() => {
+          showCustomNotification(
+            notification.message || JSON.stringify(notification),
+            notification.title || `Notification ${index + 1}`
+          );
+        }, index * 500); // Stagger notifications
+      });
+    } else {
+      toast('No notifications yet', {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+    }
   };
 
   // Handle wallet connection/disconnection and address updates
@@ -56,12 +84,78 @@ export default function Header() {
     trackUser();
   }, [ready, authenticated, user]);
 
+  // WebSocket for notifications
+  useEffect(() => {
+    // Only connect when authenticated and we have an address
+    if (!authenticated || !userAddress) {
+      return;
+    }
+
+    // Close any existing WebSocket connection
+    if (wsRef.current) {
+      wsRef.current.close();
+    }
+
+    const wsUrl = `${process.env.NEXT_PUBLIC_API_URL}/events/notifications`;
+    console.log(`Connecting to WebSocket: ${wsUrl}`);
+    wsRef.current = new WebSocket(wsUrl);
+
+    wsRef.current.onopen = () => {
+      console.log("WebSocket connection established");
+    };
+
+    wsRef.current.onmessage = (event) => {
+      try {
+        const message = JSON.parse(event.data);
+        console.log("WebSocket notification received:", message);
+    
+        // Log the dynamic action (corrected path)
+        if (message.data && message.data.data && message.data.data.action) {
+          console.log("Notification action:", message.data.data.action);  // Log dynamically the action
+        }
+    
+        // Check if it's a notification type
+        if (message.type === "NOTIFICATION") {
+          // Extract relevant data
+          const { action, tokenAmount, tokenPrice, tokenSymbol } = message.data.data || {};
+    
+          // Format the message for notification
+          let notificationMessage = `${action || "Action"} - ${tokenAmount || "N/A"} ${tokenSymbol || ""} @ ${tokenPrice ? `$${tokenPrice.toFixed(2)}` : "N/A"}`;
+    
+          // Add to notifications list
+          setNotifications((prevNotifications) => [message, ...prevNotifications]);
+    
+          // Show toast notification with formatted message
+          showCustomNotification(notificationMessage, "New Notification");
+        }
+      } catch (error) {
+        console.error("Error processing WebSocket message:", error);
+      }
+    };
+    
+
+    wsRef.current.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+
+    wsRef.current.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    return () => {
+      if (wsRef.current) {
+        console.log("Closing WebSocket connection");
+        wsRef.current.close();
+        wsRef.current = null;
+      }
+    };
+  }, [authenticated, userAddress]);
+
   // Handle address changes
   useEffect(() => {
     if (userAddress) {
       console.log("Address updated:", userAddress);
       // You can trigger any address-dependent operations here
-      // For example, fetch user-specific data, balances, etc.
     }
   }, [userAddress]);
 
@@ -119,9 +213,9 @@ export default function Header() {
         <div className="flex items-center justify-end space-x-4 flex-1 my-3 ml-auto">
           {/* Notification Button */}
           <button
-            onClick={showNotification}
-            className="px-2 py-1 text-xs sm:text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
-            aria-label="Show notification"
+            onClick={handleShowAllNotifications}
+            className="px-2 py-1 text-xs sm:text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 relative"
+            aria-label="Show notifications"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
@@ -184,13 +278,13 @@ export default function Header() {
             </div>
           ) : (
             <div>
-              <button
+            <button
                 onClick={login}
                 disabled={!ready}
                 className="px-2 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm font-medium text-white bg-violet-900 rounded-md hover:bg-violet-700 disabled:opacity-50"
-              >
-                Connect Wallet
-              </button>
+            >
+              Connect Wallet
+            </button>
             </div>
           )}
         </div>
