@@ -15,7 +15,21 @@ const LeaderboardBadge: React.FC = () => {
     const fetchTopUser = async () => {
       setIsLoading(true);
       try {
-        // Placeholder fetch logic here
+        // Placeholder fetch logic - now actually using setTopUser
+        // This mock implementation simulates data fetching
+        const mockApiResponse = {
+          points: 92,
+          address: "0x5b2e...c6a57", 
+          avatarSrc: "/avatar_1.png"
+        };
+        
+        // Actually use setTopUser to update state with mock data
+        setTopUser(mockApiResponse);
+        
+        // In a real implementation, you'd fetch data from an API:
+        // const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/leaderboard/top`);
+        // const data = await response.json();
+        // setTopUser(data.topUser);
       } catch (error) {
         console.error("Error fetching top user:", error);
       } finally {

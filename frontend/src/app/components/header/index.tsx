@@ -6,6 +6,21 @@ import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LeaderboardBadge from "../leaderboard_badge";
 
+// Define a proper type for notifications
+interface Notification {
+  type: string;
+  data: {
+    data?: {
+      action?: string;
+      tokenAmount?: number;
+      tokenPrice?: number;
+      tokenSymbol?: string;
+    }
+  };
+  message?: string;
+  title?: string;
+}
+
 export default function Header() {
   const { ready, authenticated, user, login, logout } = usePrivy();
   const [monPriceFormatted, setMonPriceFormatted] = useState<string>("0.00");
@@ -14,7 +29,7 @@ export default function Header() {
 
   // WebSocket notification state
   const wsRef = useRef<WebSocket | null>(null);
-  const [notifications, setNotifications] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   // Function to show notification
   const showCustomNotification = (message: string, title: string = "Notification") => {
@@ -106,7 +121,7 @@ export default function Header() {
 
     wsRef.current.onmessage = (event) => {
       try {
-        const message = JSON.parse(event.data);
+        const message = JSON.parse(event.data) as Notification;
         console.log("WebSocket notification received:", message);
     
         // Check if it's a notification type
@@ -117,8 +132,8 @@ export default function Header() {
           // Choose emoji based on action
           const actionEmoji = action === "buy" ? "💰" : "💸";
     
-          // Format the message for notification
-          let notificationMessage = `${actionEmoji} ${action.toUpperCase()} ${tokenAmount} ${tokenSymbol} @ $${tokenPrice ? tokenPrice.toFixed(2) : "N/A"}`;
+          // Format the message for notification - using const instead of let
+          const notificationMessage = `${actionEmoji} ${action?.toUpperCase()} ${tokenAmount} ${tokenSymbol} @ $${tokenPrice ? tokenPrice.toFixed(2) : "N/A"}`;
     
           // Add to notifications list
           setNotifications((prevNotifications) => [message, ...prevNotifications]);
