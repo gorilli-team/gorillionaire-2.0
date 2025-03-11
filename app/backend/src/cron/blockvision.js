@@ -17,10 +17,11 @@ const tokenContractAddresses = [
 ];
 
 // Function to fetch token holders
-async function fetchTokenHolders(contractAddress) {
+async function fetchTokenHolders(contractAddress, tokenName) {
   try {
     const holders = await blockvision.retrieveTokenHolders({
       contractAddress,
+      tokenName,
       pageIndex: "1",
       pageSize: "20",
     });
@@ -33,14 +34,13 @@ async function fetchTokenHolders(contractAddress) {
 
 // Initialize the cron job
 function initTokenHoldersCron() {
-  // Run every 1 minutes
-  cron.schedule("*/1 * * * *", async () => {
+  // Run every hour at minute 0
+  return cron.schedule("0 * * * *", async () => {
     try {
       console.log("Fetching token holders...");
-      tokenContractAddresses.forEach(async (token) => {
-        console.log(token);
-        await fetchTokenHolders(token.contractAddress);
-      });
+      for (const token of tokenContractAddresses) {
+        await fetchTokenHolders(token.contractAddress, token.tokenName);
+      }
       console.log("Successfully fetched token holders");
     } catch (error) {
       console.error("Failed to fetch token holders:", error);

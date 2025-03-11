@@ -1,4 +1,5 @@
 const axios = require("axios");
+const TokenHolders = require("../models/TokenHolders");
 
 // Configuration
 const baseURL =
@@ -8,6 +9,7 @@ const apiKey = process.env.BLOCKVISION_API_KEY;
 // Function to retrieve token holders
 const retrieveTokenHolders = async ({
   contractAddress,
+  tokenName,
   pageIndex = "1",
   pageSize = "20",
 }) => {
@@ -24,7 +26,24 @@ const retrieveTokenHolders = async ({
       },
     });
 
-    console.log(JSON.stringify(response.data));
+    console.log("tokenName", tokenName);
+
+    // Update existing record or create new one if it doesn't exist
+    const updatedTokenHolders = await TokenHolders.findOneAndUpdate(
+      { tokenAddress: contractAddress },
+      {
+        tokenName: tokenName,
+        total: response.data.result.total,
+        holders: response.data.result.data,
+      },
+      { new: true, upsert: true }
+    );
+
+    if (updatedTokenHolders) {
+      console.log("Token holders updated successfully");
+    } else {
+      console.log("Token holders created successfully");
+    }
 
     return response.data;
   } catch (error) {
