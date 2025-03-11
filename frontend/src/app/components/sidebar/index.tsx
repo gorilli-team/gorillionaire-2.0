@@ -1,5 +1,4 @@
 import React from "react";
-// import { useAccount } from "wagmi";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
@@ -12,7 +11,6 @@ export default function Sidebar({
   selectedPage,
   setSelectedPage,
 }: SidebarProps) {
-  // const { address } = useAccount();
   const router = useRouter();
 
   const handleGorillionaireClick = () => {
@@ -25,7 +23,7 @@ export default function Sidebar({
   };
 
   return (
-    <aside className="w-64 text-gray-800 flex flex-col bg-white h-full min-h-screen border-r border-gray-200">
+    <aside className="w-64 text-gray-800 flex flex-col bg-white h-screen sticky top-0 border-r border-gray-200 overflow-hidden">
       <div
         className="h-16 text-xl font-bold flex items-center ps-6 lg:ps-6 cursor-pointer"
         onClick={handleGorillionaireClick}
@@ -38,7 +36,7 @@ export default function Sidebar({
           className="rounded-full ml-[40px] lg:ml-0" // Added 40px margin left only on mobile
         />
       </div>
-      <nav className="flex-1 p-4">
+      <nav className="flex-1 p-4 overflow-hidden">
         <ul className="space-y-2">
           <li>
             <button
@@ -101,6 +99,49 @@ export default function Sidebar({
           </>
         </ul>
       </nav>
+      
+      {/* Footer */}
+      <div className="border-t border-gray-200 p-4">
+        <div className="space-y-3">
+          <a 
+            href="https://github.com/gorilli-team/gorillionaire" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center px-3 py-2 rounded-lg hover:bg-gray-200 text-gray-600"
+          >
+          <Image
+            src="/github.svg"
+            alt="Github"
+            width={30}
+            height={30}
+          />
+          </a>
+          
+          <a 
+            href="https://x.com/gorillionaireAI" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center px-3 py-2 rounded-lg hover:bg-gray-200 text-gray-600"
+          >
+          <Image
+            src="/twitter.svg"
+            alt="twitter"
+            width={30}
+            height={30}
+          />
+          </a>
+        </div>
+        
+        <div className="flex items-center justify-center mt-4 text-xs text-gray-500">
+          <span className="mr-2">Powered by</span>
+          <Image
+            src="/Vector.svg"
+            alt="Gorilli"
+            width={60}
+            height={60}
+          />
+        </div>
+      </div>
     </aside>
   );
 }
