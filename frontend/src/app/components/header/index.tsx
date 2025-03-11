@@ -18,7 +18,7 @@ export default function Header() {
 
   // Function to show notification
   const showCustomNotification = (message: string, title: string = "Notification") => {
-    toast.info(
+    toast(
       <div>
         <div className="font-bold">{title}</div>
         <div>{message}</div>
@@ -109,24 +109,22 @@ export default function Header() {
         const message = JSON.parse(event.data);
         console.log("WebSocket notification received:", message);
     
-        // Log the dynamic action (corrected path)
-        if (message.data && message.data.data && message.data.data.action) {
-          console.log("Notification action:", message.data.data.action);  // Log dynamically the action
-        }
-    
         // Check if it's a notification type
         if (message.type === "NOTIFICATION") {
           // Extract relevant data
           const { action, tokenAmount, tokenPrice, tokenSymbol } = message.data.data || {};
     
+          // Choose emoji based on action
+          const actionEmoji = action === "buy" ? "💰" : "💸";
+    
           // Format the message for notification
-          let notificationMessage = `${action || "Action"} - ${tokenAmount || "N/A"} ${tokenSymbol || ""} @ ${tokenPrice ? `$${tokenPrice.toFixed(2)}` : "N/A"}`;
+          let notificationMessage = `${actionEmoji} ${action.toUpperCase()} ${tokenAmount} ${tokenSymbol} @ $${tokenPrice ? tokenPrice.toFixed(2) : "N/A"}`;
     
           // Add to notifications list
           setNotifications((prevNotifications) => [message, ...prevNotifications]);
     
           // Show toast notification with formatted message
-          showCustomNotification(notificationMessage, "New Notification");
+          showCustomNotification(notificationMessage, "Trade Signal");
         }
       } catch (error) {
         console.error("Error processing WebSocket message:", error);
