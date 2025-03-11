@@ -72,18 +72,6 @@ export default function Sidebar({
             </button>
           </li>
 
-          <li>
-            <button
-              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
-                selectedPage === "Trades" ? "bg-gray-200" : ""
-              }`}
-              onClick={() => handlePageChange("Trades")}
-            >
-              <i className="fa-solid fa-money-bill-transfer pr-2"></i>
-              <span>Trades</span>
-            </button>
-          </li>
-
           <>
             <li>
               <button

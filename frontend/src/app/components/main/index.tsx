@@ -6,7 +6,6 @@ import { useAccount } from "wagmi";
 import Tokens from "../tokens";
 import Signals from "../signals";
 import Agents from "../agents";
-import Trades from "../trades";
 import Leaderboard from "../leaderboard";
 
 interface MainProps {
@@ -35,13 +34,6 @@ export default function Main({ selectedPage, setSelectedPage }: MainProps) {
             <Signals />
           </div>
         );
-      case "Trades":
-        return (
-          <div className="w-full flex flex-col justify-center items-center text-gray-800">
-            <Trades />
-          </div>
-        );
-
       case "Agents":
         return (
           <div className="w-full flex flex-col justify-center items-center text-gray-800">
