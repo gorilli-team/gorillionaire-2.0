@@ -2,7 +2,7 @@
 
 import React, { useLayoutEffect, useRef, useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { IChartApi, createChart, ColorType, LineSeries, AreaSeries, Time } from 'lightweight-charts';
+import { IChartApi, createChart, ColorType, LineSeries, AreaSeries, Time, SeriesMarker, PriceLineOptions } from 'lightweight-charts';
 
 interface PriceData {
   time: Time;
@@ -27,6 +27,7 @@ const PriceChart: React.FC<PriceChartProps> = ({ data, tokenSymbol }) => {
   const [isClient, setIsClient] = useState(false);
   const [timeRange, setTimeRange] = useState<'1d' | '7d' | '30d' | 'all'>('all');
   const [priceStats, setPriceStats] = useState<PriceStats | null>(null);
+  const [allTimeHighLow, setAllTimeHighLow] = useState<{high: {value: number, time: Time}, low: {value: number, time: Time}} | null>(null);
 
   useLayoutEffect(() => {
     setIsClient(true);
@@ -91,6 +92,25 @@ const PriceChart: React.FC<PriceChartProps> = ({ data, tokenSymbol }) => {
     });
   }, [data]);
 
+  // Find all-time high and low
+  useEffect(() => {
+    if (!data || data.length === 0) return;
+    
+    let high = { value: Number.MIN_SAFE_INTEGER, time: data[0].time };
+    let low = { value: Number.MAX_SAFE_INTEGER, time: data[0].time };
+    
+    data.forEach(item => {
+      if (item.value > high.value) {
+        high = { value: item.value, time: item.time };
+      }
+      if (item.value < low.value) {
+        low = { value: item.value, time: item.time };
+      }
+    });
+    
+    setAllTimeHighLow({ high, low });
+  }, [data]);
+
   useLayoutEffect(() => {
     if (!isClient || !chartContainerRef.current || !data || data.length === 0) return;
 
@@ -126,6 +146,9 @@ const PriceChart: React.FC<PriceChartProps> = ({ data, tokenSymbol }) => {
           precision: 6,
           minMove: 0.000001,
         },
+        // Enable markers for this series
+        lastValueVisible: true,
+        crosshairMarkerVisible: true,
       });
 
       // Transform data to ensure proper time format and unique ascending timestamps
@@ -183,8 +206,41 @@ const PriceChart: React.FC<PriceChartProps> = ({ data, tokenSymbol }) => {
       // Set the data
       lineSeries.setData(uniqueSortedData);
       
-      // Fit all data points into the visible area
-      chart.timeScale().fitContent();
+      // Add markers for all-time high and low if they're within the current time range
+      if (allTimeHighLow) {
+        try {
+          // Create colored price lines for ATH and ATL instead of markers
+          const high = allTimeHighLow.high.value;
+          const low = allTimeHighLow.low.value;
+          
+          // Add ATH price line
+          lineSeries.createPriceLine({
+            price: high,
+            color: '#22c55e',
+            lineWidth: 1,
+            lineStyle: 1, // Dotted
+            axisLabelVisible: true,
+            title: `ATH: $${high.toFixed(6)}`,
+          });
+          
+          // Add ATL price line
+          lineSeries.createPriceLine({
+            price: low,
+            color: '#ef4444',
+            lineWidth: 1,
+            lineStyle: 1, // Dotted
+            axisLabelVisible: true,
+            title: `ATL: $${low.toFixed(6)}`,
+          });
+        } catch (e) {
+          console.error('Error adding price lines:', e);
+        }
+      }
+      
+      // Fit all data points into the visible area - apply after a short delay to ensure it works
+      setTimeout(() => {
+        chart.timeScale().fitContent();
+      }, 50);
 
       // Add custom tooltip
       if (chartContainerRef.current) {
@@ -287,7 +343,40 @@ const PriceChart: React.FC<PriceChartProps> = ({ data, tokenSymbol }) => {
     } catch (error) {
       console.error('Error initializing chart:', error);
     }
-  }, [data, isClient, timeRange]);
+  }, [data, isClient, timeRange, allTimeHighLow]);
+
+  // Function to export data as CSV
+  const exportDataAsCSV = () => {
+    if (!data || data.length === 0) return;
+    
+    // Create CSV content
+    let csvContent = 'data:text/csv;charset=utf-8,';
+    csvContent += 'Date,Price\n';
+    
+    // Sort data by time
+    const sortedData = [...data].sort((a, b) => {
+      const timeA = typeof a.time === 'number' ? a.time : new Date(a.time.toString()).getTime();
+      const timeB = typeof b.time === 'number' ? b.time : new Date(b.time.toString()).getTime();
+      return timeA - timeB;
+    });
+    
+    // Add each data point to CSV
+    sortedData.forEach(item => {
+      const date = typeof item.time === 'number'
+        ? new Date(item.time * 1000).toISOString()
+        : new Date(item.time.toString()).toISOString();
+      csvContent += `${date},${item.value}\n`;
+    });
+    
+    // Create download link
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `${tokenSymbol}_price_data.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   // Server-side and initial client render
   if (!isClient || !data || data.length === 0) {
@@ -334,7 +423,20 @@ const PriceChart: React.FC<PriceChartProps> = ({ data, tokenSymbol }) => {
         )}
       </div>
       
-      <div className="flex justify-end mb-4">
+      <div className="flex justify-between mb-4">
+        <div className="flex space-x-2">
+          <button
+            onClick={exportDataAsCSV}
+            className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md flex items-center"
+            title="Download data as CSV"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            CSV
+          </button>
+        </div>
+        
         <div className="flex bg-gray-100 rounded-lg p-1">
           <button
             className={`px-3 py-1 text-sm rounded-md ${timeRange === '1d' ? 'bg-white shadow-sm' : 'text-gray-600 hover:bg-gray-200'}`}
