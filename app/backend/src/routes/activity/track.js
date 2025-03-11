@@ -226,11 +226,13 @@ router.get("/me", async (req, res) => {
         return new Date(b.date) - new Date(a.date);
       });
     }
-    //get my rank
-    const rank = await UserActivity.find()
-      .sort({ points: -1 })
-      .skip(skip)
-      .limit(limit);
+    //count the number of users with more points than the user
+    const count = await UserActivity.countDocuments({
+      points: { $gt: userActivity.points },
+    });
+    //rank is the number of users with more points than the user + 1
+    const rank = count + 1;
+
     res.json({
       userActivity,
       rank,
