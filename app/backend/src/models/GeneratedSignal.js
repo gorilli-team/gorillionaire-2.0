@@ -1,9 +1,6 @@
 const mongoose = require("mongoose");
 
 const GeneratedSignalSchema = new mongoose.Schema({
-  _id: {
-    type: String,
-  },
   type: {
     type: String,
   },

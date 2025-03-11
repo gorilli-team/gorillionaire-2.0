@@ -10,11 +10,12 @@ const TokensPage = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-gray-100 text-gray-800">
+    <div className="flex bg-gray-100 text-gray-800">
       {/* Mobile menu button */}
       <button
-        className="lg:hidden fixed top-4 left-4 z-20 p-2 rounded-md bg-gray-200"
+        className="lg:hidden fixed top-4 left-4 z-40 p-2 rounded-full bg-gray-200"
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        aria-label="Toggle menu"
       >
         <svg
           className="w-6 h-6"
@@ -35,18 +36,16 @@ const TokensPage = () => {
         </svg>
       </button>
 
-      {/* Sidebar with mobile responsiveness */}
+      {/* Sidebar */}
       <div
         className={`
-        fixed lg:relative
-        ${
-          isMobileMenuOpen
-            ? "translate-x-0"
-            : "-translate-x-full lg:translate-x-0"
-        }
-        transition-transform duration-300 ease-in-out
-        z-10 lg:z-0
-      `}
+          fixed lg:relative
+          ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+          transition-transform duration-300 ease-in-out
+          z-30 lg:z-0
+          bg-white
+          shadow-xl lg:shadow-none
+        `}
       >
         <Sidebar
           selectedPage={selectedPage}
@@ -57,11 +56,12 @@ const TokensPage = () => {
       {/* Overlay for mobile */}
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-0 lg:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
 
+      {/* Main content */}
       <div className="flex-1 flex flex-col">
         <Header />
         <TokensComponent />

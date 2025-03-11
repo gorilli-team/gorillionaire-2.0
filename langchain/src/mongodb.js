@@ -29,13 +29,16 @@ export async function fetchData() {
     const db = await connectDB();
     const spikes = db.collection("spikes");
     const transfers = db.collection("transfers");
+    const pricedatas = db.collection("pricedatas");
 
-    const oneHourAgo = Math.floor(Date.now() / 1000) - 60 * 60;
+    const oneDayAgoUNIX = Math.floor(Date.now() / 1000) - 24 * 60 * 60;
+    const oneDayAgoISO = new Date();
+    oneDayAgoISO.setUTCDate(oneDayAgoISO.getUTCDate() - 1);
 
     const spikesDocuments = await spikes
       .find({
         blockTimestamp: {
-          $gte: oneHourAgo,
+          $gte: oneDayAgoUNIX,
         },
       })
       .sort({ blockTimestamp: -1 })
@@ -44,13 +47,26 @@ export async function fetchData() {
     const transfersDocuments = await transfers
       .find({
         blockTimestamp: {
-          $gte: oneHourAgo,
+          $gte: oneDayAgoUNIX,
         },
       })
       .sort({ blockTimestamp: -1 })
       .toArray();
 
-    if (spikesDocuments.length === 0 && transfersDocuments.length === 0) {
+    const pricedatasDocuments = await pricedatas
+      .find({
+        timestamp: {
+          $gte: oneDayAgoISO,
+        },
+      })
+      .sort({ blockTimestamp: -1 })
+      .toArray();
+
+    if (
+      spikesDocuments.length === 0 &&
+      transfersDocuments.length === 0 &&
+      pricedatasDocuments.length === 0
+    ) {
       return "";
     }
 
@@ -58,6 +74,7 @@ export async function fetchData() {
     const mergedDocuments = [
       ...spikesDocuments.map((doc) => ({ ...doc, type: "spike" })),
       ...transfersDocuments.map((doc) => ({ ...doc, type: "transfer" })),
+      ...pricedatasDocuments.map((doc) => ({ ...doc, type: "pricedatas" })),
     ].sort((a, b) => a.blockTimestamp - b.blockTimestamp);
 
     const formattedData = mergedDocuments
@@ -86,6 +103,19 @@ export async function fetchData() {
             formattedAmount = amount.toFixed(2);
           }
           return `💸 ${formattedAmount} ${doc.tokenSymbol} transfer`;
+        } else if (doc.type === "pricedatas") {
+          const date = new Date(doc.timestamp);
+          const formattedDate = `${date.getUTCFullYear()}-${String(
+            date.getUTCMonth() + 1
+          ).padStart(2, "0")}-${String(date.getUTCDate()).padStart(2, "0")}`;
+          const formattedTime = `${String(date.getUTCHours()).padStart(
+            2,
+            "0"
+          )}:${String(date.getUTCMinutes()).padStart(2, "0")}`;
+          const rawPricedata = doc.price;
+          let formattedPricedata;
+          formattedPricedata = rawPricedata.toFixed(4);
+          return `💰 ${doc.tokenSymbol} was worth ${formattedPricedata}$ on ${formattedDate} at ${formattedTime}`;
         }
         return ""; // Handle any other types
       })

@@ -1,15 +1,16 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { Pagination } from "flowbite-react";
+import { useAccount } from "wagmi";
+import Image from "next/image";
+import { getTimeAgo } from "@/app/utils/time";
 
 interface Investor {
   rank: number;
-  username: string;
-  avatar: string;
-  signals: number;
-  value: number;
-  performance: number;
+  address: string;
+  points: number;
+  activitiesList: Activity[];
 }
 
 interface Activity {
@@ -19,235 +20,75 @@ interface Activity {
   date: string;
 }
 
-const Leaderboard = () => {
+const LeaderboardComponent = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [activitiesPage, setActivitiesPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredInvestors, setFilteredInvestors] = useState<Investor[]>([]);
+  const [investors, setInvestors] = useState<Investor[]>([]);
+  const [activities, setActivities] = useState<Activity[]>([]);
+
+  const { address } = useAccount();
 
   const onPageChange = (page: number) => setCurrentPage(page);
   const onActivitiesPageChange = (page: number) => setActivitiesPage(page);
 
-  const investors = useMemo<Investor[]>(
-    () => [
-      {
-        rank: 1,
-        username: "unitswamp90.nad",
-        avatar: "👤",
-        signals: 85,
-        value: 7532.78,
-        performance: 11,
-      },
-      {
-        rank: 2,
-        username: "stephen.xp.nad",
-        avatar: "👤",
-        signals: 85,
-        value: 4319.31,
-        performance: 9,
-      },
-      {
-        rank: 3,
-        username: "0+3a5b...651e",
-        avatar: "👤",
-        signals: 82,
-        value: 3392.18,
-        performance: 8,
-      },
-      {
-        rank: 4,
-        username: "arthur457.nad",
-        avatar: "👤",
-        signals: 84,
-        value: 3873.19,
-        performance: 7,
-      },
-      {
-        rank: 5,
-        username: "rfthomas.nad",
-        avatar: "👤",
-        signals: 75,
-        value: 3752.73,
-        performance: 7,
-      },
-      {
-        rank: 6,
-        username: "imfrancis.nad",
-        avatar: "👤",
-        signals: 79,
-        value: 3300.45,
-        performance: 7,
-      },
-      {
-        rank: 7,
-        username: "0+1d3c...158a",
-        avatar: "👤",
-        signals: 69,
-        value: 3291.78,
-        performance: 7,
-      },
-      {
-        rank: 8,
-        username: "0+4b6c...862f",
-        avatar: "👤",
-        signals: 67,
-        value: 2900.38,
-        performance: 6,
-      },
-      {
-        rank: 9,
-        username: "fester76.nad",
-        avatar: "👤",
-        signals: 59,
-        value: 2401.1,
-        performance: 3,
-      },
-      {
-        rank: 10,
-        username: "karen93.nad",
-        avatar: "👤",
-        signals: 60,
-        value: 2263.91,
-        performance: 3,
-      },
-      {
-        rank: 11,
-        username: "karen93.nad",
-        avatar: "👤",
-        signals: 60,
-        value: 2263.91,
-        performance: 3,
-      },
-      {
-        rank: 12,
-        username: "unitswamp90.nad",
-        avatar: "👤",
-        signals: 85,
-        value: 7532.78,
-        performance: 11,
-      },
-      {
-        rank: 13,
-        username: "stephen.xp.nad",
-        avatar: "👤",
-        signals: 85,
-        value: 4319.31,
-        performance: 9,
-      },
-      {
-        rank: 14,
-        username: "0+3a5b...651e",
-        avatar: "👤",
-        signals: 82,
-        value: 3392.18,
-        performance: 8,
-      },
-      {
-        rank: 15,
-        username: "arthur457.nad",
-        avatar: "👤",
-        signals: 84,
-        value: 3873.19,
-        performance: 7,
-      },
-      {
-        rank: 16,
-        username: "rfthomas.nad",
-        avatar: "👤",
-        signals: 75,
-        value: 3752.73,
-        performance: 7,
-      },
-      {
-        rank: 17,
-        username: "imfrancis.nad",
-        avatar: "👤",
-        signals: 79,
-        value: 3300.45,
-        performance: 7,
-      },
-      {
-        rank: 18,
-        username: "0+1d3c...158a",
-        avatar: "👤",
-        signals: 69,
-        value: 3291.78,
-        performance: 7,
-      },
-      {
-        rank: 19,
-        username: "0+4b6c...862f",
-        avatar: "👤",
-        signals: 67,
-        value: 2900.38,
-        performance: 6,
-      },
-      {
-        rank: 20,
-        username: "fester76.nad",
-        avatar: "👤",
-        signals: 59,
-        value: 2401.1,
-        performance: 3,
-      },
-      {
-        rank: 21,
-        username: "karen93.nad",
-        avatar: "👤",
-        signals: 60,
-        value: 2263.91,
-        performance: 3,
-      },
-      {
-        rank: 22,
-        username: "karen93.nad",
-        avatar: "👤",
-        signals: 60,
-        value: 2263.91,
-        performance: 3,
-      },
-    ],
-    []
-  );
+  const fetchLeaderboard = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/activity/track/leaderboard`
+      );
+      const data = await response.json();
+      console.log("leaderboard", data);
+      setInvestors(data.users || []);
+    } catch (error) {
+      console.error("Error fetching leaderboard:", error);
+      setInvestors([]);
+    }
+  };
 
+  const fetchMe = async () => {
+    try {
+      if (!address) return;
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/activity/track/me?address=${address}`
+      );
+      const data = await response.json();
+      console.log("me", data);
+      setActivities(data?.activitiesList || []);
+    } catch (error) {
+      console.error("Error fetching user activity:", error);
+      setActivities([]);
+    }
+  };
+
+  // Fetch data when component mounts and when address changes
   useEffect(() => {
-    setFilteredInvestors(investors);
-  }, [investors]);
+    fetchLeaderboard();
+    fetchMe();
 
-  // Filter investors based on search term
+    // Set up an interval to refresh data every 30 seconds
+    const interval = setInterval(() => {
+      fetchLeaderboard();
+      fetchMe();
+    }, 30000);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval);
+  }, [address]); //eslint-disable-line
+
+  // Update filtered investors when investors or search term changes
   useEffect(() => {
     if (searchTerm.trim() === "") {
       setFilteredInvestors(investors);
     } else {
       const filtered = investors.filter((investor) =>
-        investor.username.toLowerCase().includes(searchTerm.toLowerCase())
+        investor.address.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setFilteredInvestors(filtered);
     }
     setCurrentPage(1); // Reset to first page when search changes
   }, [searchTerm, investors]);
-
-  const activities = useMemo<Activity[]>(
-    () => [
-      { action: "Bought", amount: "20k", token: "DAK", date: "13/04/2024" },
-      { action: "Bought", amount: "7k", token: "CHOG", date: "11/04/2024" },
-      { action: "Sold", amount: "10k", token: "YAKI", date: "10/04/2024" },
-      { action: "Sold", amount: "2k", token: "DAK", date: "09/04/2024" },
-      { action: "Bought", amount: "12k", token: "YAKI", date: "01/04/2024" },
-      { action: "Sold", amount: "5k", token: "DAK", date: "22/03/2024" },
-      { action: "Bought", amount: "20k", token: "CHOG", date: "21/03/2024" },
-      { action: "Bought", amount: "9k", token: "YAKI", date: "21/03/2024" },
-      { action: "Sold", amount: "5k", token: "DAK", date: "17/03/2024" },
-      { action: "Bought", amount: "20k", token: "DAK", date: "13/03/2024" },
-      { action: "Sold", amount: "15k", token: "YAKI", date: "10/03/2024" },
-      { action: "Bought", amount: "20k", token: "CHOG", date: "21/03/2024" },
-      { action: "Bought", amount: "9k", token: "YAKI", date: "21/03/2024" },
-      { action: "Sold", amount: "5k", token: "DAK", date: "17/03/2024" },
-      { action: "Bought", amount: "20k", token: "DAK", date: "13/03/2024" },
-      { action: "Sold", amount: "15k", token: "YAKI", date: "10/03/2024" },
-    ],
-    []
-  );
 
   // Pagination logic for investors
   const itemsPerPage = 10;
@@ -286,11 +127,11 @@ const Leaderboard = () => {
   const emptyActivityRows = getEmptyRows(currentActivities, itemsPerPage);
 
   return (
-    <div className="bg-gray-100">
-      <div className="max-w-8xl mx-auto p-8 pt-4">
-        <div className="bg-white rounded-lg shadow-sm p-6 mt-4">
+    <div className="w-full bg-gray-100 px-2">
+      <div className="w-full mx-auto px-1 sm:px-4 md:px-6 pt-4">
+        <div className="bg-white rounded-lg shadow-sm p-1 sm:p-3 md:p-6 mt-4">
           {/* Search */}
-          <div className="mb-6">
+          <div className="mb-3 sm:mb-6 px-1 sm:px-0">
             <div className="relative">
               <input
                 type="text"
@@ -318,81 +159,72 @@ const Leaderboard = () => {
             </div>
           </div>
 
-          {/* Table with fixed height container */}
-          <div className="overflow-x-auto">
-            <div className="h-[680px] overflow-hidden">
-              <table className="w-full border-collapse">
-                <thead className="sticky top-0 bg-white z-10">
-                  <tr className="text-left text-sm text-gray-500 border-b">
-                    <th className="pb-2 font-medium">RANK</th>
-                    <th className="pb-2 font-medium">INVESTOR</th>
-                    <th className="pb-2 font-medium text-center">
-                      ACCEPTED SIGNALS
-                    </th>
-                    <th className="pb-2 font-medium">TOTAL VALUE</th>
-                    <th className="pb-2 font-medium">OVERALL PERFORMANCE</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentInvestors.map((investor) => (
-                    <tr
-                      key={investor.rank}
-                      className="border-b border-gray-100"
-                    >
-                      <td className="py-4 h-16 text-gray-700">
-                        {investor.rank}
-                      </td>
-                      <td className="py-4 h-16">
-                        <div className="flex items-center">
-                          <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mr-2">
-                            {investor.avatar}
+          {/* Table with reduced padding on mobile */}
+          <div className="overflow-x-auto -mx-1 sm:-mx-3 md:-mx-6">
+            <div className="px-1 sm:px-3 md:px-6">
+              <div className="h-[400px] sm:h-[500px] md:h-[600px] lg:h-[680px] overflow-auto">
+                <table className="w-full border-collapse">
+                  <thead className="sticky top-0 bg-white z-10">
+                    <tr className="text-left text-sm text-gray-500 border-b">
+                      <th className="pb-2 pr-1 sm:pr-2 font-medium">RANK</th>
+                      <th className="pb-2 pr-1 sm:pr-2 font-medium">INVESTOR</th>
+                      <th className="pb-2 pr-1 sm:pr-2 font-medium text-center">ACTIVITIES</th>
+                      <th className="pb-2 font-medium">POINTS</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentInvestors.map((investor) => (
+                      <tr
+                        key={investor.address}
+                        className="border-b border-gray-100"
+                      >
+                        <td className="py-3 sm:py-4 h-14 sm:h-16 text-gray-700 pr-1 sm:pr-2">
+                          {investor.rank}
+                        </td>
+                        <td className="py-3 sm:py-4 h-14 sm:h-16 pr-1 sm:pr-2">
+                          <div className="flex items-center">
+                            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center mr-2 overflow-hidden">
+                              <Image
+                                src={`/avatar_${investor.rank % 6}.png`}
+                                alt="User Avatar"
+                                width={32}
+                                height={32}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <span className="text-gray-700 font-bold truncate max-w-[100px] sm:max-w-[200px] md:max-w-full">
+                              {investor.address}
+                            </span>
                           </div>
-                          <span className="text-gray-700 font-bold">
-                            {investor.username}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="py-4 h-16 text-center text-gray-700">
-                        {investor.signals}
-                      </td>
-                      <td className="py-4 h-16 text-gray-700">
-                        ${" "}
-                        {investor.value.toLocaleString("en-US", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}
-                      </td>
-                      <td className="py-4 h-16">
-                        <span
-                          className={`text-green-${
-                            investor.performance >= 10 ? "500" : "400"
-                          }`}
-                        >
-                          + {investor.performance}%
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                  {/* Empty rows to maintain fixed height when fewer items */}
-                  {emptyInvestorRows.map((_, index) => (
-                    <tr
-                      key={`empty-${index}`}
-                      className="border-b border-gray-100"
-                    >
-                      <td className="h-16"></td>
-                      <td className="h-16"></td>
-                      <td className="h-16"></td>
-                      <td className="h-16"></td>
-                      <td className="h-16"></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                        </td>
+                        <td className="py-3 sm:py-4 h-14 sm:h-16 text-center text-gray-700 pr-1 sm:pr-2">
+                          {investor.activitiesList.length}
+                        </td>
+                        <td className="py-3 sm:py-4 h-14 sm:h-16 text-gray-700">
+                          {investor.points}
+                        </td>
+                      </tr>
+                    ))}
+                    {/* Empty rows to maintain fixed height when fewer items */}
+                    {emptyInvestorRows.map((_, index) => (
+                      <tr
+                        key={`empty-${index}`}
+                        className="border-b border-gray-100"
+                      >
+                        <td className="h-14 sm:h-16"></td>
+                        <td className="h-14 sm:h-16"></td>
+                        <td className="h-14 sm:h-16"></td>
+                        <td className="h-14 sm:h-16"></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
 
-          <div className="mt-4 flex flex-col sm:flex-row items-center justify-between">
-            <span className="text-sm text-gray-500 mb-4 sm:mb-0 font-bold">
+          <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row items-center justify-between px-1 sm:px-0">
+            <span className="text-sm text-gray-500 mb-3 sm:mb-0 font-bold">
               <span className="font-normal">Showing</span>{" "}
               {filteredInvestors.length > 0 ? indexOfFirstInvestor + 1 : 0}-
               {Math.min(indexOfLastInvestor, filteredInvestors.length)}{" "}
@@ -411,64 +243,74 @@ const Leaderboard = () => {
         </div>
 
         {/* Activity Section */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mt-6">
-          <h2 className="text-xl font-medium mb-4">My activities</h2>
+        <div className="bg-white rounded-lg shadow-sm p-1 sm:p-3 md:p-6 mt-4 sm:mt-6 mb-6">
+          <h2 className="text-lg sm:text-xl font-medium mb-3 sm:mb-4 ml-1 sm:ml-0">My activities</h2>
 
-          {/* Activities table with fixed height */}
-          <div className="overflow-x-auto">
-            <div className="h-[680px] overflow-hidden">
-              <table className="w-full border-collapse">
-                <thead className="sticky top-0 bg-white z-10">
-                  <tr className="text-left text-sm text-gray-500 border-b">
-                    <th className="pb-2 font-medium">ACTIVITY</th>
-                    <th className="pb-2 font-medium text-right">DATE</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentActivities.map((activity, index) => (
-                    <tr key={index} className="border-b border-gray-100">
-                      <td className="py-4 h-16">
-                        <div className="flex items-center">
-                          <span className="text-yellow-500 mr-2">
-                            {activity.action === "Bought" ? "💰" : "💸"}
-                          </span>
-                          <span>
-                            {activity.action} {activity.amount} {activity.token}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="py-4 h-16 text-right text-gray-500">
-                        {activity.date}
-                      </td>
+          {/* Activities table with reduced padding on mobile */}
+          <div className="overflow-x-auto -mx-1 sm:-mx-3 md:-mx-6">
+            <div className="px-1 sm:px-3 md:px-6">
+              <div className="h-[300px] sm:h-[400px] md:h-[500px] lg:h-[680px] overflow-auto">
+                <table className="w-full border-collapse">
+                  <thead className="sticky top-0 bg-white z-10">
+                    <tr className="text-left text-sm text-gray-500 border-b">
+                      <th className="pb-2 font-medium">ACTIVITY</th>
+                      <th className="pb-2 font-medium text-right">DATE</th>
                     </tr>
-                  ))}
-                  {/* Empty rows to maintain fixed height when fewer items */}
-                  {emptyActivityRows.map((_, index) => (
-                    <tr
-                      key={`empty-activity-${index}`}
-                      className="border-b border-gray-100"
-                    >
-                      <td className="h-16"></td>
-                      <td className="h-16"></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {currentActivities.length > 0 ? (
+                      currentActivities.map((activity, index) => (
+                        <tr key={index} className="border-b border-gray-100">
+                          <td className="py-3 sm:py-4 h-14 sm:h-16">
+                            <div className="flex items-center">
+                              <span className="text-yellow-500 mr-2">
+                                {activity.action === "Bought" ? "💰" : "💸"}
+                              </span>
+                              <span className="truncate max-w-[120px] sm:max-w-[250px] md:max-w-full">
+                                {activity.action} {activity.amount} {activity.token}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="py-3 sm:py-4 h-14 sm:h-16 text-right text-gray-500">
+                            {getTimeAgo(activity.date)}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr className="border-b border-gray-100">
+                        <td colSpan={2} className="py-6 sm:py-8 text-center text-gray-500">
+                          No activities yet
+                        </td>
+                      </tr>
+                    )}
+                    {/* Empty rows to maintain fixed height when fewer items */}
+                    {emptyActivityRows.map((_, index) => (
+                      <tr
+                        key={`empty-activity-${index}`}
+                        className="border-b border-gray-100"
+                      >
+                        <td className="h-14 sm:h-16"></td>
+                        <td className="h-14 sm:h-16"></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
 
           {/* Activities Pagination centered */}
-          <div className="mt-2 flex flex-col sm:flex-row items-center justify-between">
-            <span className="text-sm text-gray-500 mb-4 sm:mb-0 font-bold">
+          <div className="mt-2 flex flex-col sm:flex-row items-center justify-between px-1 sm:px-0">
+            <span className="text-sm text-gray-500 mb-3 sm:mb-0 font-bold">
               <span className="font-normal">Showing</span>{" "}
-              {indexOfFirstActivity + 1}-
+              {activities.length > 0 ? indexOfFirstActivity + 1 : 0}-
               {Math.min(indexOfLastActivity, activities.length)}{" "}
               <span className="font-normal">of</span> {activities.length}
             </span>
             <div className="flex-grow flex justify-center">
               <Pagination
                 currentPage={activitiesPage}
-                totalPages={totalActivityPages}
+                totalPages={totalActivityPages > 0 ? totalActivityPages : 1}
                 onPageChange={onActivitiesPageChange}
                 showIcons={true}
               />
@@ -481,4 +323,4 @@ const Leaderboard = () => {
   );
 };
 
-export default Leaderboard;
+export default LeaderboardComponent;
