@@ -255,6 +255,24 @@ const Signals = () => {
   const [tradeSignals, setTradeSignals] = useState<TradeSignal[]>([]);
   const [pastSignals, setPastSignals] = useState<TradeSignal[]>([]);
 
+  useEffect(() => {
+    setPastSignals((sig) =>
+      sig.toSorted(
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      )
+    );
+  }, [pastSignals]);
+
+  useEffect(() => {
+    setTradeSignals((sig) =>
+      sig.toSorted(
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      )
+    );
+  }, [tradeSignals]);
+
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -291,15 +309,21 @@ const Signals = () => {
     Record<string, string>
   >({});
 
-  const onNo = useCallback((signalId: string) => {
-    // Move signal to pastSignals
-    setTradeSignals((prev) => prev.filter((signal) => signal._id !== signalId));
-    setPastSignals((prev) => {
-      const signal = prev.find((s) => s._id === signalId);
-      if (!signal) return prev;
-      return [signal, ...prev];
-    });
-  }, []);
+  const onNo = useCallback(
+    (signalId: string) => {
+      // Move signal to pastSignals
+      setPastSignals((prev) => {
+        const signal = tradeSignals.find((s) => s._id === signalId);
+        if (!signal) return prev;
+        return [{ ...signal, userSignal: { choice: "No" } }, ...prev];
+      });
+
+      setTradeSignals((prev) =>
+        prev.filter((signal) => signal._id !== signalId)
+      );
+    },
+    [tradeSignals]
+  );
 
   const onYes = useCallback(
     async (token: Token, amount: number, type: "Buy" | "Sell") => {
