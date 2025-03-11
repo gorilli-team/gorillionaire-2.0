@@ -40,11 +40,20 @@ type Token = {
 
 type TradeEvent = {
   user: string;
-  action: "Bought" | "Sold";
+  action: string;
   amount: number;
   token: string;
   timeAgo: string;
   userImageUrl: string;
+};
+
+type ApiTrade = {
+  userAddress: string;
+  action: string;
+  tokenAmount: number;
+  tokenSymbol: string;
+  timestamp: string;
+  userImageUrl?: string;
 };
 
 type TradeSignal = {
@@ -68,7 +77,8 @@ const SIGNAL_EXPIRATION_TIME = 10 * 24 * 60 * 60 * 1000;
 
 const parseSignalText = (signalText: string) => {
   const symbol = signalText.match(/CHOG|DAK|YAKI|MON/)?.[0];
-  const amount = Number(signalText.match(/\d+\.\d+/)?.[0]);
+  const amountMatch = signalText.match(/\d+\.\d+/)?.[0];
+  const amount = amountMatch ? Number(amountMatch) : 0;
 
   return { symbol, amount };
 };
@@ -91,6 +101,8 @@ const fetchImageFromSignalText = (signalText: string) => {
 };
 
 const formatNumber = (num: number): string => {
+  if (isNaN(num)) return "0";
+  
   if (num >= 1_000_000) {
     return (
       (num / 1_000_000).toLocaleString("en-US", { maximumFractionDigits: 1 }) +
@@ -126,6 +138,7 @@ const Signals = () => {
   const [chogBalance, setChogBalance] = useState<number>(0);
   const [dakBalance, setDakBalance] = useState<number>(0);
   const [monBalance, setMonBalance] = useState<number>(0);
+  const [completedTrades, setCompletedTrades] = useState<TradeEvent[]>([]);
 
   // Get native MON balance
   const { data: monBalanceData } = useBalance({
@@ -199,57 +212,87 @@ const Signals = () => {
     ],
     [monBalance, dakBalance, moyakiBalance, chogBalance]
   );
+  
+  const fetchCompletedTrades = async () => {
+    if (!address) return;
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/trade/completed`
+      );
+      const data: ApiTrade[] = await response.json();
+      console.log("Completed trades response:", data);
+      
+      const formattedTrades = data.map((trade: ApiTrade) => ({
+        user: trade.userAddress,
+        action: trade.action,
+        amount: trade.tokenAmount,
+        token: trade.tokenSymbol,
+        timeAgo: getTimeAgo(trade.timestamp),
+        userImageUrl: trade.userImageUrl || "/avatar_0.png",
+      }));
+  
+      setCompletedTrades(formattedTrades);
+    } catch (error) {
+      console.error("Error fetching completed trades:", error);
+    }
+  };
 
-  const recentTrades: TradeEvent[] = [
-    {
-      user: "arthur457.nad",
-      action: "Sold",
-      amount: 10,
-      token: "CHOG",
-      timeAgo: "19s ago",
-      userImageUrl: "/avatar_1.png",
-    },
-    {
-      user: "imfrancis.nad",
-      action: "Bought",
-      amount: 5,
-      token: "YAKI",
-      timeAgo: "14s ago",
-      userImageUrl: "/avatar_2.png",
-    },
-    {
-      user: "nfthomas.nad",
-      action: "Sold",
-      amount: 5,
-      token: "YAKI",
-      timeAgo: "9s ago",
-      userImageUrl: "/avatar_3.png",
-    },
-    {
-      user: "luduvigo.nad",
-      action: "Bought",
-      amount: 20,
-      token: "DAK",
-      timeAgo: "35s ago",
-      userImageUrl: "/avatar_4.png",
-    },
-    {
-      user: "stephen.nad",
-      action: "Bought",
-      amount: 10,
-      token: "CHOG",
-      timeAgo: "28s ago",
-      userImageUrl: "/avatar_5.png",
-    },
-    {
-      user: "fester.nad",
-      action: "Sold",
-      amount: 5,
-      token: "DAK",
-      timeAgo: "11s ago",
-      userImageUrl: "/avatar_6.png",
-    },
-  ];
+  useEffect(() => {
+    if (address) {
+      fetchCompletedTrades();
+    }
+  }, [address]);
+
+  // const recentTrades: TradeEvent[] = [
+  //   {
+  //     user: "arthur457.nad",
+  //     action: "Sold",
+  //     amount: 10,
+  //     token: "CHOG",
+  //     timeAgo: "19s ago",
+  //     userImageUrl: "/avatar_1.png",
+  //   },
+  //   {
+  //     user: "imfrancis.nad",
+  //     action: "Bought",
+  //     amount: 5,
+  //     token: "YAKI",
+  //     timeAgo: "14s ago",
+  //     userImageUrl: "/avatar_2.png",
+  //   },
+  //   {
+  //     user: "nfthomas.nad",
+  //     action: "Sold",
+  //     amount: 5,
+  //     token: "YAKI",
+  //     timeAgo: "9s ago",
+  //     userImageUrl: "/avatar_3.png",
+  //   },
+  //   {
+  //     user: "luduvigo.nad",
+  //     action: "Bought",
+  //     amount: 20,
+  //     token: "DAK",
+  //     timeAgo: "35s ago",
+  //     userImageUrl: "/avatar_4.png",
+  //   },
+  //   {
+  //     user: "stephen.nad",
+  //     action: "Bought",
+  //     amount: 10,
+  //     token: "CHOG",
+  //     timeAgo: "28s ago",
+  //     userImageUrl: "/avatar_5.png",
+  //   },
+  //   {
+  //     user: "fester.nad",
+  //     action: "Sold",
+  //     amount: 5,
+  //     token: "DAK",
+  //     timeAgo: "11s ago",
+  //     userImageUrl: "/avatar_6.png",
+  //   },
+  // ];
 
   const [tradeSignals, setTradeSignals] = useState<TradeSignal[]>([]);
   const [pastSignals, setPastSignals] = useState<TradeSignal[]>([]);
@@ -518,7 +561,7 @@ const Signals = () => {
           <div className="py-2 px-3">
             <div className="ticker-wrapper">
               <div className="ticker-track">
-                {[...recentTrades, ...recentTrades, ...recentTrades].map(
+                {[...completedTrades, ...completedTrades, ...completedTrades].map(
                   (trade, index) => (
                     <div key={index} className="ticker-item">
                       <div className="flex items-center space-x-2">
@@ -541,12 +584,12 @@ const Signals = () => {
                           </div>
                           <div className="flex items-center">
                             <span className="mr-1">
-                              {trade.action === "Bought" ? "💰" : "💸"}
+                              {trade.action === "buy" ? "💰" : "💸"}
                             </span>
                             <span className="text-sm mr-1">{trade.action}</span>
                             <span
                               className={`text-sm font-bold ${
-                                trade.action === "Bought"
+                                trade.action === "buy"
                                   ? "text-green-500"
                                   : "text-red-500"
                               }`}
@@ -849,7 +892,7 @@ const Signals = () => {
           position: absolute;
           white-space: nowrap;
           will-change: transform;
-          animation: ticker 25s linear infinite;
+          animation: ticker 80s linear infinite;
           align-items: center; /* Center items vertically */
           width: auto; /* Allow content to determine width */
         }
