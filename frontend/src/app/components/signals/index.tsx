@@ -255,24 +255,6 @@ const Signals = () => {
   const [tradeSignals, setTradeSignals] = useState<TradeSignal[]>([]);
   const [pastSignals, setPastSignals] = useState<TradeSignal[]>([]);
 
-  useEffect(() => {
-    setPastSignals((sig) =>
-      sig.toSorted(
-        (a, b) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      )
-    );
-  }, [pastSignals]);
-
-  useEffect(() => {
-    setTradeSignals((sig) =>
-      sig.toSorted(
-        (a, b) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      )
-    );
-  }, [tradeSignals]);
-
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
