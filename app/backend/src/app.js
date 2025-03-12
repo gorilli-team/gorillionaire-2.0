@@ -37,7 +37,7 @@ app.use(
   "/signals/generated-signals",
   require("./routes/signals/generated-signals")
 );
-
+app.use("/auth/privy", require("./routes/auth/privy"));
 // Basic error handling
 app.use((err, req, res, next) => {
   console.error(err.stack);

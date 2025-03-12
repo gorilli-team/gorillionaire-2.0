@@ -29,7 +29,7 @@ import {
 } from "@/app/utils/constants";
 import { usePrivy } from "@privy-io/react-auth";
 import { toast } from "react-toastify";
-
+import Cookies from "js-cookie";
 type Token = {
   symbol: string;
   name: string;
@@ -408,12 +408,14 @@ const Signals = () => {
           hash: txHash,
           confirmations: 1,
         });
+        const privyToken = Cookies.get("privy-token");
         await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/activity/track/trade-points`,
           {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${privyToken}`,
             },
             body: JSON.stringify({
               address: user?.wallet?.address,
@@ -473,12 +475,14 @@ const Signals = () => {
         confirmations: 1,
       });
 
+      const privyToken = Cookies.get("privy-token");
       await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/activity/track/trade-points`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${privyToken}`,
           },
           body: JSON.stringify({
             address: user?.wallet?.address,
@@ -517,12 +521,14 @@ const Signals = () => {
         onNo(signalId);
       }
 
+      const privyToken = Cookies.get("privy-token");
       await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/signals/generated-signals/user-signal`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${privyToken}`,
           },
           body: JSON.stringify({
             userAddress: user?.wallet?.address,

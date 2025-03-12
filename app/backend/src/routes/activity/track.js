@@ -4,12 +4,25 @@ const { ethers } = require("ethers");
 const UserActivity = require("../../models/UserActivity");
 const Intent = require("../../models/Intent");
 const { broadcastNotification } = require("../../websocket");
+const UserAuth = require("../../models/UserAuth");
+
 //track user signin
 router.post("/signin", async (req, res) => {
   try {
     const { address } = req.body;
+    const privyToken = req.headers.authorization.replace("Bearer ", "");
+
     if (!address) {
       return res.status(400).json({ error: "No address provided" });
+    }
+
+    const userAuth = await UserAuth.findOne({
+      userAddress: address,
+      privyAccessToken: privyToken,
+    });
+
+    if (!userAuth) {
+      return res.status(400).json({ error: "User not found" });
     }
 
     const userActivity = await UserActivity.findOne({
@@ -71,10 +84,20 @@ router.post("/signin", async (req, res) => {
 router.post("/trade-points", async (req, res) => {
   try {
     const { address, txHash, intentId } = req.body;
+    const privyToken = req.headers.authorization.replace("Bearer ", "");
     if (!address || !txHash || !intentId) {
       return res
         .status(400)
         .json({ error: "Missing required fields: address, txHash, intentId" });
+    }
+
+    const userAuth = await UserAuth.findOne({
+      userAddress: address,
+      privyAccessToken: privyToken,
+    });
+
+    if (!userAuth) {
+      return res.status(400).json({ error: "User not found" });
     }
 
     const userActivity = await UserActivity.findOne({

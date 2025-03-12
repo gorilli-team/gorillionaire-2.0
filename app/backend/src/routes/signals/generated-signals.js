@@ -59,8 +59,19 @@ router.get("/", async (req, res) => {
 
 router.post("/user-signal", async (req, res) => {
   const { userAddress, signalId, choice } = req.body;
+  const privyToken = req.headers.authorization.replace("Bearer ", "");
+
   if (!userAddress || !signalId || !choice) {
     return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  const userAuth = await UserAuth.findOne({
+    userAddress,
+    privyAccessToken: privyToken,
+  });
+
+  if (!userAuth) {
+    return res.status(400).json({ error: "User not found" });
   }
 
   const userSignal = await UserSignal.findOne({
