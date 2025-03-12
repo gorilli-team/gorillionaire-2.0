@@ -62,7 +62,14 @@ const LeaderboardBadge: React.FC = () => {
       <div className="flex items-center gap-1">
         <Image src="/first-place.svg" alt="rank" width={16} height={16} />
         <span className="text-sm font-medium text-gray-800">
-          {positionUser.rank}st
+          {positionUser.rank}
+          {positionUser.rank === "1"
+            ? "st"
+            : positionUser.rank === "2"
+            ? "nd"
+            : positionUser.rank === "3"
+            ? "rd"
+            : "th"}
         </span>
       </div>
 
