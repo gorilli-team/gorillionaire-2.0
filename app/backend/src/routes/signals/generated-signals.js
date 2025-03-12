@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const GeneratedSignal = require("../../models/GeneratedSignal");
 const UserSignal = require("../../models/UserSignal");
+const UserAuth = require("../../models/UserAuth");
 
 router.get("/", async (req, res) => {
   try {
