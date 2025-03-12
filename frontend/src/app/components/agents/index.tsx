@@ -35,7 +35,7 @@ const Agents = () => {
                     <h4 className="text-lg font-semibold text-gray-800">
                       Agent Trading API Access NFT
                     </h4>
-                    <p className="text-gray-600 mt-1">Mint price: 0.05 MON</p>
+                    <p className="text-gray-600 mt-1">Mint price: 1 MON</p>
                   </div>
                   <div className="h-16 w-16 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center">
                     <span className="text-2xl text-white">🦍</span>
