@@ -30,7 +30,7 @@ const LeaderboardBadge: React.FC = () => {
           rank: data.userActivity?.rank,
         });
       } catch (error) {
-        console.error("❌ Errore nel fetch utente:", error);
+        console.error("❌ Error fetching user activity:", error);
       }
     };
 
@@ -40,46 +40,36 @@ const LeaderboardBadge: React.FC = () => {
   if (!isConnected || !positionUser) return null;
 
   return (
-    <div className="flex items-center gap-3">
-      {/* Avatar + Address pill */}
-      <div className="flex items-center bg-white border border-gray-300 rounded-full px-4 py-1 shadow-sm">
-        <div className="w-6 h-6 rounded-full overflow-hidden mr-2">
+    <div className="flex flex-wrap items-center bg-white border border-gray-300 rounded-2xl px-4 py-2 shadow-sm gap-4 max-w-full">
+      {/* Avatar + Address */}
+      <div className="flex items-center gap-2">
+        <div className="w-7 h-7 rounded-full overflow-hidden">
           <Image
             src={positionUser.avatarSrc}
             alt="avatar"
-            width={24}
-            height={24}
+            width={28}
+            height={28}
             className="object-cover"
           />
         </div>
-        <span className="text-sm font-semibold text-gray-900">
+        <span className="text-sm font-semibold text-gray-900 break-all">
           {positionUser.address}
         </span>
       </div>
 
-      {/* Rank pill */}
-      <div className="flex items-center bg-white border border-gray-300 rounded-full px-3 py-1 shadow-sm">
-        <Image
-          src="/first-place.svg"
-          alt="rank"
-          width={16}
-          height={16}
-          className="mr-1"
-        />
-        <span className="text-sm font-medium text-gray-800">{positionUser.rank}st</span>
+      {/* Rank */}
+      <div className="flex items-center gap-1">
+        <Image src="/first-place.svg" alt="rank" width={16} height={16} />
+        <span className="text-sm font-medium text-gray-800">
+          {positionUser.rank}st
+        </span>
       </div>
 
-      {/* Points pill */}
-      <div className="flex items-center bg-white border border-gray-300 rounded-full px-3 py-1 shadow-sm">
-        <Image
-          src="/star.svg"
-          alt="points"
-          width={16}
-          height={16}
-          className="mr-1"
-        />
+      {/* Points */}
+      <div className="flex items-center gap-1">
+        <Image src="/star.svg" alt="points" width={16} height={16} />
         <span className="text-sm font-medium text-gray-800">
-          {positionUser.points} points
+          {positionUser.points} pts
         </span>
       </div>
     </div>
@@ -87,4 +77,3 @@ const LeaderboardBadge: React.FC = () => {
 };
 
 export default LeaderboardBadge;
-
