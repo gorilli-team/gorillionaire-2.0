@@ -214,7 +214,6 @@ const Signals = () => {
   );
   
   const fetchCompletedTrades = async () => {
-    if (!address) return;
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/trade/completed`
@@ -238,10 +237,8 @@ const Signals = () => {
   };
 
   useEffect(() => {
-    if (address) {
-      fetchCompletedTrades();
-    }
-  }, [address]);
+    fetchCompletedTrades();
+  }, []);
 
   // const recentTrades: TradeEvent[] = [
   //   {
