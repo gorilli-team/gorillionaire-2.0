@@ -1,11 +1,20 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import {
+  useAccount,
+  useReadContract,
+  useWriteContract,
+  useWaitForTransactionReceipt,
+} from "wagmi";
 import { usePrivy } from "@privy-io/react-auth";
 import { parseEther } from "viem";
 import { NFT_ACCESS_ADDRESS } from "../../utils/constants";
 import ACCESS_NFT_ABI from "../../../../../access-nft/abi/AccessNFTAbi.json";
+
+type Holder = {
+  ownerAddress: string;
+};
 
 const Agents = () => {
   const { isConnected, address } = useAccount();
@@ -14,24 +23,25 @@ const Agents = () => {
   const [mintSuccess, setMintSuccess] = useState(false);
   const [hasNFT, setHasNFT] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [holders, setHolders] = useState<Holder[]>([]);
 
   useReadContract({
     address: NFT_ACCESS_ADDRESS,
     abi: ACCESS_NFT_ABI,
-    functionName: 's_price',
+    functionName: "s_price",
     query: { enabled: isConnected },
   });
 
   const { data: nftBalance } = useReadContract({
     address: NFT_ACCESS_ADDRESS,
     abi: ACCESS_NFT_ABI,
-    functionName: 'balanceOf',
+    functionName: "balanceOf",
     args: [address],
     query: { enabled: isConnected && !!address },
   });
 
   useEffect(() => {
-    if (typeof nftBalance === 'bigint' || typeof nftBalance === 'number') {
+    if (typeof nftBalance === "bigint" || typeof nftBalance === "number") {
       if (nftBalance > 0) {
         setHasNFT(true);
         setMintSuccess(true);
@@ -40,12 +50,43 @@ const Agents = () => {
   }, [nftBalance]);
 
   const { writeContract, data: hash, error } = useWriteContract();
-  
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
-    hash,
-    query: { enabled: !!hash },
-  });
 
+  const { isLoading: isConfirming, isSuccess: isConfirmed } =
+    useWaitForTransactionReceipt({
+      hash,
+      query: { enabled: !!hash },
+    });
+
+  useEffect(() => {
+    const fetchHolders = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/gorilli-nft/holders`
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch holders. Status: ${response.status}`
+          );
+        }
+
+        const data = await response.json();
+        console.log("Holders data:", data);
+        setHolders(data.result.data);
+        if (data.result.data.length > 0) {
+          data.result.data.forEach((holder: Holder) => {
+            if (holder.ownerAddress === address) {
+              setHasNFT(true);
+              setMintSuccess(true);
+            }
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching holders:", error);
+      }
+    };
+    fetchHolders();
+  }, [mintSuccess, isConnected]);
 
   useEffect(() => {
     if (isConfirming) {
@@ -67,14 +108,14 @@ const Agents = () => {
 
     setErrorMessage("");
     setIsMinting(true);
-    
+
     try {
       // Call mint function with 1 MON as payment
       writeContract({
         address: NFT_ACCESS_ADDRESS,
         abi: ACCESS_NFT_ABI,
-        functionName: 'mint',
-        value: parseEther('1'), // 1 MON = 1 * 10^18 wei
+        functionName: "mint",
+        value: parseEther("1"), // 1 MON = 1 * 10^18 wei
       });
     } catch (err) {
       console.error("Mint error:", err);
@@ -230,9 +271,11 @@ const Agents = () => {
                     </h5>
                     <div className="bg-gray-100 p-3 rounded-lg flex items-center justify-between">
                       <code className="text-xs text-gray-600 truncate">
-                        {address ? `${address.slice(0, 24)}...` : "0x86f6D762B53f21Te53fa5762D294d576A36..."}
+                        {address
+                          ? `${address.slice(0, 24)}...`
+                          : "0x86f6D762B53f21Te53fa5762D294d576A36..."}
                       </code>
-                      <button 
+                      <button
                         className="text-purple-600 hover:text-purple-800 flex-shrink-0 ml-2"
                         onClick={() => {
                           if (address) {
@@ -265,7 +308,9 @@ const Agents = () => {
                         <code>
                           {`// Connect your trading agent to our signal API
 const signals = await fetch('https://api.gorillionaire.io/signals', {
-  headers: { 'Authorization': 'Bearer ${address ? address : "0x86f6D762B53f21Te53fa5762D294d576A36"}' }
+  headers: { 'Authorization': 'Bearer ${
+    address ? address : "0x86f6D762B53f21Te53fa5762D294d576A36"
+  }' }
 });
 
 // Feed signals directly to your agent
@@ -302,49 +347,30 @@ myTradingAgent.consumeSignals(signals.data);`}
                   Recent Agent API Activations
                 </h3>
               </div>
-              <div className="divide-y divide-gray-200">
-                {[
-                  {
-                    address: "0x86f6D762B53f21Te53fa5762D294d576A36",
-                    time: "5 mins ago",
-                    type: "Trading Bot",
-                  },
-                  {
-                    address: "0x71c8Fb21a22d95CEa35dD9D4eA72B17E",
-                    time: "12 mins ago",
-                    type: "MEV Agent",
-                  },
-                  {
-                    address: "0x3bFc36B19f8d5331480",
-                    time: "28 mins ago",
-                    type: "Arbitrage Bot",
-                  },
-                ].map((mint, index) => (
-                  <div
-                    key={index}
-                    className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2"
-                  >
-                    <div className="flex items-center">
-                      <div className="h-8 w-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 mr-3 flex-shrink-0">
-                        🤖
-                      </div>
-                      <div className="overflow-hidden">
-                        <p className="text-sm font-medium text-gray-700 truncate">
-                          {mint.address}
-                        </p>
-                        <div className="flex items-center">
-                          <p className="text-xs text-gray-500">{mint.time}</p>
-                          <span className="mx-1 text-gray-400">•</span>
-                          <p className="text-xs text-indigo-600">{mint.type}</p>
+              {holders.length > 0 && (
+                <div className="divide-y divide-gray-200">
+                  {holders.map((holder, index) => (
+                    <div
+                      key={index}
+                      className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2"
+                    >
+                      <div className="flex items-center">
+                        <div className="h-8 w-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 mr-3 flex-shrink-0">
+                          🤖
+                        </div>
+                        <div className="overflow-hidden">
+                          <p className="text-sm font-medium text-gray-700 truncate">
+                            {holder.ownerAddress}
+                          </p>
                         </div>
                       </div>
+                      <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full sm:ml-2 flex-shrink-0">
+                        Activated
+                      </span>
                     </div>
-                    <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full sm:ml-2 flex-shrink-0">
-                      Activated
-                    </span>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
