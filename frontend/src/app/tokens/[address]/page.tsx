@@ -579,10 +579,10 @@ export default function TokenPage() {
                 )}
               </div>
             </div>
-            {/* add here a whales section with the top 10 holders */}
+            {/* add here a whales section with the top 20 holders */}
             <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 mt-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
-                <h2 className="text-xl font-bold">Top 10 Holders</h2>
+                <h2 className="text-xl font-bold">Top 20 Holders</h2>
                 <div className="flex flex-wrap items-center gap-2">
                   <div className="flex items-center">
                     <span className="text-2xl mr-1">🐋🐋🐋</span>
