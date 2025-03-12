@@ -556,6 +556,7 @@ export default function TokenPage() {
                 </h2>
                 <div className="flex items-center space-x-4">
                   <select
+                    aria-label="Filter events by type"
                     className="w-full sm:w-auto bg-white border border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-md px-3 py-2 text-sm font-medium text-gray-700 shadow-sm appearance-none cursor-pointer transition-colors duration-200 focus:outline-none"
                     value={filterEvent}
                     onChange={(e) => {
@@ -568,6 +569,7 @@ export default function TokenPage() {
                     <option value="TRANSFER">Transfer</option>
                   </select>
                   <select
+                    aria-label="Filter events by level"
                     className="w-full sm:w-auto bg-white border border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-md px-3 py-2 text-sm font-medium text-gray-700 shadow-sm appearance-none cursor-pointer transition-colors duration-200 focus:outline-none"
                     value={filterLabel}
                     onChange={(e) => {
