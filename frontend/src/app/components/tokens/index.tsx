@@ -162,6 +162,10 @@ const Tokens = () => {
     router.push(`/tokens/${address}`);
   };
 
+  const navigateToTestnetExplorer = (address: string) => {
+    window.open(`https://testnet.monadexplorer.com/token/${address}`, "_blank");
+  };
+
   const getTokenColor = (address: string) => {
     // Use the last 6 characters of the address as the color
     return `#${address.slice(-6)}`;
@@ -326,13 +330,13 @@ const Tokens = () => {
                         </td>
                         <td className="py-4 h-12">
                           <div className="flex space-x-2">
-                            <button className="px-3 py-2 text-xs font-medium text-white bg-violet-600 rounded-md hover:bg-violet-700 transition-colors">
+                            {/* <button className="px-3 py-2 text-xs font-medium text-white bg-violet-600 rounded-md hover:bg-violet-700 transition-colors">
                               Track Token
-                            </button>
+                            </button> */}
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                navigateToTokenDetail(token.tokenAddress);
+                                navigateToTestnetExplorer(token.tokenAddress);
                               }}
                               className="px-3 py-2 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors flex items-center"
                             >
