@@ -1,10 +1,11 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { useAccount } from "wagmi";
+import { usePrivy } from "@privy-io/react-auth";
 
 const LeaderboardBadge: React.FC = () => {
-  const { address, isConnected } = useAccount();
+  const { authenticated, user } = usePrivy();
+  const address = user?.wallet?.address;
 
   const [positionUser, setPositionUser] = useState<{
     points: number;
@@ -14,7 +15,7 @@ const LeaderboardBadge: React.FC = () => {
   } | null>(null);
 
   useEffect(() => {
-    if (!isConnected || !address) return;
+    if (!authenticated || !address) return;
 
     const fetchPositionUser = async () => {
       try {
@@ -35,9 +36,9 @@ const LeaderboardBadge: React.FC = () => {
     };
 
     fetchPositionUser();
-  }, [isConnected, address]);
+  }, [authenticated, address]);
 
-  if (!isConnected || !positionUser) return null;
+  if (!authenticated || !positionUser) return null;
 
   return (
     <div className="flex flex-wrap items-center bg-white border border-gray-300 rounded-2xl px-4 py-2 shadow-sm gap-4 max-w-full">

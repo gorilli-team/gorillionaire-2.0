@@ -100,7 +100,7 @@ export default function Sidebar({
             >
               <Image
                 src="/github.svg"
-                alt="Github"
+                alt="github_icon"
                 width={28}
                 height={28}
                 className="pr-2"
@@ -118,7 +118,7 @@ export default function Sidebar({
             >
               <Image
                 src="/twitter.svg"
-                alt="X"
+                alt="twitter_icon"
                 width={28}
                 height={28}
                 className="pr-2"
