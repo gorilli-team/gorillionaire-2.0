@@ -4,7 +4,6 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Image from "next/image";
 import { trackedTokens } from "@/app/shared/tokenData";
 import {
-  useAccount,
   useReadContracts,
   useBalance,
   useWriteContract,
@@ -28,6 +27,7 @@ import {
   PERMIT2_ADDRESS,
   WMONAD_ADDRESS,
 } from "@/app/utils/constants";
+import { usePrivy } from "@privy-io/react-auth";
 
 type Token = {
   symbol: string;
@@ -74,7 +74,7 @@ type TradeSignal = {
 
 const MONAD_CHAIN_ID = 10143;
 const MAX_SIGNALS = 5;
-const SIGNAL_EXPIRATION_TIME = 10 * 24 * 60 * 60 * 1000;
+const SIGNAL_EXPIRATION_TIME = 3 * 24 * 60 * 60 * 1000;
 
 const parseSignalText = (signalText: string) => {
   const symbol = signalText.match(/CHOG|DAK|YAKI|MON/)?.[0];
@@ -129,7 +129,7 @@ const mapConfidenceScoreToRisk = (confidenceScore: string) => {
 };
 
 const Signals = () => {
-  const { address } = useAccount();
+  const { user } = usePrivy();
   const { writeContractAsync } = useWriteContract();
   const { signTypedDataAsync } = useSignTypedData();
   const { sendTransactionAsync } = useSendTransaction();
@@ -147,7 +147,7 @@ const Signals = () => {
 
   // Get native MON balance
   const { data: monBalanceData } = useBalance({
-    address,
+    address: user?.wallet?.address as `0x${string}`,
     chainId: MONAD_CHAIN_ID,
   });
 
@@ -191,13 +191,18 @@ const Signals = () => {
   // Get other token balances
   const { data } = useReadContracts({
     contracts: trackedTokens
-      .filter((t) => isAddress(t.address) && address && isAddress(address))
+      .filter(
+        (t) =>
+          isAddress(t.address) &&
+          user?.wallet?.address &&
+          isAddress(user?.wallet?.address)
+      )
       .flatMap((t) => [
         {
           address: t.address as `0x${string}`,
           abi: erc20Abi,
           functionName: "balanceOf",
-          args: [address],
+          args: [user?.wallet?.address],
           chainId: MONAD_CHAIN_ID,
         },
       ]),
@@ -309,7 +314,7 @@ const Signals = () => {
     const fetchSignals = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/signals/generated-signals?userAddress=${address}`
+          `${process.env.NEXT_PUBLIC_API_URL}/signals/generated-signals?userAddress=${user?.wallet?.address}`
         );
         const data = await response.json();
         if (data && Array.isArray(data)) {
@@ -321,7 +326,9 @@ const Signals = () => {
                 new Date(Date.now() - SIGNAL_EXPIRATION_TIME)
           );
           setTradeSignals(
-            data.filter((signal) => !pastSignals.includes(signal))
+            data.filter(
+              (signal) => !pastSignals.map((s) => s._id).includes(signal._id)
+            )
           );
           setPastSignals(pastSignals);
           setIsLoading(false);
@@ -332,7 +339,7 @@ const Signals = () => {
     };
 
     fetchSignals();
-  }, [address]);
+  }, [user?.wallet?.address]);
 
   // State for Yes/No buttons
   const [selectedOptions, setSelectedOptions] = useState<
@@ -357,7 +364,7 @@ const Signals = () => {
 
   const onYes = useCallback(
     async (token: Token, amount: number, type: "Buy" | "Sell") => {
-      if (!address) return;
+      if (!user?.wallet?.address) return;
 
       // for sells we need to convert percentage to aamount, for buys change gets handled backend/side
       const sellAmount =
@@ -367,7 +374,7 @@ const Signals = () => {
         token: token.symbol,
         amount: sellAmount.toString(),
         type: type.toLowerCase(),
-        userAddress: address,
+        userAddress: user?.wallet?.address,
       });
 
       const res = await fetch(
@@ -380,7 +387,7 @@ const Signals = () => {
       // Different flow if sell token is native token
       if (quote.sellToken.toLowerCase() === MON_ADDRESS.toLowerCase()) {
         const txHash = await sendTransactionAsync({
-          account: address,
+          account: user?.wallet?.address as `0x${string}`,
           gas: quote?.transaction.gas
             ? BigInt(quote.transaction.gas)
             : undefined,
@@ -404,7 +411,7 @@ const Signals = () => {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              address,
+              address: user?.wallet?.address,
               txHash,
               intentId: quote.intentId,
             }),
@@ -447,7 +454,7 @@ const Signals = () => {
       ]);
 
       const hash = await sendTransactionAsync({
-        account: address,
+        account: user?.wallet?.address as `0x${string}`,
         gas: !!quote.transaction.gas
           ? BigInt(quote.transaction.gas)
           : undefined,
@@ -469,7 +476,7 @@ const Signals = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            address,
+            address: user?.wallet?.address,
             txHash: hash,
             intentId: quote.intentId,
           }),
@@ -477,7 +484,7 @@ const Signals = () => {
       );
     },
     [
-      address,
+      user?.wallet?.address,
       sendTransactionAsync,
       signTypedDataAsync,
       wagmiConfig,
@@ -500,7 +507,7 @@ const Signals = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            userAddress: address,
+            userAddress: user?.wallet?.address,
             signalId,
             choice: option,
           }),
@@ -520,7 +527,7 @@ const Signals = () => {
         onNo(signalId);
       }
     },
-    [tradeSignals, selectedOptions, onYes, onNo, tokens, address]
+    [tradeSignals, selectedOptions, onYes, onNo, tokens, user?.wallet?.address]
   );
 
   if (isLoading) {
@@ -531,7 +538,7 @@ const Signals = () => {
     <div className="w-full min-h-screen bg-gray-50 pt-2 lg:pt-0">
       <div className="px-2 sm:px-4 py-4 sm:py-6">
         {/* Token Stats */}
-        {address && (
+        {user?.wallet?.address && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             {tokens.map((token) => (
               <div
