@@ -98,7 +98,7 @@ const retrieveGorilliNftHolders = async () => {
 
     return response.data;
   } catch (error) {
-    console.error("Error retrieving gorilli nft holders:", error.message);
+    console.error("Error retrieving gorilli nft holders:", error);
   }
 };
 
