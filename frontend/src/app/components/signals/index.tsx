@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Image from "next/image";
-import { trackedTokens } from "@/app/shared/tokenData";
 import {
   useWriteContract,
   useConfig,
@@ -10,14 +9,7 @@ import {
   useSendTransaction,
 } from "wagmi";
 import { waitForTransactionReceipt } from "wagmi/actions";
-import {
-  concat,
-  erc20Abi,
-  isAddress,
-  numberToHex,
-  parseUnits,
-  size,
-} from "viem";
+import { concat, erc20Abi, numberToHex, parseUnits, size } from "viem";
 import { getTimeAgo } from "@/app/utils/time";
 import { LoadingOverlay } from "../ui/LoadingSpinner";
 import {
@@ -160,13 +152,20 @@ const Signals = () => {
         console.log("No wallet address available");
         return;
       }
-      
+
       // Fetch token holders data for specific user
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/token/holders/user/${user.wallet.address}`);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/token/holders/user/${user.wallet.address}`
+      );
       const data = await response.json();
       console.log("Token holders:", data);
-      
-      if (data.code === 0 && data.result && data.result.data && Array.isArray(data.result.data)) {
+
+      if (
+        data.code === 0 &&
+        data.result &&
+        data.result.data &&
+        Array.isArray(data.result.data)
+      ) {
         data.result.data.forEach((token: ApiTokenHolder) => {
           console.log(`Setting ${token.symbol} balance to ${token.balance}`);
           if (token.symbol === "MON") {
@@ -373,7 +372,7 @@ const Signals = () => {
     async (token: Token, amount: number, type: "Buy" | "Sell") => {
       if (!user?.wallet?.address) return;
 
-      console.log("token & amount", token,amount);
+      console.log("token & amount", token, amount);
 
       // for sells we need to convert percentage to amount, for buys change gets handled backend/side
       const sellAmount =
@@ -523,7 +522,6 @@ const Signals = () => {
         const { symbol, amount } = parseSignalText(signal.signal_text);
         const token = tokens.find((t) => symbol === t.symbol);
         if (!token) return;
-
 
         await onYes(token, amount, signal.type);
       } else {
