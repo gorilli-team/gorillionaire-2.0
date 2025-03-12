@@ -1,66 +1,15 @@
-## Foundry
+# Gorillionaire Access NFT (GOR-AX)
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+## Overview
+The Gorillionaire Access NFT can be purchased by the user at a fixed price set at 1 MON. After obtaining the NFT, the user will be able to unlock the encrypted signals stored on Nillion.
 
-Foundry consists of:
+## Smart Contract
+The AccessNFT smart contract has been deployed on the Monad Testnet at the following address:
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+- **AccessNFT**: 0x12bF70e3325104ed2D7fefbB8f3e88cE2Dd66A30
 
-## Documentation
+## Main functions
+The smart contract is a standard ERC721 contract. The two main functions of AccessNFT are:
+- **mint**: the user will have to send at least 1 MON in order to mint the Gorillionaire Access NFT (GOR-AX)
 
-https://book.getfoundry.sh/
-
-## Usage
-
-### Build
-
-```shell
-$ forge build
-```
-
-### Test
-
-```shell
-$ forge test
-```
-
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+- **setPrice**: this function will grant the right to change the NFT price only to the owner of the contract. This function has been implemented to face possible fluctuations in MON price, and to avoid that an excessive increase in the NFT price may deter users from using our services. 
