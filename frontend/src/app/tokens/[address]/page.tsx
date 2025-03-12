@@ -579,9 +579,42 @@ export default function TokenPage() {
                 )}
               </div>
             </div>
-            {/* add here a whales section with the top 10 holders */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-bold mb-6">Top 10 Holders</h2>
+            {/* add here a whales section with the top 20 holders */}
+            <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 mt-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+                <h2 className="text-xl font-bold">Top 20 Holders</h2>
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex items-center">
+                    <span className="text-2xl mr-1">🐋🐋🐋</span>
+                    <span className="text-xs bg-blue-100 px-2 py-1 rounded-full">
+                      {">"} 10%
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-2xl mr-1">🐋🐋</span>
+                    <span className="text-xs bg-blue-100 px-2 py-1 rounded-full">
+                      5-10%
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-2xl mr-1">🐋</span>
+                    <span className="text-xs bg-blue-100 px-2 py-1 rounded-full">
+                      {"<"} 5%
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Table header - visible only on medium screens and up */}
+              <div className="hidden md:grid md:grid-cols-5 gap-4 mb-2 px-4 font-semibold text-gray-700">
+                <div>Address</div>
+                <div className="text-center">Tokens</div>
+                <div className="text-center">Classification</div>
+                <div className="text-center">Percentage</div>
+                <div></div>
+              </div>
+
+              {/* Table rows */}
               <div className="space-y-4">
                 {tokenHolders?.holders?.map(
                   (holder: {
@@ -589,10 +622,148 @@ export default function TokenPage() {
                     amount: number;
                     percentage: number;
                   }) => (
-                    <div key={holder.holder}>
-                      <p>{holder.holder}</p>
-                      <p>{holder.amount}</p>
-                      <p>{holder.percentage}%</p>
+                    <div
+                      key={holder.holder}
+                      className="border-l-4 border-blue-500 pl-4 py-3 bg-white hover:bg-gray-50 transition-all duration-200 shadow-sm rounded-r"
+                    >
+                      {/* For mobile: Stack layout */}
+                      <div className="md:hidden space-y-3">
+                        <div className="flex justify-between items-center">
+                          <div className="flex-1 break-all">
+                            <p className="font-medium text-gray-800">
+                              {holder.holder}
+                            </p>
+                          </div>
+                          <div className="ml-2">
+                            <button
+                              onClick={() => {
+                                window.open(
+                                  `https://testnet.monadexplorer.com/address/${holder.holder}`,
+                                  "_blank"
+                                );
+                              }}
+                              className="text-sm bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-1.5 rounded-md font-medium flex items-center transition-colors"
+                            >
+                              View
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-4 w-4 ml-1"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-bold text-blue-700 text-lg">
+                              {holder.amount.toLocaleString()}{" "}
+                              <span className="text-xs text-gray-500">
+                                tokens
+                              </span>
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-2xl">
+                              {holder.percentage > 10
+                                ? "🐋🐋🐋"
+                                : holder.percentage > 5
+                                ? "🐋🐋"
+                                : "🐋"}
+                            </span>
+                            <span className="font-medium text-blue-600">
+                              {holder.percentage.toFixed(2)}%
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="w-full bg-gray-200 rounded-full h-2.5">
+                          <div
+                            className="bg-blue-600 h-2.5 rounded-full"
+                            style={{
+                              width: `${Math.min(holder.percentage, 100)}%`,
+                            }}
+                          ></div>
+                        </div>
+                      </div>
+
+                      {/* For tablet and desktop: Grid layout */}
+                      <div className="hidden md:grid md:grid-cols-5 gap-4 items-center">
+                        {/* Column 1: Address */}
+                        <div className="overflow-hidden text-ellipsis">
+                          <p className="font-medium text-gray-800 hover:overflow-visible hover:text-clip break-all">
+                            {holder.holder}
+                          </p>
+                        </div>
+
+                        {/* Column 2: Token Amount */}
+                        <div className="text-center">
+                          <p className="font-bold text-blue-700 text-lg">
+                            {holder.amount.toLocaleString()}
+                          </p>
+                          <p className="text-xs text-gray-500">tokens</p>
+                        </div>
+
+                        {/* Column 3: Whale Classification */}
+                        <div className="text-center">
+                          <span className="text-2xl">
+                            {holder.percentage > 10
+                              ? "🐋🐋🐋"
+                              : holder.percentage > 5
+                              ? "🐋🐋"
+                              : "🐋"}
+                          </span>
+                        </div>
+
+                        {/* Column 4: Percentage with Bar */}
+                        <div className="flex flex-col items-center">
+                          <div className="w-full bg-gray-200 rounded-full h-2.5 mb-1">
+                            <div
+                              className="bg-blue-600 h-2.5 rounded-full"
+                              style={{
+                                width: `${Math.min(holder.percentage, 100)}%`,
+                              }}
+                            ></div>
+                          </div>
+                          <span className="font-medium text-blue-600">
+                            {holder.percentage.toFixed(2)}%
+                          </span>
+                        </div>
+
+                        {/* Column 5: View Details Button */}
+                        <div className="flex justify-end">
+                          <button
+                            onClick={() => {
+                              window.open(
+                                `https://testnet.monadexplorer.com/address/${holder.holder}`,
+                                "_blank"
+                              );
+                            }}
+                            className="text-sm bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-1.5 rounded-md font-medium flex items-center transition-colors"
+                          >
+                            View Details
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-4 w-4 ml-1"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   )
                 )}
