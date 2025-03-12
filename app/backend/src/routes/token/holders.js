@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const TokenHolders = require("../../models/TokenHolders");
-
+const { retrieveAddressTokens } = require("../../api/blockvision");
 router.get("/:tokenAddress", async (req, res) => {
   try {
     const tokenAddress = req.params.tokenAddress;
@@ -13,6 +13,20 @@ router.get("/:tokenAddress", async (req, res) => {
   } catch (error) {
     console.error("Error fetching transfers:", error);
     res.status(500).json({ error: "Failed to fetch transfers" });
+  }
+});
+
+router.get("/user/:userAddress", async (req, res) => {
+  try {
+    const userAddress = req.params.userAddress;
+    const data = await retrieveAddressTokens({ address: userAddress });
+
+    console.log(data);
+
+    res.json(data);
+  } catch (error) {
+    console.error("Error fetching holders:", error);
+    res.status(500).json({ error: "Failed to fetch holders" });
   }
 });
 

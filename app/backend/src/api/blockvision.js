@@ -53,7 +53,37 @@ const retrieveTokenHolders = async ({
   }
 };
 
+const retrieveAddressTokens = async ({
+  address,
+  pageIndex = "1",
+  pageSize = "20",
+}) => {
+  try {
+    const response = await axios.get(`${baseURL}/account/tokens`, {
+      params: {
+        address,
+        pageIndex,
+        pageSize,
+      },
+      headers: {
+        "x-api-key": apiKey,
+        accept: "application/json",
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error retrieving address tokens:", error.message);
+    throw {
+      message: "Failed to retrieve address tokens",
+      error: error.message,
+      status: error.response?.status || 500,
+    };
+  }
+};
+
 // Export the function directly
 module.exports = {
   retrieveTokenHolders,
+  retrieveAddressTokens,
 };
