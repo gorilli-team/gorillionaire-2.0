@@ -124,7 +124,7 @@ export async function generateBuySignal() {
     console.log(`\n[${timestamp}] Generating trading signal...`);
 
     const answer = await getTradingSignal(
-      "Give me the best trading signal you can deduce from the context you have. Make it a BUY signal. Make sure the signal is different from previous ones. Remember that both BUY and SELL signals are equally important for making money in trading. Base your signal on the actual market data and events in the context."
+      "Give me the best trading signal you can deduce from the context you have. Make it a BUY signal. Min Value 1 Unit. Make sure the signal is different from previous ones. Remember that both BUY and SELL signals are equally important for making money in trading. Base your signal on the actual market data and events in the context."
     );
 
     console.log(`[${timestamp}] TRADING SIGNAL:`);
