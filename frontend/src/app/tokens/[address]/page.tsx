@@ -525,20 +525,22 @@ export default function TokenPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-4 mt-6">
-                <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+                <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
                   <p className="text-sm text-gray-600">Tracked Since</p>
-                  <p className="text-lg font-semibold">
+                  <p className="text-lg sm:text-lg font-semibold truncate">
                     {token.trackedSince || "N/A"}
                   </p>
                 </div>
-                <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
                   <p className="text-sm text-gray-600">Events Tracked</p>
-                  <p className="text-lg font-semibold">{eventsNumber || 0}</p>
+                  <p className="text-lg sm:text-lg font-semibold">
+                    {eventsNumber || 0}
+                  </p>
                 </div>
-                <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
                   <p className="text-sm text-gray-600">Holders</p>
-                  <p className="text-lg font-semibold">
+                  <p className="text-lg sm:text-lg font-semibold">
                     {tokenHolders?.total?.toLocaleString() || "N/A"}
                   </p>
                 </div>

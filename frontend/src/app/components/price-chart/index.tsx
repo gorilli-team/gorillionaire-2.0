@@ -455,11 +455,11 @@ const PriceChart: React.FC<PriceChartProps> = ({ data, tokenSymbol }) => {
 
   return (
     <div className="w-full p-4 bg-white rounded-lg shadow-md">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold">{tokenSymbol} Price Chart</h3>
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4">
+        <h3 className="text-lg font-semibold mb-2 md:mb-0">{tokenSymbol} Price Chart</h3>
 
         {priceStats && (
-          <div className="flex items-center space-x-4">
+          <div className="flex flex-wrap gap-4 md:gap-4 md:justify-end mt-1 md:mt-0">
             <div className="flex flex-col">
               <span className="text-xs text-gray-500">Price</span>
               <span className="font-medium">
