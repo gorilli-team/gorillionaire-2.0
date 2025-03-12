@@ -1,57 +1,51 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import { useAccount } from "wagmi";
 
 const LeaderboardBadge: React.FC = () => {
-  const [topUser, setTopUser] = useState({
-    points: 85,
-    address: "0x5b2e...c6a57",
-    avatarSrc: "/avatar_1.png",
-  });
+  const { address, isConnected } = useAccount();
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [positionUser, setPositionUser] = useState<{
+    points: number;
+    address: string;
+    avatarSrc: string;
+    rank: string;
+  } | null>(null);
 
   useEffect(() => {
-    const fetchTopUser = async () => {
-      setIsLoading(true);
+    if (!isConnected || !address) return;
+
+    const fetchPositionUser = async () => {
       try {
-        // Placeholder fetch logic - now actually using setTopUser
-        // This mock implementation simulates data fetching
-        const mockApiResponse = {
-          points: 92,
-          address: "0x5b2e...c6a57", 
-          avatarSrc: "/avatar_1.png"
-        };
-        
-        // Actually use setTopUser to update state with mock data
-        setTopUser(mockApiResponse);
-        
-        // In a real implementation, you'd fetch data from an API:
-        // const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/leaderboard/top`);
-        // const data = await response.json();
-        // setTopUser(data.topUser);
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/activity/track/me?address=${address}`
+        );
+        const data = await response.json();
+
+        setPositionUser({
+          points: data.userActivity?.points || 0,
+          address: data.userActivity?.address || address,
+          avatarSrc: "/avatar_1.png",
+          rank: data.userActivity?.rank,
+        });
       } catch (error) {
-        console.error("Error fetching top user:", error);
-      } finally {
-        setIsLoading(false);
+        console.error("❌ Errore nel fetch utente:", error);
       }
     };
 
-    fetchTopUser();
-  }, []);
+    fetchPositionUser();
+  }, [isConnected, address]);
 
-  if (isLoading) {
-    return (
-      <div className="h-12 w-full max-w-md bg-gray-200 animate-pulse rounded-lg" />
-    );
-  }
+  if (!isConnected || !positionUser) return null;
 
   return (
     <div className="flex items-center gap-3">
+      {/* Avatar + Address pill */}
       <div className="flex items-center bg-white border border-gray-300 rounded-full px-4 py-1 shadow-sm">
         <div className="w-6 h-6 rounded-full overflow-hidden mr-2">
           <Image
-            src={topUser.avatarSrc}
+            src={positionUser.avatarSrc}
             alt="avatar"
             width={24}
             height={24}
@@ -59,7 +53,7 @@ const LeaderboardBadge: React.FC = () => {
           />
         </div>
         <span className="text-sm font-semibold text-gray-900">
-          {topUser.address}
+          {positionUser.address}
         </span>
       </div>
 
@@ -72,7 +66,7 @@ const LeaderboardBadge: React.FC = () => {
           height={16}
           className="mr-1"
         />
-        <span className="text-sm font-medium text-gray-800">1st</span>
+        <span className="text-sm font-medium text-gray-800">{positionUser.rank}st</span>
       </div>
 
       {/* Points pill */}
@@ -85,7 +79,7 @@ const LeaderboardBadge: React.FC = () => {
           className="mr-1"
         />
         <span className="text-sm font-medium text-gray-800">
-          {topUser.points} points
+          {positionUser.points} points
         </span>
       </div>
     </div>
@@ -93,3 +87,4 @@ const LeaderboardBadge: React.FC = () => {
 };
 
 export default LeaderboardBadge;
+
