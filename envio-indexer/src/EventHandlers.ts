@@ -72,7 +72,7 @@ Chog.Transfer.handler(async ({ event, context }) => {
   if (event.params.value > CHOG_____WHALE_TRANSFER) {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/events/transfers`,
+        `${process.env.API_BASE_URL}/events/transfers`,
         {
           method: "POST",
           headers: {
@@ -149,7 +149,7 @@ Molandak.Transfer.handler(async ({ event, context }) => {
     try {
       // Store the transfer in the database via a POST request to the backend
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/events/transfers`,
+        `${process.env.API_BASE_URL}/events/transfers`,
         {
           method: "POST",
           headers: {
@@ -221,7 +221,7 @@ Moyaki.Transfer.handler(async ({ event, context }) => {
     try {
       // Store the transfer in the database via a POST request to the backend
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/events/transfers`,
+        `${process.env.API_BASE_URL}/events/transfers`,
         {
           method: "POST",
           headers: {

@@ -5,6 +5,8 @@ import {
   UniswapPoolFactory_PoolCreated_event,
 } from "generated";
 
+import sendTelegramNotification from "./services/telegram";
+
 UniswapPoolFactory.PoolCreated.handler(async ({ event, context }) => {
   const token0Address = event.params.token0;
   const token1Address = event.params.token1;
@@ -36,7 +38,7 @@ async function handleNewListing(
   try {
     // Store the token in the database via a POST request to the backend
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/events/listings`,
+      `${process.env.API_BASE_URL}/events/listings`,
       {
         method: "POST",
         headers: {
@@ -60,8 +62,11 @@ async function handleNewListing(
       console.log("listing already exists");
     } else if (response.status === 201) {
       // here put the telegram notification
-      const message = "New Listing!!!";
-      // await sendTelegramNotification(message);
+      const message =
+        `🚀 <b>New Token Listed on Uniswap V3!</b>\n\n` +
+        `<b>Token Address:</b> <code>${address}</code>\n` +
+        `<b>View on Explorer:</b> <a href="https://testnet.monadexplorer.com/token/${address}">Click here</a>`;
+      await sendTelegramNotification(message);
 
       console.log("listing stored successfully");
     }

@@ -85,7 +85,7 @@ export class TransferTracker {
       ) {
         try {
           const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL}/events/spike`,
+            `${process.env.API_BASE_URL}/events/spike`,
             {
               method: "POST",
               headers: {
