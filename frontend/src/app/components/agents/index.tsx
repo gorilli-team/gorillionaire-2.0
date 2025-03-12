@@ -120,13 +120,6 @@ const Agents = () => {
     }
   }, [isConfirming, isConfirmed, error]);
 
-  // Fetch signals when the user has an NFT
-  useEffect(() => {
-    if (hasNFT && address) {
-      fetchSignals();
-    }
-  }, [hasNFT, address]);
-
   const fetchSignals = async () => {
     setIsLoadingSignals(true);
     setSignalError("");
