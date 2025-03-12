@@ -63,6 +63,17 @@ export default function Sidebar({
           <li>
             <button
               className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
+                selectedPage === "Leaderboard" ? "bg-gray-200" : ""
+              }`}
+              onClick={() => handlePageChange("Leaderboard")}
+            >
+              <i className="fa-solid fa-star pr-2"></i>
+              <span>Leaderboard</span>
+            </button>
+          </li>
+          <li>
+            <button
+              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
                 selectedPage === "Agents" ? "bg-gray-200" : ""
               }`}
               onClick={() => handlePageChange("Agents")}
@@ -71,30 +82,16 @@ export default function Sidebar({
               <span>Agents</span>
             </button>
           </li>
-
-          <>
-            <li>
-              <button
-                className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
-                  selectedPage === "Leaderboard" ? "bg-gray-200" : ""
-                }`}
-                onClick={() => handlePageChange("Leaderboard")}
-              >
-                <i className="fa-solid fa-star pr-2"></i>
-                <span>Leaderboard</span>
-              </button>
-            </li>
-          </>
         </ul>
       </nav>
-      
+
       {/* Footer */}
       <div className="border-t border-gray-200 p-4">
         <ul className="space-y-2">
           <li>
-            <a 
-              href="https://github.com/gorilli-team/gorillionaire" 
-              target="_blank" 
+            <a
+              href="https://github.com/gorilli-team/gorillionaire"
+              target="_blank"
               rel="noopener noreferrer"
               className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 flex items-center"
             >
@@ -108,11 +105,11 @@ export default function Sidebar({
               <span>GitHub</span>
             </a>
           </li>
-          
+
           <li>
-            <a 
-              href="https://x.com/gorillionaireAI" 
-              target="_blank" 
+            <a
+              href="https://x.com/gorillionaireAI"
+              target="_blank"
               rel="noopener noreferrer"
               className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 flex items-center"
             >
@@ -129,12 +126,7 @@ export default function Sidebar({
         </ul>
         <div className="flex items-center pl-3 mt-4 text-xs text-gray-500">
           <span className="mr-2">Powered by</span>
-          <Image
-            src="/Vector.svg"
-            alt="Gorilli"
-            width={70}
-            height={70}
-          />
+          <Image src="/Vector.svg" alt="Gorilli" width={70} height={70} />
         </div>
       </div>
     </aside>

@@ -22,7 +22,6 @@ import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
 
-
 type Token = {
   symbol: string;
   name: string;
@@ -397,7 +396,7 @@ const Signals = () => {
       if (quote.issues?.balance) {
         return toast.error("Insufficient balance");
       }
-      
+
       // Show notification when trade request is being sent to the blockchain
       toast(
         <div>
@@ -588,7 +587,7 @@ const Signals = () => {
         theme="light"
         transition={Bounce}
       />
-      
+
       <div className="px-2 sm:px-4 py-4 sm:py-6">
         {/* Token Stats */}
         {user?.wallet?.address && (
@@ -674,7 +673,7 @@ const Signals = () => {
                                 : "text-red-500"
                             }`}
                           >
-                            {trade.amount}k {trade.token}
+                            {trade.amount} {trade.token}
                           </span>
                           <span className="text-xs text-gray-500 ml-2">
                             {trade.timeAgo}
