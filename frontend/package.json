@@ -11,6 +11,7 @@
   "dependencies": {
     "@coinbase/onchainkit": "^0.36.9",
     "@privy-io/react-auth": "^2.6.2",
+    "axios": "^1.8.3",
     "ethers": "^6.13.5",
     "flowbite-react": "^0.10.2",
     "gorillionaire-frontend": "file:",
