@@ -193,8 +193,9 @@ const Agents = () => {
                   <div className="flex items-center">
                     <div className="w-2 h-2 bg-yellow-400 rounded-full mr-2 flex-shrink-0"></div>
                     <p className="text-sm text-gray-700">
-                      Currently <span className="font-medium">247</span>{" "}
-                      Gorillionaires powering their agents with our signals
+                      Join the{" "}
+                      <span className="font-medium">Gorillionaires</span>{" "}
+                      powering their agents with our signals
                     </p>
                   </div>
                 </div>
