@@ -4,8 +4,6 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Image from "next/image";
 import { trackedTokens } from "@/app/shared/tokenData";
 import {
-  useReadContracts,
-  useBalance,
   useWriteContract,
   useConfig,
   useSignTypedData,
@@ -30,6 +28,7 @@ import {
 import { usePrivy } from "@privy-io/react-auth";
 import { toast } from "react-toastify";
 import Cookies from "js-cookie";
+
 type Token = {
   symbol: string;
   name: string;
@@ -38,6 +37,17 @@ type Token = {
   decimals: number;
   address: `0x${string}`;
   price: number;
+};
+
+type ApiTokenHolder = {
+  balance: string;
+  contractAddress: string;
+  decimal: number;
+  imageURL: string;
+  name: string;
+  price: string;
+  symbol: string;
+  verified: boolean;
 };
 
 type TradeEvent = {
@@ -86,7 +96,6 @@ const parseSignalText = (signalText: string) => {
 };
 
 const fetchImageFromSignalText = (signalText: string) => {
-  //find the first instance of one of the following words: CHOG, DAK, YAKI, MON
   const { symbol } = parseSignalText(signalText);
   if (symbol === "CHOG") {
     return "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/5d1206c2-042c-4edc-9f8b-dcef2e9e8f00/public";
@@ -97,7 +106,6 @@ const fetchImageFromSignalText = (signalText: string) => {
   } else if (symbol === "MON") {
     return "https://imagedelivery.net/cBNDGgkrsEA-b_ixIp9SkQ/I_t8rg_V_400x400.jpg/public";
   } else {
-    //return placeholder image/ no token
     return "https://imagedelivery.net/cBNDGgkrsEA-b_ixIp9SkQ/I_t8rg_V_400x400.jpg/public";
   }
 };
@@ -146,11 +154,43 @@ const Signals = () => {
   const [moyakiPrice, setMoyakiPrice] = useState<number>(0);
   const [monPrice, setMonPrice] = useState<number>(0);
 
-  // Get native MON balance
-  const { data: monBalanceData } = useBalance({
-    address: user?.wallet?.address as `0x${string}`,
-    chainId: MONAD_CHAIN_ID,
-  });
+  const fetchHolderData = async () => {
+    try {
+      if (!user?.wallet?.address) {
+        console.log("No wallet address available");
+        return;
+      }
+      
+      // Fetch token holders data for specific user
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/token/holders/user/${user.wallet.address}`);
+      const data = await response.json();
+      console.log("Token holders:", data);
+      
+      if (data.code === 0 && data.result && data.result.data && Array.isArray(data.result.data)) {
+        data.result.data.forEach((token: ApiTokenHolder) => {
+          console.log(`Setting ${token.symbol} balance to ${token.balance}`);
+          if (token.symbol === "MON") {
+            setMonBalance(parseFloat(token.balance));
+          } else if (token.symbol === "CHOG") {
+            setChogBalance(parseFloat(token.balance));
+          } else if (token.symbol === "DAK") {
+            setDakBalance(parseFloat(token.balance));
+          } else if (token.symbol === "YAKI") {
+            setMoyakiBalance(parseFloat(token.balance));
+          }
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching token holders data:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (user?.wallet?.address) {
+      console.log("User logged in, fetching holder data");
+      fetchHolderData();
+    }
+  }, [user?.wallet?.address]);
 
   const fetchPriceData = async () => {
     try {
@@ -189,44 +229,10 @@ const Signals = () => {
     }
   };
 
-  // Get other token balances
-  const { data } = useReadContracts({
-    contracts: trackedTokens
-      .filter(
-        (t) =>
-          isAddress(t.address) &&
-          user?.wallet?.address &&
-          isAddress(user?.wallet?.address)
-      )
-      .flatMap((t) => [
-        {
-          address: t.address as `0x${string}`,
-          abi: erc20Abi,
-          functionName: "balanceOf",
-          args: [user?.wallet?.address],
-          chainId: MONAD_CHAIN_ID,
-        },
-      ]),
-  });
-
   useEffect(() => {
     console.log("Fetching price data");
     fetchPriceData();
   }, []);
-
-  useEffect(() => {
-    if (monBalanceData) {
-      setMonBalance(Number(monBalanceData.formatted));
-    }
-  }, [monBalanceData]);
-
-  useEffect(() => {
-    if (data && data.length >= 3) {
-      setDakBalance(Number(data[0].result) / 10 ** 18);
-      setMoyakiBalance(Number(data[1].result) / 10 ** 18);
-      setChogBalance(Number(data[2].result) / 10 ** 18);
-    }
-  }, [data]);
 
   const tokens: Token[] = useMemo(
     () => [
@@ -367,7 +373,9 @@ const Signals = () => {
     async (token: Token, amount: number, type: "Buy" | "Sell") => {
       if (!user?.wallet?.address) return;
 
-      // for sells we need to convert percentage to aamount, for buys change gets handled backend/side
+      console.log("token & amount", token,amount);
+
+      // for sells we need to convert percentage to amount, for buys change gets handled backend/side
       const sellAmount =
         type === "Sell" ? (token.totalHolding * amount) / 100 : amount;
 
@@ -516,6 +524,7 @@ const Signals = () => {
         const token = tokens.find((t) => symbol === t.symbol);
         if (!token) return;
 
+
         await onYes(token, amount, signal.type);
       } else {
         onNo(signalId);
@@ -540,6 +549,8 @@ const Signals = () => {
     },
     [tradeSignals, selectedOptions, onYes, onNo, tokens, user?.wallet?.address]
   );
+
+  console.log("object tokens", tokens);
 
   if (isLoading) {
     return <LoadingOverlay />;
