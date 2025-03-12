@@ -75,7 +75,11 @@ async function buildPriceRequest(tokenSymbol, amount, type, userAddress) {
 }
 
 async function getPrice(token, amount, type) {
-  const { priceParams, headers } = await buildPriceRequest(token, amount, type);
+  const { priceParams, headers } = await buildPriceRequest(
+    token,
+    Number(amount),
+    type
+  );
 
   const priceResponse = await fetch(
     "https://api.0x.org/swap/permit2/price?" + priceParams.toString(),
@@ -90,7 +94,7 @@ async function getPrice(token, amount, type) {
 
 async function getQuote(token, amount, type, userAddress) {
   const { priceParams, headers, usdValue, tokenPrice } =
-    await buildPriceRequest(token, amount, type, userAddress);
+    await buildPriceRequest(token, Number(amount), type, userAddress);
 
   const priceResponse = await fetch(
     "https://api.0x.org/swap/permit2/quote?" + priceParams.toString(),
