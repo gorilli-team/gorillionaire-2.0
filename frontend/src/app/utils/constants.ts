@@ -5,3 +5,7 @@ export const MON_ADDRESS =
 export const PERMIT2_ADDRESS =
   "0x000000000022d473030f116ddee9f6b43ac78ba3" as const;
 export const MONAD_CHAIN_ID = 10143;
+
+export const NFT_ACCESS_ADDRESS = 
+  "0x12bF70e3325104ed2D7fefbB8f3e88cE2Dd66A30" as const;
+

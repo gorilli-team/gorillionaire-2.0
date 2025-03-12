@@ -1,18 +1,86 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { usePrivy } from "@privy-io/react-auth";
+import { parseEther } from "viem";
+import { NFT_ACCESS_ADDRESS } from "../../utils/constants";
+import ACCESS_NFT_ABI from "../../../../../access-nft/abi/AccessNFTAbi.json";
 
 const Agents = () => {
+  const { isConnected, address } = useAccount();
+  const { login } = usePrivy();
   const [isMinting, setIsMinting] = useState(false);
   const [mintSuccess, setMintSuccess] = useState(false);
+  const [hasNFT, setHasNFT] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleMint = () => {
-    setIsMinting(true);
-    // Simulate minting process
-    setTimeout(() => {
+  useReadContract({
+    address: NFT_ACCESS_ADDRESS,
+    abi: ACCESS_NFT_ABI,
+    functionName: 's_price',
+    query: { enabled: isConnected },
+  });
+
+  const { data: nftBalance } = useReadContract({
+    address: NFT_ACCESS_ADDRESS,
+    abi: ACCESS_NFT_ABI,
+    functionName: 'balanceOf',
+    args: [address],
+    query: { enabled: isConnected && !!address },
+  });
+
+  useEffect(() => {
+    if (typeof nftBalance === 'bigint' || typeof nftBalance === 'number') {
+      if (nftBalance > 0) {
+        setHasNFT(true);
+        setMintSuccess(true);
+      }
+    }
+  }, [nftBalance]);
+
+  const { writeContract, data: hash, error } = useWriteContract();
+  
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
+    hash,
+    query: { enabled: !!hash },
+  });
+
+
+  useEffect(() => {
+    if (isConfirming) {
+      setIsMinting(true);
+    } else if (isConfirmed) {
       setIsMinting(false);
       setMintSuccess(true);
-    }, 2000);
+    } else if (error) {
+      setIsMinting(false);
+      setErrorMessage(error.message || "Transaction failed. Please try again.");
+    }
+  }, [isConfirming, isConfirmed, error]);
+
+  const handleMint = () => {
+    if (!isConnected) {
+      login();
+      return;
+    }
+
+    setErrorMessage("");
+    setIsMinting(true);
+    
+    try {
+      // Call mint function with 1 MON as payment
+      writeContract({
+        address: NFT_ACCESS_ADDRESS,
+        abi: ACCESS_NFT_ABI,
+        functionName: 'mint',
+        value: parseEther('1'), // 1 MON = 1 * 10^18 wei
+      });
+    } catch (err) {
+      console.error("Mint error:", err);
+      setIsMinting(false);
+      setErrorMessage("Failed to start minting process. Please try again.");
+    }
   };
 
   return (
@@ -90,6 +158,15 @@ const Agents = () => {
                   </div>
                 </div>
 
+                {errorMessage && (
+                  <div className="bg-red-100 border border-red-200 text-red-700 p-4 rounded-lg mb-6">
+                    <div className="flex items-center">
+                      <span className="text-xl mr-2 flex-shrink-0">⚠️</span>
+                      <p>{errorMessage}</p>
+                    </div>
+                  </div>
+                )}
+
                 {mintSuccess ? (
                   <div className="bg-green-100 border border-green-200 text-green-700 p-4 rounded-lg mb-6">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2">
@@ -105,14 +182,16 @@ const Agents = () => {
                 ) : (
                   <button
                     onClick={handleMint}
-                    disabled={isMinting}
+                    disabled={isMinting || hasNFT}
                     className={`w-full py-3 px-4 rounded-lg font-medium text-white ${
-                      isMinting
+                      isMinting || hasNFT
                         ? "bg-gray-400"
                         : "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
                     } transition-all duration-200 flex items-center justify-center`}
                   >
-                    {isMinting ? (
+                    {!isConnected ? (
+                      "Connect Wallet to Mint"
+                    ) : isMinting ? (
                       <>
                         <svg
                           className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
@@ -136,6 +215,8 @@ const Agents = () => {
                         </svg>
                         Minting...
                       </>
+                    ) : hasNFT ? (
+                      "You Already Own This NFT"
                     ) : (
                       "Mint NFT to Fuel Your Trading Agents"
                     )}
@@ -149,9 +230,16 @@ const Agents = () => {
                     </h5>
                     <div className="bg-gray-100 p-3 rounded-lg flex items-center justify-between">
                       <code className="text-xs text-gray-600 truncate">
-                        0x86f6D762B53f21Te53fa5762D294d576A36...
+                        {address ? `${address.slice(0, 24)}...` : "0x86f6D762B53f21Te53fa5762D294d576A36..."}
                       </code>
-                      <button className="text-purple-600 hover:text-purple-800 flex-shrink-0 ml-2">
+                      <button 
+                        className="text-purple-600 hover:text-purple-800 flex-shrink-0 ml-2"
+                        onClick={() => {
+                          if (address) {
+                            navigator.clipboard.writeText(address);
+                          }
+                        }}
+                      >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           className="h-5 w-5"
@@ -177,7 +265,7 @@ const Agents = () => {
                         <code>
                           {`// Connect your trading agent to our signal API
 const signals = await fetch('https://api.gorillionaire.io/signals', {
-  headers: { 'xxx' : 'xxx' }
+  headers: { 'Authorization': 'Bearer ${address ? address : "0x86f6D762B53f21Te53fa5762D294d576A36"}' }
 });
 
 // Feed signals directly to your agent
