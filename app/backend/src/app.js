@@ -33,6 +33,7 @@ app.use("/pyth", require("./routes/pyth/mon-price"));
 
 app.use("/activity/track", require("./routes/activity/track"));
 app.use("/token/holders", require("./routes/token/holders"));
+app.use("/gorilli-nft/holders", require("./routes/gorilliNft/holders"));
 app.use(
   "/signals/generated-signals",
   require("./routes/signals/generated-signals")

@@ -5,6 +5,8 @@ const TokenHolders = require("../models/TokenHolders");
 const baseURL =
   process.env.BLOCKVISION_API_URL || "https://api.blockvision.org/v2/monad";
 const apiKey = process.env.BLOCKVISION_API_KEY;
+const GORILLI_NFT_CONTRACT_ADDRESS =
+  "0x12bF70e3325104ed2D7fefbB8f3e88cE2Dd66A30";
 
 // Function to retrieve token holders
 const retrieveTokenHolders = async ({
@@ -82,8 +84,27 @@ const retrieveAddressTokens = async ({
   }
 };
 
+const retrieveGorilliNftHolders = async () => {
+  try {
+    const response = await axios.get(
+      `${baseURL}/collection/holders?contractAddress=${GORILLI_NFT_CONTRACT_ADDRESS}`,
+      {
+        headers: {
+          "x-api-key": apiKey,
+          accept: "application/json",
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error retrieving gorilli nft holders:", error.message);
+  }
+};
+
 // Export the function directly
 module.exports = {
   retrieveTokenHolders,
   retrieveAddressTokens,
+  retrieveGorilliNftHolders,
 };
