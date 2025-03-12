@@ -143,6 +143,7 @@ const Signals = () => {
   const [chogPrice, setChogPrice] = useState<number>(0);
   const [dakPrice, setDakPrice] = useState<number>(0);
   const [moyakiPrice, setMoyakiPrice] = useState<number>(0);
+  const [monPrice, setMonPrice] = useState<number>(0);
 
   // Get native MON balance
   const { data: monBalanceData } = useBalance({
@@ -152,6 +153,15 @@ const Signals = () => {
 
   const fetchPriceData = async () => {
     try {
+
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/pyth/mon-price`
+      );
+      const monData = await res.json();
+      const monPrice = monData?.price?.price;
+      const scaledMonPrice = Number(monPrice) / 1e8;
+      setMonPrice(scaledMonPrice);
+
       console.log("Fetching price data");
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/events/prices/latest`
@@ -222,7 +232,7 @@ const Signals = () => {
         imageUrl: fetchImageFromSignalText("MON"),
         decimals: 18,
         address: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-        price: 0,
+        price: monPrice,
       },
       {
         symbol: "DAK",
@@ -538,17 +548,23 @@ const Signals = () => {
                       className="object-cover rounded-full"
                     />
                   </div>
-                  <div className="flex flex-col flex-grow">
-                    <span className="text-sm">{token.name}</span>
-                    <span className="text-xl font-bold">
-                      {formatNumber(token.totalHolding)}{" "}
-                      <span className="text-xl font-bold">{token.symbol}</span>
+                  <div className="flex flex-col flex-grow space-y-1">
+                    <span className="text-sm text-gray-600 font-medium">
+                      {token.name}
+                    </span>
+                    <div className="flex flex-col">
+                      <span className="text-2xl font-bold text-gray-900">
+                        {formatNumber(token.totalHolding)}{" "}
+                        <span className="text-xl font-semibold text-violet-600">
+                          {token.symbol}
+                        </span>
+                      </span>
                       {token.price && token.price > 0 ? (
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-gray-500 mt-1">
                           ${token?.price?.toFixed(4)}
                         </span>
                       ) : null}
-                    </span>
+                    </div>
                   </div>
                   <div className="flex flex-col items-end"></div>
                 </div>
