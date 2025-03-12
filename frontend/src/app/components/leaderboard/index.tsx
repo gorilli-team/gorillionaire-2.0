@@ -14,9 +14,8 @@ interface Investor {
 }
 
 interface Activity {
-  action: string;
-  amount: string;
-  token: string;
+  name: string;
+  points: string;
   date: string;
 }
 
@@ -54,8 +53,8 @@ const LeaderboardComponent = () => {
         `${process.env.NEXT_PUBLIC_API_URL}/activity/track/me?address=${address}`
       );
       const data = await response.json();
-      console.log("me", data);
-      setActivities(data?.activitiesList || []);
+      console.log("userActivity:", data); 
+      setActivities(data?.userActivity.activitiesList || []);
     } catch (error) {
       console.error("Error fetching user activity:", error);
       setActivities([]);
@@ -255,6 +254,7 @@ const LeaderboardComponent = () => {
                     <tr className="text-left text-sm text-gray-500 border-b">
                       <th className="pb-2 font-medium">ACTIVITY</th>
                       <th className="pb-2 font-medium text-right">DATE</th>
+                      <th className="pb-2 font-medium text-right">POINTS</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -264,31 +264,35 @@ const LeaderboardComponent = () => {
                           <td className="py-3 sm:py-4 h-14 sm:h-16">
                             <div className="flex items-center">
                               <span className="text-yellow-500 mr-2">
-                                {activity.action === "Bought" ? "💰" : "💸"}
                               </span>
                               <span className="truncate max-w-[120px] sm:max-w-[250px] md:max-w-full">
-                                {activity.action} {activity.amount} {activity.token}
+                                {activity.name} 
                               </span>
                             </div>
                           </td>
                           <td className="py-3 sm:py-4 h-14 sm:h-16 text-right text-gray-500">
                             {getTimeAgo(activity.date)}
                           </td>
+                          <td className="py-3 sm:py-4 h-14 sm:h-16 text-right text-gray-500">
+                            {activity.points} Points
+                          </td>
                         </tr>
                       ))
                     ) : (
                       <tr className="border-b border-gray-100">
-                        <td colSpan={2} className="py-6 sm:py-8 text-center text-gray-500">
+                        <td colSpan={3} className="py-6 sm:py-8 text-center text-gray-500">
                           No activities yet
                         </td>
                       </tr>
                     )}
-                    {/* Empty rows to maintain fixed height when fewer items */}
+
+                    {/* Empty rows */}
                     {emptyActivityRows.map((_, index) => (
                       <tr
-                        key={`empty-activity-${index}`}
+                        key={`empty-${index}`}
                         className="border-b border-gray-100"
                       >
+                        <td className="h-14 sm:h-16"></td>
                         <td className="h-14 sm:h-16"></td>
                         <td className="h-14 sm:h-16"></td>
                       </tr>
@@ -299,8 +303,7 @@ const LeaderboardComponent = () => {
             </div>
           </div>
 
-          {/* Activities Pagination centered */}
-          <div className="mt-2 flex flex-col sm:flex-row items-center justify-between px-1 sm:px-0">
+          <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row items-center justify-between px-1 sm:px-0">
             <span className="text-sm text-gray-500 mb-3 sm:mb-0 font-bold">
               <span className="font-normal">Showing</span>{" "}
               {activities.length > 0 ? indexOfFirstActivity + 1 : 0}-
@@ -315,7 +318,6 @@ const LeaderboardComponent = () => {
                 showIcons={true}
               />
             </div>
-            <div className="hidden sm:block sm:w-32"></div>
           </div>
         </div>
       </div>
