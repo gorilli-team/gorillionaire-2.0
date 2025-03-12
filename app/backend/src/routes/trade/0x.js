@@ -8,7 +8,7 @@ const LIMIT = 20;
 router.get("/completed", async (req, res) => {
   const { page = 1, limit = LIMIT } = req.query;
   const intents = await Intent.find({ status: "completed" })
-    .sort({ createdAt: -1 })
+    .sort({ timestamp: -1 })
     .skip((page - 1) * limit)
     .limit(limit);
 
