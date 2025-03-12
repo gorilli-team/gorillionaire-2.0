@@ -36,6 +36,7 @@ type Token = {
   totalHolding: number;
   decimals: number;
   address: `0x${string}`;
+  price: number;
 };
 
 type TradeEvent = {
@@ -102,7 +103,7 @@ const fetchImageFromSignalText = (signalText: string) => {
 
 const formatNumber = (num: number): string => {
   if (isNaN(num)) return "0";
-  
+
   if (num >= 1_000_000) {
     return (
       (num / 1_000_000).toLocaleString("en-US", { maximumFractionDigits: 1 }) +
@@ -139,12 +140,44 @@ const Signals = () => {
   const [dakBalance, setDakBalance] = useState<number>(0);
   const [monBalance, setMonBalance] = useState<number>(0);
   const [completedTrades, setCompletedTrades] = useState<TradeEvent[]>([]);
+  const [chogPrice, setChogPrice] = useState<number>(0);
+  const [dakPrice, setDakPrice] = useState<number>(0);
+  const [moyakiPrice, setMoyakiPrice] = useState<number>(0);
 
   // Get native MON balance
   const { data: monBalanceData } = useBalance({
     address,
     chainId: MONAD_CHAIN_ID,
   });
+
+  const fetchPriceData = async () => {
+    try {
+      console.log("Fetching price data");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/events/prices/latest`
+      );
+      const data = await response.json();
+
+      data.data.forEach(
+        (item: {
+          symbol: string;
+          price: {
+            price: number;
+          };
+        }) => {
+          if (item.symbol === "CHOG") {
+            setChogPrice(item.price?.price);
+          } else if (item.symbol === "DAK") {
+            setDakPrice(item.price?.price);
+          } else if (item.symbol === "YAKI") {
+            setMoyakiPrice(item.price?.price);
+          }
+        }
+      );
+    } catch (error) {
+      console.error("Error fetching price data:", error);
+    }
+  };
 
   // Get other token balances
   const { data } = useReadContracts({
@@ -160,6 +193,11 @@ const Signals = () => {
         },
       ]),
   });
+
+  useEffect(() => {
+    console.log("Fetching price data");
+    fetchPriceData();
+  }, []);
 
   useEffect(() => {
     if (monBalanceData) {
@@ -184,6 +222,7 @@ const Signals = () => {
         imageUrl: fetchImageFromSignalText("MON"),
         decimals: 18,
         address: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+        price: 0,
       },
       {
         symbol: "DAK",
@@ -192,6 +231,7 @@ const Signals = () => {
         imageUrl: fetchImageFromSignalText("DAK"),
         decimals: 18,
         address: "0x0F0BDEbF0F83cD1EE3974779Bcb7315f9808c714",
+        price: dakPrice,
       },
       {
         symbol: "YAKI",
@@ -200,6 +240,7 @@ const Signals = () => {
         imageUrl: fetchImageFromSignalText("YAKI"),
         decimals: 18,
         address: "0xfe140e1dCe99Be9F4F15d657CD9b7BF622270C50",
+        price: moyakiPrice,
       },
       {
         symbol: "CHOG",
@@ -208,11 +249,20 @@ const Signals = () => {
         imageUrl: fetchImageFromSignalText("CHOG"),
         decimals: 18,
         address: "0xE0590015A873bF326bd645c3E1266d4db41C4E6B",
+        price: chogPrice,
       },
     ],
-    [monBalance, dakBalance, moyakiBalance, chogBalance]
+    [
+      monBalance,
+      dakBalance,
+      moyakiBalance,
+      chogBalance,
+      chogPrice,
+      dakPrice,
+      moyakiPrice,
+    ]
   );
-  
+
   const fetchCompletedTrades = async () => {
     try {
       const response = await fetch(
@@ -220,7 +270,7 @@ const Signals = () => {
       );
       const data: ApiTrade[] = await response.json();
       console.log("Completed trades response:", data);
-      
+
       const formattedTrades = data.map((trade: ApiTrade) => ({
         user: trade.userAddress,
         action: trade.action,
@@ -229,7 +279,7 @@ const Signals = () => {
         timeAgo: getTimeAgo(trade.timestamp),
         userImageUrl: trade.userImageUrl || "/avatar_0.png",
       }));
-  
+
       setCompletedTrades(formattedTrades);
     } catch (error) {
       console.error("Error fetching completed trades:", error);
@@ -239,57 +289,6 @@ const Signals = () => {
   useEffect(() => {
     fetchCompletedTrades();
   }, []);
-
-  // const recentTrades: TradeEvent[] = [
-  //   {
-  //     user: "arthur457.nad",
-  //     action: "Sold",
-  //     amount: 10,
-  //     token: "CHOG",
-  //     timeAgo: "19s ago",
-  //     userImageUrl: "/avatar_1.png",
-  //   },
-  //   {
-  //     user: "imfrancis.nad",
-  //     action: "Bought",
-  //     amount: 5,
-  //     token: "YAKI",
-  //     timeAgo: "14s ago",
-  //     userImageUrl: "/avatar_2.png",
-  //   },
-  //   {
-  //     user: "nfthomas.nad",
-  //     action: "Sold",
-  //     amount: 5,
-  //     token: "YAKI",
-  //     timeAgo: "9s ago",
-  //     userImageUrl: "/avatar_3.png",
-  //   },
-  //   {
-  //     user: "luduvigo.nad",
-  //     action: "Bought",
-  //     amount: 20,
-  //     token: "DAK",
-  //     timeAgo: "35s ago",
-  //     userImageUrl: "/avatar_4.png",
-  //   },
-  //   {
-  //     user: "stephen.nad",
-  //     action: "Bought",
-  //     amount: 10,
-  //     token: "CHOG",
-  //     timeAgo: "28s ago",
-  //     userImageUrl: "/avatar_5.png",
-  //   },
-  //   {
-  //     user: "fester.nad",
-  //     action: "Sold",
-  //     amount: 5,
-  //     token: "DAK",
-  //     timeAgo: "11s ago",
-  //     userImageUrl: "/avatar_6.png",
-  //   },
-  // ];
 
   const [tradeSignals, setTradeSignals] = useState<TradeSignal[]>([]);
   const [pastSignals, setPastSignals] = useState<TradeSignal[]>([]);
@@ -544,6 +543,11 @@ const Signals = () => {
                     <span className="text-xl font-bold">
                       {formatNumber(token.totalHolding)}{" "}
                       <span className="text-xl font-bold">{token.symbol}</span>
+                      {token.price && token.price > 0 ? (
+                        <span className="text-sm text-gray-500">
+                          ${token?.price?.toFixed(4)}
+                        </span>
+                      ) : null}
                     </span>
                   </div>
                   <div className="flex flex-col items-end"></div>
@@ -558,50 +562,52 @@ const Signals = () => {
           <div className="py-2 px-3">
             <div className="ticker-wrapper">
               <div className="ticker-track">
-                {[...completedTrades, ...completedTrades, ...completedTrades].map(
-                  (trade, index) => (
-                    <div key={index} className="ticker-item">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 relative border border-gray-200">
-                          {trade.userImageUrl && (
-                            <Image
-                              src={trade.userImageUrl}
-                              alt={`${trade.user} avatar`}
-                              width={32}
-                              height={32}
-                              className="object-cover"
-                            />
-                          )}
+                {[
+                  ...completedTrades,
+                  ...completedTrades,
+                  ...completedTrades,
+                ].map((trade, index) => (
+                  <div key={index} className="ticker-item">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 relative border border-gray-200">
+                        {trade.userImageUrl && (
+                          <Image
+                            src={trade.userImageUrl}
+                            alt={`${trade.user} avatar`}
+                            width={32}
+                            height={32}
+                            className="object-cover"
+                          />
+                        )}
+                      </div>
+                      <div className="flex flex-col">
+                        <div className="flex items-center">
+                          <span className="text-sm font-bold">
+                            {trade.user}
+                          </span>
                         </div>
-                        <div className="flex flex-col">
-                          <div className="flex items-center">
-                            <span className="text-sm font-bold">
-                              {trade.user}
-                            </span>
-                          </div>
-                          <div className="flex items-center">
-                            <span className="mr-1">
-                              {trade.action === "buy" ? "💰" : "💸"}
-                            </span>
-                            <span className="text-sm mr-1">{trade.action}</span>
-                            <span
-                              className={`text-sm font-bold ${
-                                trade.action === "buy"
-                                  ? "text-green-500"
-                                  : "text-red-500"
-                              }`}
-                            >
-                              {trade.amount}k {trade.token}
-                            </span>
-                            <span className="text-xs text-gray-500 ml-2">
-                              {trade.timeAgo}
-                            </span>
-                          </div>
+                        <div className="flex items-center">
+                          <span className="mr-1">
+                            {trade.action === "buy" ? "💰" : "💸"}
+                          </span>
+                          <span className="text-sm mr-1">{trade.action}</span>
+                          <span
+                            className={`text-sm font-bold ${
+                              trade.action === "buy"
+                                ? "text-green-500"
+                                : "text-red-500"
+                            }`}
+                          >
+                            {trade.amount}k {trade.token}
+                          </span>
+                          <span className="text-xs text-gray-500 ml-2">
+                            {trade.timeAgo}
+                          </span>
                         </div>
                       </div>
                     </div>
-                  )
-                )}
+                  </div>
+                ))}
               </div>
             </div>
           </div>

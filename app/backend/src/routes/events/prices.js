@@ -24,6 +24,29 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/latest", async (req, res) => {
+  try {
+    const symbols = ["CHOG", "DAK", "YAKI"];
+
+    //for each symbol, get the latest price
+    const prices = await Promise.all(
+      symbols.map(async (symbol) => {
+        const price = await PriceData.findOne({
+          tokenSymbol: symbol.toUpperCase(),
+        })
+          .sort({ timestamp: -1 })
+          .limit(1);
+        return { symbol, price };
+      })
+    );
+
+    res.json({ success: true, data: prices });
+  } catch (error) {
+    console.error("Error fetching prices:", error);
+    res.status(500).json({ success: false, error: "Failed to fetch prices" });
+  }
+});
+
 // Trigger price update
 router.get("/update", async (req, res) => {
   try {
