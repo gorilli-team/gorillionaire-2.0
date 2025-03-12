@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Pagination } from "flowbite-react";
-import Image from "next/image";
 import { Time } from "lightweight-charts";
 
 import Token from "../token/index";
@@ -303,21 +302,6 @@ const Tokens = () => {
                             <span className="text-gray-500">
                               ({token.tokenSymbol})
                             </span>
-                            <a
-                              href={`https://testnet.monadexplorer.com/token/${token.tokenAddress}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center hover:opacity-80 transition-opacity"
-                            >
-                              <Image
-                                src="/monad-explorer.png"
-                                alt="Monad Logo"
-                                className="w-6 h-6 rounded-md"
-                                width={24}
-                                height={24}
-                                priority={false}
-                              />
-                            </a>
                           </div>
                         </td>
                         <td className="py-4 h-12 text-gray-700">

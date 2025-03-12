@@ -32,6 +32,7 @@ app.use("/pyth", require("./routes/pyth/mon-price"));
 //app.use("/events/price-feeds", require("./routes/events/price-feeds"));
 
 app.use("/activity/track", require("./routes/activity/track"));
+app.use("/token/holders", require("./routes/token/holders"));
 app.use(
   "/signals/generated-signals",
   require("./routes/signals/generated-signals")

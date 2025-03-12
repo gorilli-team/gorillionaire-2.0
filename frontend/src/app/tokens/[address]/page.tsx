@@ -47,6 +47,14 @@ export default function TokenPage() {
   const [hasMore, setHasMore] = useState(true);
   const [eventsNumber, setEventsNumber] = useState(0);
   const [newEventIds, setNewEventIds] = useState<Set<string>>(new Set());
+  const [tokenHolders, setTokenHolders] = useState<{
+    total: number;
+    holders: {
+      holder: string;
+      amount: number;
+      percentage: number;
+    }[];
+  } | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
 
   const [priceData, setPriceData] = useState<PriceData[]>([]);
@@ -86,6 +94,23 @@ export default function TokenPage() {
     }
   };
 
+  const fetchHolders = async (tokenAddress: string) => {
+    try {
+      console.log("fetching holders", tokenAddress);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/token/holders/${tokenAddress}`
+      );
+      const data = await response.json();
+      console.log("holders", data);
+      setTokenHolders({
+        total: data.total,
+        holders: data.holders,
+      });
+    } catch (error) {
+      console.error("Error fetching holders:", error);
+    }
+  };
+
   useEffect(() => {
     const fetchTokenData = async () => {
       if (!params.address) return;
@@ -107,6 +132,7 @@ export default function TokenPage() {
           setToken(tokenData);
           if (tokenData.symbol) {
             fetchPriceData(tokenData.symbol);
+            fetchHolders(tokenData.address);
           }
         } else {
           setToken(tokenData);
@@ -465,7 +491,7 @@ export default function TokenPage() {
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-600">Holders</p>
                   <p className="text-lg font-semibold">
-                    {token.holders?.toLocaleString() || "N/A"}
+                    {tokenHolders?.total?.toLocaleString() || "N/A"}
                   </p>
                 </div>
               </div>
@@ -550,6 +576,25 @@ export default function TokenPage() {
                   >
                     {loading ? "Loading..." : "Load More"}
                   </button>
+                )}
+              </div>
+            </div>
+            {/* add here a whales section with the top 10 holders */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h2 className="text-xl font-bold mb-6">Top 10 Holders</h2>
+              <div className="space-y-4">
+                {tokenHolders?.holders?.map(
+                  (holder: {
+                    holder: string;
+                    amount: number;
+                    percentage: number;
+                  }) => (
+                    <div key={holder.holder}>
+                      <p>{holder.holder}</p>
+                      <p>{holder.amount}</p>
+                      <p>{holder.percentage}%</p>
+                    </div>
+                  )
                 )}
               </div>
             </div>

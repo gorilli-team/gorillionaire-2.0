@@ -47,23 +47,37 @@ const Token: React.FC<TokenProps> = ({
             )}
           </div>
           <div className="flex flex-col">
-            <span className="font-semibold text-black text-sm sm:text-base">{name}</span>
+            <span className="font-semibold text-black text-sm sm:text-base">
+              {name}
+            </span>
             <span className="text-xs sm:text-sm text-gray-600">{symbol}</span>
           </div>
         </div>
       </div>
       <div className="space-y-1 sm:space-y-2 text-sm">
         <div className="flex justify-between items-center">
-          <span className="text-xs sm:text-sm text-gray-600">Tracked Since</span>
-          <span className="font-medium text-xs sm:text-sm">{trackedSince || "N/A"}</span>
+          <span className="text-xs sm:text-sm text-gray-600">
+            Tracked Since
+          </span>
+          <span className="font-medium text-xs sm:text-sm">
+            {trackedSince || "N/A"}
+          </span>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-xs sm:text-sm text-gray-600">Tracking Time</span>
-          <span className="font-medium text-xs sm:text-sm">{calculateTrackingTime()}</span>
+          <span className="text-xs sm:text-sm text-gray-600">
+            Tracking Time
+          </span>
+          <span className="font-medium text-xs sm:text-sm">
+            {calculateTrackingTime()}
+          </span>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-xs sm:text-sm text-gray-600">Signals Generated</span>
-          <span className="font-medium text-xs sm:text-sm">{signalsGenerated || 0}</span>
+          <span className="text-xs sm:text-sm text-gray-600">
+            Events Generated
+          </span>
+          <span className="font-medium text-xs sm:text-sm">
+            {signalsGenerated || 0}
+          </span>
         </div>
       </div>
     </div>

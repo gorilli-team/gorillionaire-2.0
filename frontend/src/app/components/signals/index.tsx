@@ -153,7 +153,6 @@ const Signals = () => {
 
   const fetchPriceData = async () => {
     try {
-
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/pyth/mon-price`
       );
@@ -270,6 +269,7 @@ const Signals = () => {
       chogPrice,
       dakPrice,
       moyakiPrice,
+      monPrice,
     ]
   );
 
@@ -561,7 +561,7 @@ const Signals = () => {
                       </span>
                       {token.price && token.price > 0 ? (
                         <span className="text-sm text-gray-500 mt-1">
-                          ${token?.price?.toFixed(4)}
+                          Price: ${token?.price?.toFixed(4)}
                         </span>
                       ) : null}
                     </div>
