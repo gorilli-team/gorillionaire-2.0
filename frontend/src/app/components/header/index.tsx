@@ -183,7 +183,6 @@ export default function Header() {
   useEffect(() => {
     if (userAddress) {
       console.log("Address updated:", userAddress);
-      // You can trigger any address-dependent operations here
     }
   }, [userAddress]);
 
