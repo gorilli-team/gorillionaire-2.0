@@ -193,7 +193,7 @@ export default function Header() {
       if (newPrice !== monPriceFormatted) {
         setMonPriceFormatted(newPrice);
         setIsFlashing(true);
-        setTimeout(() => setIsFlashing(false), 1000);
+        setTimeout(() => setIsFlashing(false), 5000);
       }
     } catch (error) {
       console.error("Error fetching price:", error);
