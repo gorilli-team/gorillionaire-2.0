@@ -177,7 +177,7 @@ const Agents = () => {
                         <code>
                           {`// Connect your trading agent to our signal API
 const signals = await fetch('https://api.gorillionaire.io/signals', {
-  headers: { 'Authorization': 'Bearer 0x86f6D762B53f21Te53fa5762D294d576A36' }
+  headers: { 'xxx' : 'xxx' }
 });
 
 // Feed signals directly to your agent
