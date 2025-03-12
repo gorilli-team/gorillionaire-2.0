@@ -125,6 +125,12 @@ const LeaderboardComponent = () => {
   const emptyInvestorRows = getEmptyRows(currentInvestors, itemsPerPage);
   const emptyActivityRows = getEmptyRows(currentActivities, itemsPerPage);
 
+  // Function to check if the current wallet address matches an investor
+  const isCurrentUserAddress = (investorAddress: string): boolean => {
+    if (!address) return false;
+    return address.toLowerCase() === investorAddress.toLowerCase();
+  };
+
   return (
     <div className="w-full bg-gray-100 px-2">
       <div className="w-full mx-auto px-1 sm:px-4 md:px-6 pt-4">
@@ -179,9 +185,13 @@ const LeaderboardComponent = () => {
                     {currentInvestors.map((investor) => (
                       <tr
                         key={investor.address}
-                        className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                        className={`border-b border-gray-100 hover:bg-gray-50 transition-colors ${
+                          isCurrentUserAddress(investor.address)
+                            ? "bg-violet-200"
+                            : ""
+                        }`}
                       >
-                        <td className="py-4 h-16 text-gray-700 pr-2">
+                        <td className="py-4 h-16 text-gray-700 pr-2 pl-4">
                           <div className="flex items-center">
                             {investor.rank <= 3 ? (
                               <span className="inline-flex items-center justify-center w-6 h-6 rounded-full mr-2 bg-amber-100 text-amber-800 font-bold">
@@ -267,9 +277,13 @@ const LeaderboardComponent = () => {
                 {/* Mobile View */}
                 <div className="sm:hidden space-y-4">
                   {currentInvestors.map((investor) => (
-                    <div
+                                          <div
                       key={investor.address}
-                      className="border rounded-lg p-3 space-y-3 hover:border-gray-300 transition-colors"
+                      className={`border rounded-lg p-3 space-y-3 hover:border-gray-300 transition-colors ${
+                        isCurrentUserAddress(investor.address)
+                          ? "bg-violet-200"
+                          : ""
+                      }`}
                     >
                       <div className="flex justify-between items-center">
                         <div className="flex items-center">
