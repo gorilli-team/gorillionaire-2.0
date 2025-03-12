@@ -11,7 +11,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import { parseEther } from "viem";
 import { NFT_ACCESS_ADDRESS } from "../../utils/constants";
 import ACCESS_NFT_ABI from "../../../../../access-nft/abi/AccessNFTAbi.json";
-
+import Image from "next/image";
 type Holder = {
   ownerAddress: string;
 };
@@ -133,9 +133,21 @@ const Agents = () => {
           <div className="w-full">
             <div className="bg-white rounded-lg border border-gray-200 shadow-md overflow-hidden">
               <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-4">
-                <h3 className="text-lg md:text-xl font-bold text-white">
-                  🔒 Unlock Premium Agent Trading Signals
-                </h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg md:text-xl font-bold text-white">
+                    🔒 Unlock Premium Agent Trading Signals
+                  </h3>
+                  <div className="hidden sm:flex items-center gap-1 bg-white rounded-lg p-2">
+                    <span className="text-md text-violet-900">Powered by</span>
+                    <Image
+                      src="/nillion_full_brand_blue.png"
+                      alt="Nillion"
+                      width={64}
+                      height={16}
+                      className="ml-1"
+                    />
+                  </div>
+                </div>
               </div>
 
               <div className="p-4 md:p-6">
@@ -158,7 +170,8 @@ const Agents = () => {
                   </p>
                   <p className="text-indigo-700 text-sm mt-1">
                     Feed our high-confidence signals directly to your autonomous
-                    trading bots via our secure API
+                    trading bots via our secure API, protected by Nillion
+                    zero-knowledge encryption
                   </p>
                 </div>
 
@@ -187,6 +200,18 @@ const Agents = () => {
                       Agent performance boosting alpha strategies
                     </p>
                   </div>
+                  <div className="flex items-start">
+                    <span className="text-green-500 mr-2 flex-shrink-0">✓</span>
+                    <p className="text-gray-700">
+                      Nillion Secret Vault for encrypted signal storage
+                    </p>
+                  </div>
+                  <div className="flex items-start">
+                    <span className="text-green-500 mr-2 flex-shrink-0">✓</span>
+                    <p className="text-gray-700">
+                      Zero-knowledge access control via NFT verification
+                    </p>
+                  </div>
                 </div>
 
                 <div className="bg-gray-100 p-4 rounded-lg mb-6">
@@ -195,7 +220,7 @@ const Agents = () => {
                     <p className="text-sm text-gray-700">
                       Join the{" "}
                       <span className="font-medium">Gorillionaires</span>{" "}
-                      powering their agents with our signals
+                      powering their agents with our Nillion-secured signals
                     </p>
                   </div>
                 </div>
@@ -307,17 +332,53 @@ const Agents = () => {
                       </h6>
                       <pre className="mt-2 text-xs bg-gray-800 text-gray-200 p-3 rounded overflow-x-auto">
                         <code>
-                          {`// Connect your trading agent to our signal API
+                          {`// Connect your trading agent to our Nillion-secured signal API
 const signals = await fetch('https://api.gorillionaire.io/signals', {
   headers: { 'Authorization': 'Bearer ${
     address ? address : "0x86f6D762B53f21Te53fa5762D294d576A36"
   }' }
 });
 
-// Feed signals directly to your agent
+// Your NFT ownership is verified automatically via zero-knowledge proof
+// Nillion's Secret Vault decrypts signals only for authorized agents
 myTradingAgent.consumeSignals(signals.data);`}
                         </code>
                       </pre>
+                    </div>
+
+                    <div className="mt-4 bg-indigo-50 p-3 rounded-lg">
+                      <h6 className="font-medium text-indigo-800 text-sm">
+                        How Nillion Secures Your Trading Signals:
+                      </h6>
+                      <ul className="mt-2 space-y-2 text-sm text-indigo-700">
+                        <li className="flex items-start">
+                          <span className="text-indigo-500 mr-2 flex-shrink-0">
+                            •
+                          </span>
+                          <p>
+                            Signals are encrypted and distributed across Nillion
+                            Secret Vault nodes
+                          </p>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-indigo-500 mr-2 flex-shrink-0">
+                            •
+                          </span>
+                          <p>
+                            Zero-knowledge proofs verify your NFT ownership
+                            without revealing your wallet
+                          </p>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-indigo-500 mr-2 flex-shrink-0">
+                            •
+                          </span>
+                          <p>
+                            Signal content and event data are fully encrypted -
+                            only timestamps remain in plain text
+                          </p>
+                        </li>
+                      </ul>
                     </div>
                   </div>
                 )}
@@ -328,14 +389,61 @@ myTradingAgent.consumeSignals(signals.data);`}
                   <div className="flex items-center text-sm text-gray-500">
                     <span className="mr-1">Powered by</span>
                     <span className="font-medium text-purple-600">
-                      Monad 10,000 TPS Infrastructure
+                      Monad 10,000 TPS Infrastructure & Nillion Secret Vault
                     </span>
                   </div>
                   <div className="flex items-center">
                     <div className="h-2 w-2 bg-green-500 rounded-full mr-1 flex-shrink-0"></div>
                     <span className="text-sm text-gray-600">
-                      Live agent signals
+                      Live encrypted agent signals
                     </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Nillion Security Explanation */}
+            <div className="mt-8 bg-white rounded-lg border border-gray-200 shadow-md overflow-hidden">
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4">
+                <h3 className="font-medium text-white flex items-center">
+                  <Image
+                    src="/nillion_full_brand_blue.png"
+                    alt="Nillion"
+                    width={64}
+                    height={16}
+                    className="mr-2 bg-white p-1 rounded"
+                  />
+                  Secure Signal Infrastructure
+                </h3>
+              </div>
+              <div className="p-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <h4 className="font-medium text-gray-800 mb-2">
+                      1. Signal Generation
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      Langchain agent generates trading signals, which are
+                      immediately encrypted and stored in Nillion Secret Vault.
+                    </p>
+                  </div>
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <h4 className="font-medium text-gray-800 mb-2">
+                      2. Distributed Encryption
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      Signals are fragmented and distributed across three nilDB
+                      nodes, with each storing only encrypted fragments.
+                    </p>
+                  </div>
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <h4 className="font-medium text-gray-800 mb-2">
+                      3. NFT-based Access
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      Your NFT serves as the access key, allowing only your
+                      trading agents to decrypt and utilize our alpha signals.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -360,7 +468,7 @@ myTradingAgent.consumeSignals(signals.data);`}
                           🤖
                         </div>
                         <div className="overflow-hidden">
-                          <p className="text-sm font-medium text-gray-700 truncate">
+                          <p className="text-sm font-medium text-gray-700 break-all">
                             {holder.ownerAddress}
                           </p>
                         </div>
