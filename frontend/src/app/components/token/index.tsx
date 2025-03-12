@@ -59,7 +59,7 @@ const Token: React.FC<TokenProps> = ({
           <span className="text-xs sm:text-sm text-gray-600">
             Tracked Since
           </span>
-          <span className="font-medium text-xs sm:text-sm">
+          <span className="font-medium text-xs sm:text-sm truncate ml-2 max-w-[120px] sm:max-w-none">
             {trackedSince || "N/A"}
           </span>
         </div>
@@ -67,7 +67,7 @@ const Token: React.FC<TokenProps> = ({
           <span className="text-xs sm:text-sm text-gray-600">
             Tracking Time
           </span>
-          <span className="font-medium text-xs sm:text-sm">
+          <span className="font-medium text-xs sm:text-sm truncate ml-2 max-w-[120px] sm:max-w-none">
             {calculateTrackingTime()}
           </span>
         </div>
@@ -75,7 +75,7 @@ const Token: React.FC<TokenProps> = ({
           <span className="text-xs sm:text-sm text-gray-600">
             Events Generated
           </span>
-          <span className="font-medium text-xs sm:text-sm">
+          <span className="font-medium text-xs sm:text-sm truncate ml-2 max-w-[120px] sm:max-w-none">
             {signalsGenerated || 0}
           </span>
         </div>

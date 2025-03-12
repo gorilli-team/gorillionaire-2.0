@@ -59,6 +59,7 @@ export default function TokenPage() {
 
   const [priceData, setPriceData] = useState<PriceData[]>([]);
   const [priceLoading, setPriceLoading] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const fetchPriceData = async (symbol: string) => {
     if (!symbol) return;
@@ -449,7 +450,54 @@ export default function TokenPage() {
 
   return (
     <div className="flex h-screen bg-gray-100 text-gray-800">
-      <Sidebar selectedPage={selectedPage} setSelectedPage={setSelectedPage} />
+      {/* Mobile menu button */}
+      <button
+        className="lg:hidden fixed top-4 left-4 z-40 p-2 rounded-full bg-gray-200"
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        aria-label="Toggle menu"
+      >
+        <svg
+          className="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d={
+              isMobileMenuOpen
+                ? "M6 18L18 6M6 6l12 12"
+                : "M4 6h16M4 12h16M4 18h16"
+            }
+          />
+        </svg>
+      </button>
+
+      {/* Sidebar */}
+      <div
+        className={`
+          fixed lg:relative
+          ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+          transition-transform duration-300 ease-in-out
+          z-30 lg:z-0
+          bg-white
+          shadow-xl lg:shadow-none
+          h-full
+        `}
+      >
+        <Sidebar selectedPage={selectedPage} setSelectedPage={setSelectedPage} />
+      </div>
+
+      {/* Overlay for mobile */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         <Header />
         <div className="flex-1 overflow-auto bg-gray-50">
@@ -477,20 +525,22 @@ export default function TokenPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-4 mt-6">
-                <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+                <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
                   <p className="text-sm text-gray-600">Tracked Since</p>
-                  <p className="text-lg font-semibold">
+                  <p className="text-lg sm:text-lg font-semibold truncate">
                     {token.trackedSince || "N/A"}
                   </p>
                 </div>
-                <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
                   <p className="text-sm text-gray-600">Events Tracked</p>
-                  <p className="text-lg font-semibold">{eventsNumber || 0}</p>
+                  <p className="text-lg sm:text-lg font-semibold">
+                    {eventsNumber || 0}
+                  </p>
                 </div>
-                <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
                   <p className="text-sm text-gray-600">Holders</p>
-                  <p className="text-lg font-semibold">
+                  <p className="text-lg sm:text-lg font-semibold">
                     {tokenHolders?.total?.toLocaleString() || "N/A"}
                   </p>
                 </div>
@@ -844,3 +894,4 @@ function generateRandomEvents(
     (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
   );
 }
+
