@@ -61,7 +61,7 @@ async function buildPriceRequest(tokenSymbol, amount, type, userAddress) {
         ? MON_ADDRESS.toLowerCase()
         : tokenInfo.address.toLowerCase(),
     sellAmount: ethers
-      .parseUnits(amount.toString(), tokenInfo.decimals)
+      .parseUnits(amount.toFixed(tokenInfo.decimals), tokenInfo.decimals)
       .toString(),
     taker: userAddress,
   });

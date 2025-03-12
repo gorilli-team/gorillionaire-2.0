@@ -28,6 +28,7 @@ import {
   WMONAD_ADDRESS,
 } from "@/app/utils/constants";
 import { usePrivy } from "@privy-io/react-auth";
+import { toast } from "react-toastify";
 
 type Token = {
   symbol: string;
@@ -384,8 +385,12 @@ const Signals = () => {
 
       if (!quote) return;
 
+      if (quote.issues?.balance) {
+        return toast.error("Insufficient balance");
+      }
+
       // Different flow if sell token is native token
-      if (quote.sellToken.toLowerCase() === MON_ADDRESS.toLowerCase()) {
+      if (quote.sellToken?.toLowerCase() === MON_ADDRESS.toLowerCase()) {
         const txHash = await sendTransactionAsync({
           account: user?.wallet?.address as `0x${string}`,
           gas: quote?.transaction.gas
@@ -499,6 +504,19 @@ const Signals = () => {
         [signalId]: option,
       });
 
+      if (option === "Yes") {
+        const signal = tradeSignals.find((s) => s._id === signalId);
+        if (!signal) return;
+
+        const { symbol, amount } = parseSignalText(signal.signal_text);
+        const token = tokens.find((t) => symbol === t.symbol);
+        if (!token) return;
+
+        await onYes(token, amount, signal.type);
+      } else {
+        onNo(signalId);
+      }
+
       await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/signals/generated-signals/user-signal`,
         {
@@ -513,19 +531,6 @@ const Signals = () => {
           }),
         }
       );
-
-      if (option === "Yes") {
-        const signal = tradeSignals.find((s) => s._id === signalId);
-        if (!signal) return;
-
-        const { symbol, amount } = parseSignalText(signal.signal_text);
-        const token = tokens.find((t) => symbol === t.symbol);
-        if (!token) return;
-
-        onYes(token, amount, signal.type);
-      } else {
-        onNo(signalId);
-      }
     },
     [tradeSignals, selectedOptions, onYes, onNo, tokens, user?.wallet?.address]
   );
