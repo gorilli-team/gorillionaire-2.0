@@ -1,12 +1,12 @@
 "use client";
-import { usePrivy } from "@privy-io/react-auth";
+import { useLogin, usePrivy } from "@privy-io/react-auth";
 import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LeaderboardBadge from "../leaderboard_badge";
+import Cookies from "js-cookie";
 
-// Define a proper type for notifications
 interface Notification {
   type: string;
   data: {
@@ -15,14 +15,33 @@ interface Notification {
       tokenAmount?: number;
       tokenPrice?: number;
       tokenSymbol?: string;
-    }
+    };
   };
   message?: string;
   title?: string;
 }
 
 export default function Header() {
-  const { ready, authenticated, user, login, logout } = usePrivy();
+  const { ready, authenticated, user, logout } = usePrivy();
+
+  const { login } = useLogin({
+    onComplete: async ({ user }) => {
+      const privyToken = Cookies.get("privy-token");
+      if (!privyToken || !user.wallet?.address) return;
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/privy`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ address: user.wallet.address, privyToken }),
+        }
+      );
+      await response.json();
+    },
+  });
   const [monPriceFormatted, setMonPriceFormatted] = useState<string>("0.00");
   const [isFlashing, setIsFlashing] = useState(false);
   const [userAddress, setUserAddress] = useState<string | null>(null);
@@ -31,7 +50,10 @@ export default function Header() {
   const wsRef = useRef<WebSocket | null>(null);
 
   // Function to show notification
-  const showCustomNotification = (message: string, title: string = "Notification") => {
+  const showCustomNotification = (
+    message: string,
+    title: string = "Notification"
+  ) => {
     toast(
       <div>
         <div className="font-bold">{title}</div>
@@ -48,7 +70,7 @@ export default function Header() {
         transition: Bounce,
       }
     );
-  }
+  };
 
   // Handle wallet connection/disconnection and address updates
   useEffect(() => {
@@ -57,20 +79,21 @@ export default function Header() {
     const trackUser = async () => {
       if (authenticated && user?.wallet) {
         setUserAddress(user.wallet.address);
-        console.log("User wallet address:", user.wallet.address);
         //make a call to the backend to track the user
+        const privyToken = Cookies.get("privy-token");
+
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/activity/track/signin`,
           {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${privyToken}`,
             },
             body: JSON.stringify({ address: user.wallet.address }),
           }
         );
-        const data = await response.json();
-        console.log("Response:", data);
+        await response.json();
       } else {
         setUserAddress(null);
       }
@@ -103,21 +126,23 @@ export default function Header() {
       try {
         const message = JSON.parse(event.data) as Notification;
         console.log("WebSocket notification received:", message);
-    
+
         // Check if it's a notification type
         if (message.type === "NOTIFICATION") {
           // Extract relevant data
-          const { action, tokenAmount, tokenPrice, tokenSymbol } = message.data.data || {};
-    
+          const { action, tokenAmount, tokenPrice, tokenSymbol } =
+            message.data.data || {};
+
           // Choose emoji based on action
           const actionEmoji = action === "buy" ? "💰" : "💸";
-    
+
           // Format the message for notification - using const instead of let
-          const notificationMessage = `${actionEmoji} ${action?.toUpperCase()} ${tokenAmount} ${tokenSymbol} @ $${tokenPrice ? tokenPrice.toFixed(2) : "N/A"}`;
-    
+          const notificationMessage = `${actionEmoji} ${action?.toUpperCase()} ${tokenAmount} ${tokenSymbol} @ $${
+            tokenPrice ? tokenPrice.toFixed(2) : "N/A"
+          }`;
+
           // Add to notifications list
 
-    
           // Show toast notification with formatted message
           showCustomNotification(notificationMessage, "Trade Signal");
         }
@@ -125,7 +150,6 @@ export default function Header() {
         console.error("Error processing WebSocket message:", error);
       }
     };
-    
 
     wsRef.current.onclose = () => {
       console.log("WebSocket connection closed");
@@ -198,16 +222,16 @@ export default function Header() {
         theme="light"
         transition={Bounce}
       />
-      
+
       <header className="h-16 px-4 sm:px-6 flex items-center justify-between border-b border-gray-300 bg-gray-100 sticky top-0 z-20">
         {/* Left space for mobile hamburger menu */}
         <div className="w-8 h-8 lg:hidden"></div>
-        
-        <div className="flex items-center justify-end space-x-4 flex-1 my-3 ml-auto"> 
+
+        <div className="flex items-center justify-end space-x-4 flex-1 my-3 ml-auto">
           <div className="hidden md:block">
             <LeaderboardBadge />
           </div>
-          
+
           {monPriceFormatted !== "0.00" && (
             <div
               className={`flex items-center gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg transition-colors duration-500 ml-auto sm:ml-0 ${
@@ -239,7 +263,7 @@ export default function Header() {
               </div>
             </div>
           )}
-          
+
           {ready && authenticated ? (
             <div className="flex items-center gap-2 sm:gap-4">
               {userAddress && (
@@ -260,13 +284,13 @@ export default function Header() {
             </div>
           ) : (
             <div>
-            <button
+              <button
                 onClick={login}
                 disabled={!ready}
                 className="px-2 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm font-medium text-white bg-violet-900 rounded-md hover:bg-violet-700 disabled:opacity-50"
-            >
-              Connect Wallet
-            </button>
+              >
+                Connect Wallet
+              </button>
             </div>
           )}
         </div>
