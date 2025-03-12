@@ -7,10 +7,6 @@ const userActivitySchema = new mongoose.Schema(
       required: true,
       index: true,
     },
-    rank: {
-      type: Number,
-      default: 1,
-    },
     nonce: {
       type: String,
     },

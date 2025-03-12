@@ -176,7 +176,6 @@ router.get("/points", async (req, res) => {
   }
 });
 
-// Get all users ranked by points
 router.get("/leaderboard", async (req, res) => {
   try {
     const twoDaysAgo = new Date();
@@ -191,13 +190,17 @@ router.get("/leaderboard", async (req, res) => {
       UserActivity.countDocuments(),
     ]);
 
-    //add rank to each user
-    users.forEach((user, index) => {
-      user.rank = index + 1;
+    // Calculate the real rank by adding the skip value
+    const usersWithRank = users.map((user, index) => {
+      // Create a new object with all user properties plus the rank
+      return {
+        ...user.toObject(), // Convert Mongoose document to plain object
+        rank: skip + index + 1, // Adjust rank based on pagination
+      };
     });
 
     res.json({
-      users,
+      users: usersWithRank,
       pagination: {
         total,
         page,
@@ -231,11 +234,13 @@ router.get("/me", async (req, res) => {
       points: { $gt: userActivity.points },
     });
     //rank is the number of users with more points than the user + 1
-    const rank = count + 1;
+    const result = {
+      ...userActivity.toObject(),
+      rank: count + 1,
+    };
 
     res.json({
-      userActivity,
-      rank,
+      userActivity: result,
     });
   } catch (error) {
     console.error("Error fetching user activity:", error);
