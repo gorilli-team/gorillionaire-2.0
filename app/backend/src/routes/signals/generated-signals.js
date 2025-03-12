@@ -43,9 +43,9 @@ router.get("/", async (req, res) => {
 
       const expanded = signals.map((s) => ({
         ...s.toObject(),
-        userSignal: userSignals.find(
-          (userSignal) => userSignal.signalId === s._id
-        ),
+        userSignal: userSignals.find((us) => {
+          return us.signalId === s._id.toString();
+        }),
       }));
       res.json(expanded);
     } else {
