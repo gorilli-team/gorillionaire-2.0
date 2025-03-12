@@ -15,6 +15,7 @@ interface Notification {
       tokenAmount?: number;
       tokenPrice?: number;
       tokenSymbol?: string;
+      userAddress?: string;
     };
   };
   message?: string;
@@ -126,25 +127,35 @@ export default function Header() {
       try {
         const message = JSON.parse(event.data) as Notification;
         console.log("WebSocket notification received:", message);
-
-        // Check if it's a notification type
-        if (message.type === "NOTIFICATION") {
+        
+        // Debug logging to see the address comparison
+        const notificationAddress = message.data?.data?.userAddress;
+        console.log("Notification address:", notificationAddress);
+        console.log("Current user address:", userAddress);
+        
+        if (
+          message.type === "NOTIFICATION" && 
+          notificationAddress && userAddress &&
+          notificationAddress.toLowerCase() === userAddress.toLowerCase()
+        ) {
           // Extract relevant data
           const { action, tokenAmount, tokenPrice, tokenSymbol } =
             message.data.data || {};
-
+          
+          console.log("Address match, showing notification");
+          
           // Choose emoji based on action
           const actionEmoji = action === "buy" ? "💰" : "💸";
-
+          
           // Format the message for notification - using const instead of let
           const notificationMessage = `${actionEmoji} ${action?.toUpperCase()} ${tokenAmount} ${tokenSymbol} @ $${
             tokenPrice ? tokenPrice.toFixed(2) : "N/A"
           }`;
-
-          // Add to notifications list
-
+          
           // Show toast notification with formatted message
           showCustomNotification(notificationMessage, "Trade Signal");
+        } else {
+          console.log("Not showing notification, address doesn't match or not a notification type");
         }
       } catch (error) {
         console.error("Error processing WebSocket message:", error);
@@ -172,7 +183,6 @@ export default function Header() {
   useEffect(() => {
     if (userAddress) {
       console.log("Address updated:", userAddress);
-      // You can trigger any address-dependent operations here
     }
   }, [userAddress]);
 
