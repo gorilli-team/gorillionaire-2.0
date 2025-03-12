@@ -1,4 +1,11 @@
-import { SecretVaultWrapper } from "secretvaults";
+// secretVault.js
+let SecretVaultWrapper;
+
+// Dynamic import
+(async () => {
+  const module = await import("secretvaults");
+  SecretVaultWrapper = module.SecretVaultWrapper;
+})();
 
 const orgConfig = {
   orgCredentials: {
@@ -23,7 +30,10 @@ const orgConfig = {
 
 let svWrapper = null;
 
-export async function getCollection(schemaId) {
+async function getCollection(schemaId) {
+  if (!SecretVaultWrapper) {
+    throw new Error("SecretVaultWrapper is not loaded yet");
+  }
   if (!svWrapper) {
     svWrapper = new SecretVaultWrapper(
       orgConfig.nodes,
@@ -35,7 +45,12 @@ export async function getCollection(schemaId) {
   return svWrapper;
 }
 
-export async function readSignalsData(schemaId, query = {}) {
+async function readSignalsData(schemaId, query = {}) {
   const collection = await getCollection(schemaId);
   return collection.readFromNodes(query);
 }
+
+module.exports = {
+  getCollection,
+  readSignalsData,
+};
