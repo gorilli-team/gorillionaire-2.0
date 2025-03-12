@@ -376,13 +376,15 @@ const Agents = () => {
                     </div>
 
                     <div className="mt-4 bg-blue-50 p-3 rounded-lg">
-                      <h6 className="font-medium text-blue-800 text-sm">
+                      <h6 className="font-medium text-blue-800 text-xs">
                         Integration Example:
                       </h6>
-                      <pre className="mt-2 text-xs bg-gray-800 text-gray-200 p-3 rounded overflow-x-auto">
-                        <code>
-                          {`// Connect your trading agent to our Nillion-secured signal API
-const response = await fetch(\`https://api.gorillionai.re/nillion/data?schemaId=\${process.env.YOUR_SCHEMA_ID}\`);
+                      <div className="mt-2 bg-gray-800 text-gray-200 p-3 rounded max-w-full">
+                        <pre className="whitespace-pre-wrap break-words overflow-x-auto">
+                          <code className="block text-xs break-words">
+                            {`// Connect your trading agent to our Nillion-secured signal API
+const response = await fetch(
+\`https://api.gorillionai.re/nillion/data?schemaId=\${process.env.YOUR_SCHEMA_ID}\`);
 const signals = await response.json();
 
 // Nillion's Secret Vault decrypts signals only for authorized agents
@@ -391,8 +393,9 @@ if (signals.data) {
 } else {
   console.error('No signals data available');
 }`}
-                        </code>
-                      </pre>
+                          </code>
+                        </pre>
+                      </div>
                     </div>
 
                     <div className="mt-4 bg-indigo-50 p-3 rounded-lg">
@@ -748,8 +751,8 @@ if (signals.data) {
                         <div className="h-8 w-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 mr-3 flex-shrink-0">
                           🤖
                         </div>
-                        <div className="overflow-hidden">
-                          <p className="text-sm font-medium text-gray-700 truncate">
+                        <div className="overflow-hidden max-w-full">
+                          <p className="text-sm font-medium text-gray-700 break-all">
                             {holder.ownerAddress}
                           </p>
                         </div>
