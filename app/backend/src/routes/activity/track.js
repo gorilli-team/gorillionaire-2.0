@@ -231,7 +231,13 @@ router.get("/me", async (req, res) => {
     }
     //count the number of users with more points than the user
     const count = await UserActivity.countDocuments({
-      points: { $gt: userActivity.points },
+      $or: [
+        { points: { $gt: userActivity.points } },
+        {
+          points: userActivity.points,
+          createdAt: { $lt: userActivity.createdAt },
+        },
+      ],
     });
     //rank is the number of users with more points than the user + 1
     const result = {
