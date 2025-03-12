@@ -20,40 +20,12 @@ const Agents = () => {
       <div className="w-full px-4 py-6">
         {/* Main info section - now full width */}
         <div className="flex flex-col items-center justify-center">
-          {/* <div className="w-full bg-gradient-to-br from-purple-100 to-blue-100 rounded-lg p-4 md:p-8 text-center shadow-lg">
-            <h2 className="text-2xl md:text-3xl font-bold text-purple-800 mb-4 md:mb-6">
-              🤖 Monad Trading Agents: The Future of L1 Trading 🦍
-            </h2>
-            <p className="text-purple-700 text-base md:text-lg mb-4 md:mb-6">
-              Deep in the Monad blockchain, our autonomous agents are being
-              forged to harness the power of the fastest L1 ever built.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 text-blue-700">
-              <p className="font-medium">🤖 Microsecond-level MEV Detection</p>
-              <p className="font-medium">
-                🦍 Gorillionaire-grade Trading Strategies
-              </p>
-              <p className="font-medium">
-                🤖 High-Frequency Arbitrage on Monad
-              </p>
-              <p className="font-medium">🦍 Alpha Opportunities</p>
-            </div>
-            <div className="mt-6 md:mt-8 p-4 bg-purple-200 rounded-lg">
-              <p className="text-purple-800 font-semibold">
-                Where Traditional MEV Bots Meet Gorilla Trading Power
-              </p>
-              <p className="text-purple-600 mt-2">
-                Powered by Monad 10,000 TPS Infrastructure
-              </p>
-            </div>
-          </div> */}
-
-          {/* NFT Access Section - now full width */}
+          {/* NFT Access Section - now full width with clearer agent messaging */}
           <div className="w-full">
             <div className="bg-white rounded-lg border border-gray-200 shadow-md overflow-hidden">
               <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-4">
                 <h3 className="text-lg md:text-xl font-bold text-white">
-                  🔒 Unlock Premium Signals
+                  🔒 Unlock Premium Agent Trading Signals
                 </h3>
               </div>
 
@@ -61,7 +33,7 @@ const Agents = () => {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                   <div>
                     <h4 className="text-lg font-semibold text-gray-800">
-                      Gorillionaire API Access NFT
+                      Agent Trading API Access NFT
                     </h4>
                     <p className="text-gray-600 mt-1">Mint price: 0.05 MON</p>
                   </div>
@@ -70,29 +42,40 @@ const Agents = () => {
                   </div>
                 </div>
 
+                <div className="bg-indigo-50 p-4 rounded-lg mb-6">
+                  <p className="text-indigo-800 font-medium">
+                    Power your trading agents with exclusive Gorillionaire
+                    signals
+                  </p>
+                  <p className="text-indigo-700 text-sm mt-1">
+                    Feed our high-confidence signals directly to your autonomous
+                    trading bots via our secure API
+                  </p>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
                   <div className="flex items-start">
                     <span className="text-green-500 mr-2 flex-shrink-0">✓</span>
                     <p className="text-gray-700">
-                      Exclusive access to all trading signals
+                      Direct signal integration with your trading agents
                     </p>
                   </div>
                   <div className="flex items-start">
                     <span className="text-green-500 mr-2 flex-shrink-0">✓</span>
                     <p className="text-gray-700">
-                      Real-time API endpoints with confidence scores
+                      Agent-optimized API endpoints with confidence scores
                     </p>
                   </div>
                   <div className="flex items-start">
                     <span className="text-green-500 mr-2 flex-shrink-0">✓</span>
                     <p className="text-gray-700">
-                      Historical price data for all tokens
+                      MEV-aware signal feeds for all tokens
                     </p>
                   </div>
                   <div className="flex items-start">
                     <span className="text-green-500 mr-2 flex-shrink-0">✓</span>
                     <p className="text-gray-700">
-                      Priority access to new agent releases
+                      Agent performance boosting alpha strategies
                     </p>
                   </div>
                 </div>
@@ -102,7 +85,7 @@ const Agents = () => {
                     <div className="w-2 h-2 bg-yellow-400 rounded-full mr-2 flex-shrink-0"></div>
                     <p className="text-sm text-gray-700">
                       Currently <span className="font-medium">247</span>{" "}
-                      Gorillionaires have minted
+                      Gorillionaires powering their agents with our signals
                     </p>
                   </div>
                 </div>
@@ -114,7 +97,7 @@ const Agents = () => {
                       <div>
                         <p className="font-medium">NFT Successfully Minted!</p>
                         <p className="text-sm">
-                          Your API access is now unlocked
+                          Your trading agents now have access to premium signals
                         </p>
                       </div>
                     </div>
@@ -154,7 +137,7 @@ const Agents = () => {
                         Minting...
                       </>
                     ) : (
-                      "Mint NFT for API Access"
+                      "Mint NFT to Fuel Your Trading Agents"
                     )}
                   </button>
                 )}
@@ -162,7 +145,7 @@ const Agents = () => {
                 {mintSuccess && (
                   <div className="mt-6">
                     <h5 className="font-medium text-gray-800 mb-2">
-                      Your API Keys
+                      Your Agent API Keys
                     </h5>
                     <div className="bg-gray-100 p-3 rounded-lg flex items-center justify-between">
                       <code className="text-xs text-gray-600 truncate">
@@ -185,6 +168,23 @@ const Agents = () => {
                         </svg>
                       </button>
                     </div>
+
+                    <div className="mt-4 bg-blue-50 p-3 rounded-lg">
+                      <h6 className="font-medium text-blue-800 text-sm">
+                        Integration Example:
+                      </h6>
+                      <pre className="mt-2 text-xs bg-gray-800 text-gray-200 p-3 rounded overflow-x-auto">
+                        <code>
+                          {`// Connect your trading agent to our signal API
+const signals = await fetch('https://api.gorillionaire.io/signals', {
+  headers: { 'Authorization': 'Bearer 0x86f6D762B53f21Te53fa5762D294d576A36' }
+});
+
+// Feed signals directly to your agent
+myTradingAgent.consumeSignals(signals.data);`}
+                        </code>
+                      </pre>
+                    </div>
                   </div>
                 )}
               </div>
@@ -194,35 +194,43 @@ const Agents = () => {
                   <div className="flex items-center text-sm text-gray-500">
                     <span className="mr-1">Powered by</span>
                     <span className="font-medium text-purple-600">
-                      Monad Chain
+                      Monad 10,000 TPS Infrastructure
                     </span>
                   </div>
                   <div className="flex items-center">
                     <div className="h-2 w-2 bg-green-500 rounded-full mr-1 flex-shrink-0"></div>
                     <span className="text-sm text-gray-600">
-                      Live on mainnet
+                      Live agent signals
                     </span>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Recent Mints Section - full width and responsive */}
+            {/* Recent Mints Section - with agent language */}
             <div className="mt-8 bg-white rounded-lg border border-gray-200 shadow-md overflow-hidden">
               <div className="bg-gray-50 border-b border-gray-200 p-4">
-                <h3 className="font-medium text-gray-700">Recent NFT Mints</h3>
+                <h3 className="font-medium text-gray-700">
+                  Recent Agent API Activations
+                </h3>
               </div>
               <div className="divide-y divide-gray-200">
                 {[
                   {
                     address: "0x86f6D762B53f21Te53fa5762D294d576A36",
                     time: "5 mins ago",
+                    type: "Trading Bot",
                   },
                   {
                     address: "0x71c8Fb21a22d95CEa35dD9D4eA72B17E",
                     time: "12 mins ago",
+                    type: "MEV Agent",
                   },
-                  { address: "0x3bFc36B19f8d5331480", time: "28 mins ago" },
+                  {
+                    address: "0x3bFc36B19f8d5331480",
+                    time: "28 mins ago",
+                    type: "Arbitrage Bot",
+                  },
                 ].map((mint, index) => (
                   <div
                     key={index}
@@ -230,17 +238,21 @@ const Agents = () => {
                   >
                     <div className="flex items-center">
                       <div className="h-8 w-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 mr-3 flex-shrink-0">
-                        🦍
+                        🤖
                       </div>
                       <div className="overflow-hidden">
                         <p className="text-sm font-medium text-gray-700 truncate">
                           {mint.address}
                         </p>
-                        <p className="text-xs text-gray-500">{mint.time}</p>
+                        <div className="flex items-center">
+                          <p className="text-xs text-gray-500">{mint.time}</p>
+                          <span className="mx-1 text-gray-400">•</span>
+                          <p className="text-xs text-indigo-600">{mint.type}</p>
+                        </div>
                       </div>
                     </div>
                     <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full sm:ml-2 flex-shrink-0">
-                      Minted
+                      Activated
                     </span>
                   </div>
                 ))}
