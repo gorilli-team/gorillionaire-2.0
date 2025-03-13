@@ -29,14 +29,26 @@ yarn dev
 4- Open: [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 
-### ✅ Wallet Connection with Privy
-Gorillionaire leverages Privy's advanced authentication infrastructure to provide a seamless and secure wallet connection experience. Our integration supports:
+### ✅ Privy Integration
 
-Multiple login methods: Email, Google, Apple, Discord, Twitter, and Web3 wallets
-Embedded wallet creation for users without existing crypto wallets
-Simplified onboarding with flexible authentication options
+**Gorillionaire** leverages Privy's advanced authentication infrastructure to provide a seamless and secure wallet connection experience. Our integration supports:
+
+- Multiple login methods: Email, Google, Apple, Discord, Twitter, and Web3 wallets.
+- Embedded wallet creation for users without existing crypto wallets.
+- Simplified onboarding with flexible authentication options.
 
 While currently integrated with the Monad testnet, our Privy setup prepares the groundwork for future financial integrations. The configuration includes preliminary MoonPay funding support, though full cryptocurrency purchasing features are not yet activated in the testnet environment.
+
+To implement Privy authentication, we followed a straightforward setup process:
+
+- Create an account at Privy Dashboard
+- Create a new project within the Privy platform
+- Customize wallet settings and authentication methods
+- Configure login preferences
+- Monitor user access and authentication logs
+
+The integration requires importing the Privy App ID into the project configuration (see env.example):
+NEXT_PUBLIC_PRIVY_APP_ID=
 
 <div style="display: flex; justify-content: center; gap: 10px;">
   <div style="width: 50%;">
