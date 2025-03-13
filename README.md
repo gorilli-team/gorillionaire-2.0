@@ -338,6 +338,57 @@ Gorillionaire aligns with and contributes to the Monad ecosystem in multiple way
 
 6. **Leveraging Monad's Unique Capabilities**: Specifically designed to take advantage of Monad's low-latency, high-throughput environment—capabilities that would be difficult to achieve on other chains.
 
+## 11. Team
+
+## Team Information & Contributions
+
+### Team Members & Roles
+
+- **Riccardo** - Security & Backend Lead
+  - Implemented secure data architecture
+  - Developed backend infrastructure
+  - Created blockchain event tracking systems
+  - Integrated 0x Swap API for trade execution
+
+- **Samuele** - Frontend & Authentication Lead
+  - Built responsive user interface
+  - Implemented Privy integration for secure wallet authentication
+  - Designed user experience flows
+  - Created interactive dashboard components
+
+- **Marco** - AI & Secure Storage Lead
+  - Developed LangChain implementation for signal generation
+  - Created AI models for data analysis
+  - Integrated Nillion Secret Vault for secure signal storage
+  - Designed AI agent interfaces
+
+- **Christian** - Data Visualization & Price Feed Lead
+  - Implemented price feed integrations
+  - Created interactive price visualization components
+  - Developed real-time data displays
+  - Built market trend analysis tools
+
+- **Paolo** - Project Lead
+  - Designed the product with the team
+  - Did market analysis
+  - Coded along with the team to provide support where needed
+
+### Team Reflection
+
+Our team's experience during the hackathon was transformative. While in Denver, we made a significant pivot from our original concept after receiving valuable feedback from the Monad foundation, partners, and investors. Being physically present in Denver proved crucial for our project's evolution, as it allowed us to rapidly iterate based on direct stakeholder input.
+
+One of our biggest challenges was scope management. Initially, we were ambitious with our feature set, but through mentorship and testing, we learned to prioritize a focused, testable MVP. This shift in approach allowed us to deliver a more refined product that could be easily validated by users.
+
+The diverse technical backgrounds of our team members enabled us to tackle complex challenges across multiple domains—from AI implementation to blockchain integration and frontend development. This cross-functional collaboration was essential for creating a cohesive product that addresses real user needs.
+
+Key takeaways from our hackathon experience include:
+- The importance of in-person collaboration for rapid iteration
+- The value of direct feedback from ecosystem stakeholders
+- The necessity of reducing scope to focus on core value propositions
+- The power of bringing together diverse technical expertise
+
+We leave this hackathon with not just a product, but with stronger technical skills, deeper ecosystem connections, and a clearer vision for how Gorillionaire can contribute to the Monad ecosystem.
+
 ## 11. License
 
 The project has been developed for the Monad EVM/ACCATHON. All the files are licensed under the [MIT License](./LICENSE). We reserve the rights to change the license for further production deployment of the entire project.
