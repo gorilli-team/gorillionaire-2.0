@@ -1,10 +1,8 @@
-# Frontend
+# Gorillionaire Frontend
 
 ## Overview
 
-We put strong emphasis on delivering an intuitive and accessible user experience with **Gorillionaire**, ensuring users of all backgrounds — from DeFi veterans to first-time traders — can navigate and use the platform effortlessly. The interface is clean, consistent, and easy to navigate. We followed UX best practices to ensure users can quickly understand where to go and what to do, with a clear and logical structure across all screens. Every interaction in **Gorillionaire** is designed to be simple and accessible, even for users unfamiliar with crypto trading or blockchain technologies. Features are easy to find, actions are straightforward, and the overall flow is smooth and frictionless.
-We believe that a great user experience is key to onboarding more people into decentralized finance. By focusing on design, accessibility, and responsiveness, **Gorillionaire** offers a seamless and inclusive experience that leverages the performance power of **Monad**.
-The UI has a modern and engaging visual design — with a harmonious color palette, smooth transitions, and thoughtfully crafted components. The platform is not only functional but also aesthetically pleasing, making it enjoyable to use.
+We put strong emphasis on delivering an intuitive and accessible user experience with **Gorillionaire**, ensuring users of all backgrounds, from DeFi veterans to first-time traders, can navigate and use the platform effortlessly. The interface is clean, consistent, and easy to navigate. **Gorillionaire** offers a seamless and inclusive experience that leverages the performance power of **Monad**.
 
 ## How to run the project locally
 
@@ -17,6 +15,12 @@ yarn
 2- Clone the .env.example and add all the variables listed
 ```
 mv .env.example .env
+```
+
+```
+NEXT_PUBLIC_PRIVY_APP_ID=
+NEXT_PUBLIC_NILLION_SCHEMA_ID=
+NEXT_PUBLIC_API_URL=
 ```
 
 
@@ -57,6 +61,18 @@ NEXT_PUBLIC_PRIVY_APP_ID=
   <div style="width: 50%;">
     <img src="public/privy_wallet.png" style="width: 100%; object-fit: cover;"/>
   </div>
+</div>
+
+### ✅ Trading View 
+We’ve paid attention to accessibility standards to make **Gorillionaire** inclusive for everyone:
+- High-contrast color schemes for better visibility and readability.
+- Clear visual hierarchy and semantic structure.
+- Keyboard navigation and screen reader compatibility for users with motor or visual impairments.
+
+We leveraged Google Lighthouse, a powerful web auditing tool, to rigorously assess and optimize our platform's accessibility. Our meticulous approach has yielded impressive results, with accessibility scores consistently ranging between 92% and 96% across both desktop and mobile platforms. This achievement underscores our commitment to creating an inclusive digital experience that ensures usability for all users, regardless of their abilities or the device they're using.
+
+<div style="width: 100%;">
+    <img src="public/accessibility.png"/>
 </div>
 
 ### ✅ Accessibility  
