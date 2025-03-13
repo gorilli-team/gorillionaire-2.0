@@ -39,37 +39,38 @@
   - [9.3 Signal generation](#93-signal-generation)
   - [9.4 Nillion's Secret Vault](#94-nillions-secret-vault)
   - [9.5 AccessNFT smart contract](#95-accessnft-smart-contract)
-- [10. License](#10-license)
+- [10. Project Description and Impact](#10-project-description-and-impact)
+- [11. License](#10-license)
 
 ## 1. Overview
 
-Gorillionaire is an AI-powered crypto trading platform that delivers real-time BUY/SELL signals by analyzing on-chain data, whale activity, token listings, and price feeds from sources like Envio, Codex, Pyth, and Blockvision. Users connected using Privy can act on   signals seamlessly using 0x Swap API and earn points in a gamified leaderboard. Built on Monad for speed and efficiency, Gorillionaire also provides AI-driven token analytics and access to private signals via the Nillion Secret Vault, empowering traders and AI agents with actionable insights.
+Gorillionaire is an AI-powered crypto trading platform that delivers real-time BUY/SELL signals by analyzing on-chain data, whale activity, token listings, and price feeds from sources like Envio, Codex, Pyth, and Blockvision. Users connected using Privy can act on signals seamlessly using 0x Swap API and earn points in a gamified leaderboard. Built on Monad for speed and efficiency, Gorillionaire also provides AI-driven token analytics and access to private signals via the Nillion Secret Vault, empowering traders and AI agents with actionable insights.
 
 ## 2. Target audience
 
 Gorillionaire is designed for crypto traders, AI-powered trading agents, and data-driven investors looking for a competitive edge in the fast-moving crypto market.
 
 1. Active Crypto Traders
-Traders seeking real-time, AI-enhanced trade signals to identify high-potential opportunities.
-Users who want to execute trades seamlessly without manually researching multiple data sources.
-Those who enjoy a gamified trading experience, earning points and climbing the leaderboard through active participation.
+   Traders seeking real-time, AI-enhanced trade signals to identify high-potential opportunities.
+   Users who want to execute trades seamlessly without manually researching multiple data sources.
+   Those who enjoy a gamified trading experience, earning points and climbing the leaderboard through active participation.
 2. AI-Powered Trading Agents & Developers
-Algorithmic traders and developers building AI-driven trading strategies that require structured, high-quality data.
-AI agents that need machine-readable, real-time event signals to automate and optimize trading decisions.
-Developers looking for secure access to signals via the Nillion Secret Vault for deeper AI integration.
+   Algorithmic traders and developers building AI-driven trading strategies that require structured, high-quality data.
+   AI agents that need machine-readable, real-time event signals to automate and optimize trading decisions.
+   Developers looking for secure access to signals via the Nillion Secret Vault for deeper AI integration.
 3. On-Chain Analysts & Data Enthusiasts
-Users interested in analyzing token trends, whale movements, and social sentiment before making investment decisions.
-Analysts leveraging Gorillionaire’s multi-source aggregated data to stay ahead of market shifts.
+   Users interested in analyzing token trends, whale movements, and social sentiment before making investment decisions.
+   Analysts leveraging Gorillionaire’s multi-source aggregated data to stay ahead of market shifts.
 4. Gamified Traders & Community Members
-Users who want to engage with trading in a more interactive way, earning points and rewards for active participation.
-Those looking to compete on leaderboards and showcase their trading expertise.
-How Users Benefit
-Access to AI-optimized trading signals that simplify decision-making.
-Seamless trade execution directly within the platform, eliminating manual effort.
-Gamification features that make trading engaging and competitive.
-Exclusive access for AI agents to structured, high-frequency event signals for automation.
-Deep token analytics to gain an edge in emerging markets, especially on Monad.
-Gorillionaire is built for both individual traders and AI-driven strategies, making it a key intelligence source for navigating crypto markets efficiently.
+   Users who want to engage with trading in a more interactive way, earning points and rewards for active participation.
+   Those looking to compete on leaderboards and showcase their trading expertise.
+   How Users Benefit
+   Access to AI-optimized trading signals that simplify decision-making.
+   Seamless trade execution directly within the platform, eliminating manual effort.
+   Gamification features that make trading engaging and competitive.
+   Exclusive access for AI agents to structured, high-frequency event signals for automation.
+   Deep token analytics to gain an edge in emerging markets, especially on Monad.
+   Gorillionaire is built for both individual traders and AI-driven strategies, making it a key intelligence source for navigating crypto markets efficiently.
 
 ## 3. Long-term sustainability
 
@@ -137,16 +138,18 @@ Each folder contains its own README with detailed setup instructions and environ
 ### Technical Architecture
 
 Data Collection Layer:
+
 - Integrates with multiple blockchain data providers (ENVIO, CODEX, BlockVision, PYTH)
 - Collects comprehensive on-chain data including:
- - Token transfers
- - Price spikes and volatility
- - New token listings
- - Token holder distribution
- - Real-time price feeds
- - Market-on-open price data
+- Token transfers
+- Price spikes and volatility
+- New token listings
+- Token holder distribution
+- Real-time price feeds
+- Market-on-open price data
 
 Data Processing Layer:
+
 - Implements a robust data polling mechanism
 - Leverages MongoDB for flexible schema data storage
 - Utilizes Supabase for real-time database functionality
@@ -154,6 +157,7 @@ Data Processing Layer:
 - Performs data normalization and transformation for downstream analysis
 
 Signal Generation Layer:
+
 - Powered by LangChain for context-aware processing
 - Implements a sophisticated retrieval-augmented generation system
 - Processes standalone questions with relevant context
@@ -163,6 +167,7 @@ Signal Generation Layer:
 - Connects to 0x Protocol for decentralized trade execution
 
 Security Storage Layer:
+
 - Implements Nillion's technology for secure, encrypted storage
 - Utilizes a decentralized database architecture for fault tolerance
 - Distributes sensitive trading signals across multiple nodes
@@ -170,6 +175,7 @@ Security Storage Layer:
 - Maintains a tamper-proof record of all generated signals
 
 ### Key Technical Features
+
 - Decentralized architecture for enhanced security and reliability
 - Vector-based data representation for advanced pattern recognition
 - Context-aware signal generation with confidence scoring
@@ -178,6 +184,7 @@ Security Storage Layer:
 - Authenticated wallet integration for secure transactions
 
 ### Integration Points
+
 - Blockchain data providers for real-time information
 - NoSQL and relational databases for efficient data storage
 - AI/ML frameworks for signal generation
@@ -230,7 +237,108 @@ AccessNFT is a standard ERC721 contract that allows users to mint their NFT, wit
 
 More details [here](./access-nft/README.md).
 
-## 10. License
+## 10. Project Description and Impact
+
+### Problem
+
+The crypto market moves at lightning speed, with massive daily on-chain transactions across multiple blockchains. Traders and AI-driven strategies struggle to extract real-time actionable insights from fragmented data sources like price feeds, whale transactions, new token listings, and social sentiment. Despite the $130+ billion in daily crypto trading volume, existing signal platforms process only a fraction of this data and lack deep automation, leaving traders to manually interpret signals and execute trades. Additionally, AI trading agents require high-quality, structured data to make informed decisions, yet most rely on incomplete or delayed sources, leading to inefficiencies and missed opportunities.
+
+### Solution
+
+Gorillionaire solves these inefficiencies by providing a real-time, AI-powered signal platform designed for both human traders and AI agents. The platform processes vast amounts of on-chain data from multiple sources (Envio, Codex, Pyth, BlockVision) to generate structured, actionable trade signals that can be instantly executed.
+
+Key features include:
+
+- Multi-source data aggregation tracking token transfers, spikes, new listings, whale activity, and price feeds
+- AI-powered trade signals using LangChain-based processing to generate high-confidence BUY/SELL recommendations
+- Seamless trade execution through 0x Swap API integration
+- Gamified trading experience with points and leaderboards
+- AI agent compatibility with Nillion Secret Vault for secure processing of trading insights
+- Advanced token analytics for deeper market understanding
+
+### Technical Architecture
+
+Gorillionaire's architecture consists of four interconnected layers:
+
+1. **Data Collection Layer**
+
+   - Integrates with Envio, Codex, BlockVision, and PYTH APIs
+   - Collects comprehensive blockchain data including transfers, spikes, listings, holder information
+   - Optimized for Monad's high-throughput environment to process data at unprecedented speeds
+
+2. **Data Processing Layer**
+
+   - Utilizes MongoDB and Supabase for efficient data storage and retrieval
+   - Implements a sophisticated data polling mechanism to fetch recent blockchain events
+   - Transforms raw blockchain data into numerical vector representations
+   - Leverages Monad's accelerated EVM for high-speed data processing and transformation
+
+3. **Signal Generation Layer**
+
+   - Powered by LangChain for context-aware processing
+   - Implements a retrieval-augmented generation system to process blockchain events
+   - Generates precise BUY/SELL signals with confidence scores
+   - Takes advantage of Monad's low-latency capabilities to deliver real-time signals
+
+4. **Security Storage Layer**
+   - Implements Nillion's Secret Vault technology for secure, encrypted storage
+   - Utilizes decentralized database architecture for fault tolerance
+   - Ensures data integrity and confidentiality through encryption
+   - Maintains tamper-proof records compatible with Monad's security model
+
+The frontend provides an intuitive dashboard for signal visualization, trade execution, and leaderboard tracking. Smart contracts handle the points system, leaderboard mechanics, and integration with 0x for trading execution—all optimized for Monad's accelerated EVM to ensure fast transaction processing and minimal gas costs.
+
+### Target Users
+
+Gorillionaire targets two primary user groups:
+
+1. **Active Crypto Traders**
+
+   - Day traders and swing traders looking for real-time market insights
+   - Benefit from actionable signals, instant trade execution, and reduced research time
+   - Gain competitive advantage through early access to market-moving information
+   - Enjoy gamified trading experience with points and leaderboards
+
+2. **AI Trading Agents & Developers**
+   - Algorithm developers creating automated trading strategies
+   - Quant traders deploying AI-powered solutions
+   - Benefit from structured, machine-readable signals for algorithmic consumption
+   - Leverage Nillion Secret Vault for secure processing of proprietary trading strategies
+   - Build next-generation trading applications on top of Gorillionaire's signal infrastructure
+
+### Uniqueness and Innovation
+
+Gorillionaire stands out from existing solutions in several ways:
+
+1. **Dual-Audience Approach**: Unlike platforms that target either human traders or bots, Gorillionaire serves both with structured, actionable signals.
+
+2. **Real-Time, Actionable Intelligence**: Instead of delayed reports or vague sentiment analysis, Gorillionaire provides high-confidence, executable trade signals with specific parameters.
+
+3. **Complete Trading Ecosystem**: Combining signal generation, trade execution, and competitive gamification creates a comprehensive trading platform rather than just an alert system.
+
+4. **AI-Native Design**: Built from the ground up to be compatible with AI agents, enabling the next generation of automated trading strategies.
+
+5. **Signal Infrastructure Focus**: Emphasis on building the backbone for AI-powered trading strategies rather than just another trading tool.
+
+6. **Secure Signal Vault**: Nillion integration provides a unique approach to handling sensitive trading signals through encrypted, decentralized storage.
+
+### Monad Alignment
+
+Gorillionaire aligns with and contributes to the Monad ecosystem in multiple ways:
+
+1. **Showcasing Monad's Speed**: Demonstrates the power of Monad's accelerated EVM through high-frequency data processing and real-time signal generation.
+
+2. **Expanding Monad's Trading Ecosystem**: Provides essential infrastructure for traders and developers to build and execute sophisticated strategies on Monad.
+
+3. **Driving Transaction Volume**: Encourages active trading through signal-based execution, potentially increasing transaction volume on Monad.
+
+4. **Attracting Developer Talent**: By focusing on a developer-first approach, Gorillionaire helps bring technical talent to the Monad ecosystem.
+
+5. **Creating Network Effects**: As more traders and AI agents use Gorillionaire on Monad, the platform becomes more valuable, creating a positive feedback loop for the ecosystem.
+
+6. **Leveraging Monad's Unique Capabilities**: Specifically designed to take advantage of Monad's low-latency, high-throughput environment—capabilities that would be difficult to achieve on other chains.
+
+## 11. License
 
 The project has been developed for the Monad EVM/ACCATHON. All the files are licensed under the [MIT License](./LICENSE). We reserve the rights to change the license for further production deployment of the entire project.
 
