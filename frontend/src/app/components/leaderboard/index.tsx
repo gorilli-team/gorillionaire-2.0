@@ -31,8 +31,10 @@ const LeaderboardComponent = () => {
   const { address } = useAccount();
 
   const onPageChange = (page: number) => {
+    setCurrentPage(page);
     fetchLeaderboard(page);
   };
+
   const onActivitiesPageChange = (page: number) => setActivitiesPage(page);
 
   const fetchLeaderboard = async (currentPage: number) => {
@@ -64,22 +66,21 @@ const LeaderboardComponent = () => {
     }
   };
 
-  // Fetch data when component mounts and when address changes
   useEffect(() => {
     fetchLeaderboard(currentPage);
     fetchMe();
-
+  
     // Set up an interval to refresh data every 30 seconds
     const interval = setInterval(() => {
       fetchLeaderboard(currentPage);
       fetchMe();
     }, 30000);
-
+  
     // Cleanup interval on component unmount
     return () => clearInterval(interval);
-  }, [address]); //eslint-disable-line
+  }, [address, currentPage]);
 
-  // Update filtered investors when investors or search term changes
+  // Effect to update filteredInvestors when investors change
   useEffect(() => {
     if (searchTerm.trim() === "") {
       setFilteredInvestors(investors);
@@ -89,25 +90,22 @@ const LeaderboardComponent = () => {
       );
       setFilteredInvestors(filtered);
     }
-    setCurrentPage(1); // Reset to first page when search changes
-  }, [searchTerm, investors]);
+  }, [investors, searchTerm]);
 
-  // Pagination logic for investors
+  // Separate effect to reset to page 1 when search term changes
+  useEffect(() => {
+    if (searchTerm.trim() !== "") {
+      setCurrentPage(1);
+    }
+  }, [searchTerm]);
+
+  // Pagination logic for investors - no slicing since the server already returns paginated data
   const itemsPerPage = 10;
   const totalInvestorPages = Math.ceil(investorCount / itemsPerPage);
+  const currentInvestors = filteredInvestors; // Use directly, no slicing
 
-  // Get current investors for table based on page
-  const indexOfLastInvestor = currentPage * itemsPerPage;
-  const indexOfFirstInvestor = indexOfLastInvestor - itemsPerPage;
-  const currentInvestors = filteredInvestors.slice(
-    indexOfFirstInvestor,
-    indexOfLastInvestor
-  );
-
-  // Pagination logic for activities
+  // Pagination logic for activities - this stays as client-side pagination
   const totalActivityPages = Math.ceil(activities.length / itemsPerPage);
-
-  // Get current activities for table based on page
   const indexOfLastActivity = activitiesPage * itemsPerPage;
   const indexOfFirstActivity = indexOfLastActivity - itemsPerPage;
   const currentActivities = activities.slice(
@@ -387,8 +385,8 @@ const LeaderboardComponent = () => {
           <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row items-center justify-between px-1 sm:px-0">
             <span className="text-sm text-gray-500 mb-3 sm:mb-0 font-bold">
               <span className="font-normal">Showing</span>{" "}
-              {investorCount > 0 ? indexOfFirstInvestor + 1 : 0}-
-              {Math.min(indexOfLastInvestor, investorCount)}{" "}
+              {investors.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}-
+              {Math.min(currentPage * itemsPerPage, investorCount)}{" "}
               <span className="font-normal">of</span> {investorCount}
             </span>
             <div className="flex-grow flex justify-center">

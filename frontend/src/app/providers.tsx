@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createConfig, http, WagmiProvider } from "wagmi";
 import { coinbaseWallet } from "wagmi/connectors";
 
-// Definizione della chain Monad utilizzando viem
+// Viem define chain
 export const monadChain = defineChain({
   id: 10143,
   name: "Monad testnet",
@@ -68,6 +68,15 @@ export function Providers({ children }: { children: ReactNode }) {
               monadChain
             ],
             loginMethods: ['email', 'google', 'apple', 'discord', 'twitter', 'wallet'],
+            fundingMethodConfig: {
+              moonpay: {
+                paymentMethod: 'credit_debit_card', // Purchase with credit or debit card
+                uiConfig: {
+                  accentColor: '#696FFD',
+                  theme: 'light'
+                },
+              },
+            },
           }}
         >
           {children}
