@@ -176,15 +176,15 @@ const Agents = () => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-gray-50">
-      <div className="w-full px-4 py-6">
-        {/* Main info section - now full width */}
+    <div className="w-full min-h-screen bg-gray-50 overflow-x-hidden">
+      <div className="w-full max-w-full px-2 sm:px-4 py-4 sm:py-6">
+        {/* Main info section */}
         <div className="flex flex-col items-center justify-center">
-          {/* NFT Access Section - now full width with clearer agent messaging */}
+          {/* NFT Access Section */}
           <div className="w-full">
             <div className="bg-white rounded-lg border border-gray-200 shadow-md overflow-hidden">
-              <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-4">
-                <div className="flex items-center justify-between">
+              <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-3 sm:p-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                   <h3 className="text-lg md:text-xl font-bold text-white">
                     🔒 Unlock Premium Agent Trading Signals
                   </h3>
@@ -201,20 +201,20 @@ const Agents = () => {
                 </div>
               </div>
 
-              <div className="p-4 md:p-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+              <div className="p-3 sm:p-4 md:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 mb-4 sm:mb-6">
                   <div>
                     <h4 className="text-lg font-semibold text-gray-800">
                       Agent Trading API Access NFT
                     </h4>
                     <p className="text-gray-600 mt-1">Mint price: 1 MON</p>
                   </div>
-                  <div className="h-16 w-16 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                  <div className="h-16 w-16 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center mt-2 sm:mt-0">
                     <span className="text-2xl text-white">🦍</span>
                   </div>
                 </div>
 
-                <div className="bg-indigo-50 p-4 rounded-lg mb-6">
+                <div className="bg-indigo-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6">
                   <p className="text-indigo-800 font-medium">
                     Power your trading agents with exclusive Gorillionaire
                     signals
@@ -226,46 +226,46 @@ const Agents = () => {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 mb-4 sm:mb-6">
                   <div className="flex items-start">
                     <span className="text-green-500 mr-2 flex-shrink-0">✓</span>
-                    <p className="text-gray-700">
+                    <p className="text-gray-700 text-sm sm:text-base">
                       Direct signal integration with your trading agents
                     </p>
                   </div>
                   <div className="flex items-start">
                     <span className="text-green-500 mr-2 flex-shrink-0">✓</span>
-                    <p className="text-gray-700">
+                    <p className="text-gray-700 text-sm sm:text-base">
                       Agent-optimized API endpoints with confidence scores
                     </p>
                   </div>
                   <div className="flex items-start">
                     <span className="text-green-500 mr-2 flex-shrink-0">✓</span>
-                    <p className="text-gray-700">
+                    <p className="text-gray-700 text-sm sm:text-base">
                       MEV-aware signal feeds for all tokens
                     </p>
                   </div>
                   <div className="flex items-start">
                     <span className="text-green-500 mr-2 flex-shrink-0">✓</span>
-                    <p className="text-gray-700">
+                    <p className="text-gray-700 text-sm sm:text-base">
                       Agent performance boosting alpha strategies
                     </p>
                   </div>
                   <div className="flex items-start">
                     <span className="text-green-500 mr-2 flex-shrink-0">✓</span>
-                    <p className="text-gray-700">
+                    <p className="text-gray-700 text-sm sm:text-base">
                       Nillion Secret Vault for encrypted signal storage
                     </p>
                   </div>
                   <div className="flex items-start">
                     <span className="text-green-500 mr-2 flex-shrink-0">✓</span>
-                    <p className="text-gray-700">
+                    <p className="text-gray-700 text-sm sm:text-base">
                       Zero-knowledge access control via NFT verification
                     </p>
                   </div>
                 </div>
 
-                <div className="bg-gray-100 p-4 rounded-lg mb-6">
+                <div className="bg-gray-100 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6">
                   <div className="flex items-center">
                     <div className="w-2 h-2 bg-yellow-400 rounded-full mr-2 flex-shrink-0"></div>
                     <p className="text-sm text-gray-700">
@@ -277,16 +277,16 @@ const Agents = () => {
                 </div>
 
                 {errorMessage && (
-                  <div className="bg-red-100 border border-red-200 text-red-700 p-4 rounded-lg mb-6">
+                  <div className="bg-red-100 border border-red-200 text-red-700 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6">
                     <div className="flex items-center">
                       <span className="text-xl mr-2 flex-shrink-0">⚠️</span>
-                      <p>{errorMessage}</p>
+                      <p className="text-sm sm:text-base">{errorMessage}</p>
                     </div>
                   </div>
                 )}
 
                 {mintSuccess ? (
-                  <div className="bg-green-100 border border-green-200 text-green-700 p-4 rounded-lg mb-6">
+                  <div className="bg-green-100 border border-green-200 text-green-700 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                       <span className="text-xl mr-2 flex-shrink-0">✅</span>
                       <div>
@@ -342,12 +342,12 @@ const Agents = () => {
                 )}
 
                 {mintSuccess && (
-                  <div className="mt-6">
+                  <div className="mt-4 sm:mt-6">
                     <h5 className="font-medium text-gray-800 mb-2">
                       Your Schema ID
                     </h5>
                     <div className="bg-gray-100 p-3 rounded-lg flex items-center justify-between">
-                      <code className="text-xs text-gray-600 truncate">
+                      <code className="text-xs text-gray-600 overflow-x-hidden truncate max-w-[calc(100%-2rem)]">
                         {process.env.NEXT_PUBLIC_NILLION_SCHEMA_ID}
                       </code>
                       <button
@@ -379,9 +379,9 @@ const Agents = () => {
                       <h6 className="font-medium text-blue-800 text-xs">
                         Integration Example:
                       </h6>
-                      <div className="mt-2 bg-gray-800 text-gray-200 p-3 rounded max-w-full">
-                        <pre className="whitespace-pre-wrap break-words overflow-x-auto">
-                          <code className="block text-xs break-words">
+                      <div className="mt-2 bg-gray-800 text-gray-200 p-2 sm:p-3 rounded">
+                        <pre className="whitespace-pre-wrap break-words overflow-x-auto max-w-full text-xs">
+                          <code className="block break-words">
                             {`// Connect your trading agent to our Nillion-secured signal API
 const response = await fetch(
 \`https://api.gorillionai.re/nillion/data?schemaId=\${process.env.YOUR_SCHEMA_ID}\`);
@@ -434,7 +434,7 @@ if (signals.data) {
                     </div>
 
                     {/* Nillion Signal Viewer */}
-                    <div className="mt-6">
+                    <div className="mt-4 sm:mt-6">
                       <div className="flex items-center justify-between mb-4">
                         <h5 className="font-medium text-gray-800">
                           Your Nillion-Protected Signals
@@ -481,9 +481,9 @@ if (signals.data) {
                           </span>
                         </div>
                       ) : rawJsonResponse ? (
-                        <div className="bg-gray-800 p-4 rounded-lg">
+                        <div className="bg-gray-800 p-2 sm:p-4 rounded-lg">
                           <div className="flex justify-between items-center mb-2">
-                            <h6 className="text-white font-medium">
+                            <h6 className="text-white font-medium text-sm">
                               Raw JSON Response
                             </h6>
                             <button
@@ -497,9 +497,9 @@ if (signals.data) {
                           </div>
                           <div className="overflow-x-auto">
                             <pre
-                              className="text-green-400 text-sm whitespace-pre-wrap break-words"
+                              className="text-green-400 text-xs sm:text-sm whitespace-pre-wrap break-words"
                               style={{
-                                maxHeight: "400px",
+                                maxHeight: "250px",
                                 overflowY: "auto",
                                 wordBreak: "break-all",
                                 whiteSpace: "pre-wrap",
@@ -522,7 +522,7 @@ if (signals.data) {
                                 }`}
                                 onClick={() => handleSignalClick(signal)}
                               >
-                                <div className="flex items-center justify-between">
+                                <div className="flex items-center justify-between flex-wrap gap-2">
                                   <div className="flex items-center">
                                     <div
                                       className={`h-2 w-2 rounded-full ${
@@ -533,7 +533,7 @@ if (signals.data) {
                                           : "bg-red-500"
                                       } mr-2`}
                                     ></div>
-                                    <p className="font-medium text-gray-800">
+                                    <p className="font-medium text-gray-800 text-sm sm:text-base">
                                       {signal.token || "Unknown Token"}
                                     </p>
                                   </div>
@@ -552,7 +552,7 @@ if (signals.data) {
                                 <p className="text-sm text-gray-600 mt-1 line-clamp-2">
                                   {signal.text}
                                 </p>
-                                <div className="flex justify-between mt-2 text-xs text-gray-500">
+                                <div className="flex justify-between mt-2 text-xs text-gray-500 flex-wrap gap-2">
                                   <span>Confidence: {signal.confidence}%</span>
                                   <span>
                                     {new Date(
@@ -575,8 +575,8 @@ if (signals.data) {
 
                       {/* Selected Signal Detail View */}
                       {selectedSignal && (
-                        <div className="mt-4 bg-white border border-gray-200 rounded-lg p-4">
-                          <div className="flex items-center justify-between mb-3">
+                        <div className="mt-4 bg-white border border-gray-200 rounded-lg p-3 sm:p-4">
+                          <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
                             <h6 className="font-medium text-gray-800">
                               Signal Details
                             </h6>
@@ -603,11 +603,13 @@ if (signals.data) {
 
                             <div>
                               <p className="text-xs text-gray-500">Analysis</p>
-                              <p className="text-sm">{selectedSignal.text}</p>
+                              <p className="text-sm">
+                                {selectedSignal.text}
+                              </p>
                             </div>
 
                             <div className="flex items-center">
-                              <p className="text-xs text-gray-500 mr-2">
+                              <p className="text-xs text-gray-500 mr-2 whitespace-nowrap">
                                 Confidence:
                               </p>
                               <div className="flex-1 bg-gray-200 rounded-full h-2">
@@ -624,7 +626,7 @@ if (signals.data) {
                                   }}
                                 ></div>
                               </div>
-                              <span className="ml-2 text-xs font-medium">
+                              <span className="ml-2 text-xs font-medium whitespace-nowrap">
                                 {selectedSignal.confidence}%
                               </span>
                             </div>
@@ -667,17 +669,17 @@ if (signals.data) {
                 )}
               </div>
 
-              <div className="border-t border-gray-200 p-4 bg-gray-50">
+              <div className="border-t border-gray-200 p-3 sm:p-4 bg-gray-50">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div className="flex items-center text-sm text-gray-500">
+                  <div className="flex items-center text-xs sm:text-sm text-gray-500 flex-wrap">
                     <span className="mr-1">Powered by</span>
                     <span className="font-medium text-purple-600">
                       Monad 10,000 TPS Infrastructure & Nillion Secret Vault
                     </span>
                   </div>
-                  <div className="flex items-center">
+                  <div className="flex items-center mt-2 sm:mt-0">
                     <div className="h-2 w-2 bg-green-500 rounded-full mr-1 flex-shrink-0"></div>
-                    <span className="text-sm text-gray-600">
+                    <span className="text-xs sm:text-sm text-gray-600">
                       Live encrypted agent signals
                     </span>
                   </div>
@@ -686,9 +688,9 @@ if (signals.data) {
             </div>
 
             {/* Nillion Security Explanation */}
-            <div className="mt-8 bg-white rounded-lg border border-gray-200 shadow-md overflow-hidden">
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4">
-                <h3 className="font-medium text-white flex items-center">
+            <div className="mt-6 sm:mt-8 bg-white rounded-lg border border-gray-200 shadow-md overflow-hidden">
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-3 sm:p-4">
+                <h3 className="font-medium text-white flex items-center flex-wrap gap-2">
                   <Image
                     src="/nillion_full_brand_blue.png"
                     alt="Nillion"
@@ -699,32 +701,32 @@ if (signals.data) {
                   Secure Signal Infrastructure
                 </h3>
               </div>
-              <div className="p-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="p-3 sm:p-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
                   <div className="bg-gray-50 p-3 rounded-lg">
-                    <h4 className="font-medium text-gray-800 mb-2">
+                    <h4 className="font-medium text-gray-800 mb-2 text-sm sm:text-base">
                       1. Signal Generation
                     </h4>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-xs sm:text-sm text-gray-600">
                       Langchain&apos;s agent generates trading signals, which
                       are immediately encrypted and stored in Nillion&apos;s
                       Secret Vault.
                     </p>
                   </div>
                   <div className="bg-gray-50 p-3 rounded-lg">
-                    <h4 className="font-medium text-gray-800 mb-2">
+                    <h4 className="font-medium text-gray-800 mb-2 text-sm sm:text-base">
                       2. Distributed Encryption
                     </h4>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-xs sm:text-sm text-gray-600">
                       Signals are fragmented and distributed across three nilDB
                       nodes, with each storing only encrypted fragments.
                     </p>
                   </div>
                   <div className="bg-gray-50 p-3 rounded-lg">
-                    <h4 className="font-medium text-gray-800 mb-2">
+                    <h4 className="font-medium text-gray-800 mb-2 text-sm sm:text-base">
                       3. NFT-based Access
                     </h4>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-xs sm:text-sm text-gray-600">
                       Your NFT serves as the access key, allowing only your
                       trading agents to decrypt and utilize our alpha signals.
                     </p>
@@ -734,25 +736,25 @@ if (signals.data) {
             </div>
 
             {/* Recent Mints Section - with agent language */}
-            <div className="mt-8 bg-white rounded-lg border border-gray-200 shadow-md overflow-hidden">
-              <div className="bg-gray-50 border-b border-gray-200 p-4">
+            <div className="mt-6 sm:mt-8 bg-white rounded-lg border border-gray-200 shadow-md overflow-hidden">
+              <div className="bg-gray-50 border-b border-gray-200 p-3 sm:p-4">
                 <h3 className="font-medium text-gray-700">
                   Recent Agent API Activations
                 </h3>
               </div>
-              {holders.length > 0 && (
+              {holders.length > 0 ? (
                 <div className="divide-y divide-gray-200">
                   {holders.map((holder, index) => (
                     <div
                       key={index}
-                      className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2"
+                      className="p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2"
                     >
-                      <div className="flex items-center">
+                      <div className="flex items-center w-full sm:w-auto">
                         <div className="h-8 w-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 mr-3 flex-shrink-0">
                           🤖
                         </div>
                         <div className="overflow-hidden max-w-full">
-                          <p className="text-sm font-medium text-gray-700 break-all">
+                          <p className="text-xs sm:text-sm font-medium text-gray-700 break-all">
                             {holder.ownerAddress}
                           </p>
                         </div>
@@ -762,6 +764,10 @@ if (signals.data) {
                       </span>
                     </div>
                   ))}
+                </div>
+              ) : (
+                <div className="p-4 text-center text-gray-500">
+                  No agent activations found yet
                 </div>
               )}
             </div>
