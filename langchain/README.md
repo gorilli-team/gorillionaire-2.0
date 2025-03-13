@@ -22,8 +22,7 @@ mv .env.example .env
 3- Run the index.js script
 
 ```
-cd src
-node --env-file=../.env index.js
+node --env-file=../.env src/index.js
 ```
 
 ## Integration logic

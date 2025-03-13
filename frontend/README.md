@@ -7,12 +7,14 @@ We put strong emphasis on delivering an intuitive and accessible user experience
 ## How to run the project locally
 
 1- Install the dependencies
+
 ```
 cd frontend
-yarn
+yarn install
 ```
 
 2- Clone the .env.example and add all the variables listed
+
 ```
 mv .env.example .env
 ```
@@ -23,7 +25,6 @@ NEXT_PUBLIC_NILLION_SCHEMA_ID=
 NEXT_PUBLIC_API_URL=
 ```
 
-
 3- Run the development server:
 
 ```bash
@@ -31,7 +32,6 @@ yarn dev
 ```
 
 4- Open: [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
 
 ### ✅ Privy Integration
 
@@ -69,18 +69,20 @@ NEXT_PUBLIC_PRIVY_APP_ID=
 
 Key Features
 
-- Interactive Time Range Selection**: Easily switch between 1D, 1W, 1M, and All-time views
-- Real-time Price Statistics**: Monitor current price and percentage changes (1h, 6h, 24h)
-- All-Time High/Low Markers**: Instantly visualize important price thresholds
-- Interactive Tooltips**: Hover over the chart to see precise price data and timestamps
-- Data Export**: Download historical price data as CSV for further analysis
+- Interactive Time Range Selection\*\*: Easily switch between 1D, 1W, 1M, and All-time views
+- Real-time Price Statistics\*\*: Monitor current price and percentage changes (1h, 6h, 24h)
+- All-Time High/Low Markers\*\*: Instantly visualize important price thresholds
+- Interactive Tooltips\*\*: Hover over the chart to see precise price data and timestamps
+- Data Export\*\*: Download historical price data as CSV for further analysis
 
 <div style="width: 100%;">
     <img src="public/chart.png"/>
 </div>
 
-### ✅ Accessibility  
+### ✅ Accessibility
+
 We’ve paid attention to accessibility standards to make **Gorillionaire** inclusive for everyone:
+
 - High-contrast color schemes for better visibility and readability.
 - Clear visual hierarchy and semantic structure.
 - Keyboard navigation and screen reader compatibility for users with motor or visual impairments.
@@ -91,11 +93,12 @@ We leveraged Google Lighthouse, a powerful web auditing tool, to rigorously asse
     <img src="public/accessibility.png"/>
 </div>
 
+### ✅ Responsiveness
 
-### ✅ Responsiveness  
 **Gorillionaire** was meticulously designed with a mobile-first and adaptive approach. Our development focused on creating a seamless user experience across various devices and screen sizes.
 
 Key responsive design features include:
+
 - Adaptive layout that dynamically adjusts to different screen sizes.
 - Hamburger menu for mobile navigation, ensuring intuitive interaction on smaller screens.
 - Flexible grid systems and responsive components.
@@ -105,6 +108,7 @@ Key responsive design features include:
 <br>
 
 Signal Section Mobile:
+
 <div style="display: flex; justify-content: center; gap: 10px;">
   <div style="width: 50%;">
     <img src="public/responsive.png" style="width: 100%; object-fit: cover;"/>
