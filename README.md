@@ -40,7 +40,8 @@
   - [9.4 Nillion's Secret Vault](#94-nillions-secret-vault)
   - [9.5 AccessNFT smart contract](#95-accessnft-smart-contract)
 - [10. Project Description and Impact](#10-project-description-and-impact)
-- [11. License](#10-license)
+- [11. User Experience](#11-user-experience)
+- [12. License](#12-license)
 
 ## 1. Overview
 
@@ -116,12 +117,12 @@ Each folder contains its own README with detailed setup instructions and environ
 <a href="https://nillion.com/"><img src="./docs/img/nillion-logo.jpg" alt="Nillion Logo" width="50" height="50"></a>
 <a href="https://envio.dev/"><img src="./docs/img/envio-logo.png" alt="Envio Logo" width="120" height="50"></a>
 
-| Sponsor     | Integration method    | Description                                                                                                                                                         | Link to the bounty                                                                                                                               |
-| ----------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Privy       | Wallet authentication | Users can easily access the platform with their wallet thanks to Privy, which smoothens the onboarding process with crypto/fiat onramping.                          | [Link](https://monad-foundation.notion.site/Sponsor-Bounties-Resources-1916367594f2802ba5d8c832089fde42?p=1916367594f280e987a0d78437c2c777&pm=c) |
-| 0x Swap API | Swap tokens           | Users can execute their trade according to the signal generated thanks to 0x Swap API, which allows them to find the best swap opportunity available on the market. | [Link](https://monad-foundation.notion.site/Sponsor-Bounties-Resources-1916367594f2802ba5d8c832089fde42?p=1916367594f2808588d7d30ce1ee5f00&pm=c) |
-| Nillion     | Encrypted storage     | Generated signals are stored securely on a decentralized database provided by Nillion.                                                                              | [Link](https://monad-foundation.notion.site/Sponsor-Bounties-Resources-1916367594f2802ba5d8c832089fde42?p=1916367594f280aea084c6cf78329696&pm=c) |
-| Envio       | Token tracking        | Transfers and listings events are tracked with Envio, these will serve as the context for the signal generation process.                                            | [Link](https://monad-foundation.notion.site/Sponsor-Bounties-Resources-1916367594f2802ba5d8c832089fde42?p=1a16367594f280378f5eedd541e71366&pm=c) |
+| Sponsor     | Integration method    | Description                                                                                                                                                         | Link to the bounty                                                                                                                                         |
+| ----------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Privy       | Wallet authentication | Users can easily access the platform with their wallet thanks to Privy, which smoothens the onboarding process with crypto/fiat onramping.                          | [Link](#privy)()                                                                                                                                           |
+| 0x Swap API | Swap tokens           | Users can execute their trade according to the signal generated thanks to 0x Swap API, which allows them to find the best swap opportunity available on the market. | [Link](#0x)(https://monad-foundation.notion.site/Sponsor-Bounties-Resources-1916367594f2802ba5d8c832089fde42?p=1916367594f2808588d7d30ce1ee5f00&pm=c)      |
+| Nillion     | Encrypted storage     | Generated signals are stored securely on a decentralized database provided by Nillion.                                                                              | [Link](#nillion)(https://monad-foundation.notion.site/Sponsor-Bounties-Resources-1916367594f2802ba5d8c832089fde42?p=1916367594f280aea084c6cf78329696&pm=c) |
+| Envio       | Token tracking        | Transfers and listings events are tracked with Envio, these will serve as the context for the signal generation process.                                            | [Link](#envio)(https://monad-foundation.notion.site/Sponsor-Bounties-Resources-1916367594f2802ba5d8c832089fde42?p=1a16367594f280378f5eedd541e71366&pm=c)   |
 
 ## 8. Security considerations
 
@@ -345,24 +346,28 @@ Gorillionaire aligns with and contributes to the Monad ecosystem in multiple way
 ### Team Members & Roles
 
 - **Riccardo** - Security & Backend Lead
+
   - Implemented secure data architecture
   - Developed backend infrastructure
   - Created blockchain event tracking systems
   - Integrated 0x Swap API for trade execution
 
 - **Samuele** - Frontend & Authentication Lead
+
   - Built responsive user interface
   - Implemented Privy integration for secure wallet authentication
   - Designed user experience flows
   - Created interactive dashboard components
 
 - **Marco** - AI & Secure Storage Lead
+
   - Developed LangChain implementation for signal generation
   - Created AI models for data analysis
   - Integrated Nillion Secret Vault for secure signal storage
   - Designed AI agent interfaces
 
 - **Christian** - Data Visualization & Price Feed Lead
+
   - Implemented price feed integrations
   - Created interactive price visualization components
   - Developed real-time data displays
@@ -382,6 +387,7 @@ One of our biggest challenges was scope management. Initially, we were ambitious
 The diverse technical backgrounds of our team members enabled us to tackle complex challenges across multiple domains—from AI implementation to blockchain integration and frontend development. This cross-functional collaboration was essential for creating a cohesive product that addresses real user needs.
 
 Key takeaways from our hackathon experience include:
+
 - The importance of in-person collaboration for rapid iteration
 - The value of direct feedback from ecosystem stakeholders
 - The necessity of reducing scope to focus on core value propositions
@@ -389,38 +395,96 @@ Key takeaways from our hackathon experience include:
 
 We leave this hackathon with not just a product, but with stronger technical skills, deeper ecosystem connections, and a clearer vision for how Gorillionaire can contribute to the Monad ecosystem.
 
-## 11. License
-
-The project has been developed for the Monad EVM/ACCATHON. All the files are licensed under the [MIT License](./LICENSE). We reserve the rights to change the license for further production deployment of the entire project.
-
-## 🎯 User Experience (UX)
+## 11. User Experience
 
 We put strong emphasis on delivering an intuitive and accessible user experience with **Gorillionaire**, ensuring users of all backgrounds — from DeFi veterans to first-time traders — can navigate and use the platform effortlessly.
+To discover more check: [frontend README](./frontend/README.md)
 
-### ✅ Intuitive Design
+## 12. Bounties Extra Info
 
-The interface is clean, consistent, and easy to navigate. We followed UX best practices to ensure users can quickly understand where to go and what to do, with a clear and logical structure across all screens.
+### 0x
 
-### ✅ User-Friendliness
+Full Integration with 0x Swap API
+Our application integrates the 0x Swap API for both pricing and transaction submission. The backend uses the 0x API to fetch the best swap price for a given token pair and trade type (buy/sell). Once a quote is obtained via the https://api.0x.org/swap/permit2/quote endpoint, it contains a fully-built transaction payload, including calldata to execute the swap on-chain. This transaction object is saved to the database, allowing us to track intents and execute/cross-check trades.
 
-Every interaction in **Gorillionaire** is designed to be simple and accessible, even for users unfamiliar with crypto trading or blockchain technologies. Features are easy to find, actions are straightforward, and the overall flow is smooth and frictionless.
+Demonstrated Transaction Submission (not just pricing)
+We go beyond simple pricing: each quote obtained includes a valid transaction object (res.transaction) which users can submit directly to the blockchain. The full quote and transaction intent are stored and linked to a specific user, forming the core of our points-based reward system.
 
-### ✅ Accessibility
+How It Works
+A user selects a trade signal (buy/sell a token). Our backend fetches a quote via the 0x API, builds the transaction using the quote endpoint. The transaction data is returned and also saved with intent metadata. Users can sign and submit this transaction via the frontend.
 
-We've paid attention to accessibility standards to make **Gorillionaire** inclusive for everyone:
+Code Reference
+Relevant code can be found here: https://github.com/gorilli-team/gorillionaire/blob/main/app/backend/src/routes/trade/0x.js
 
-- High-contrast color schemes for better visibility and readability.
-- Clear visual hierarchy and semantic structure.
-- Keyboard navigation and screen reader compatibility for users with motor or visual impairments.
+Key functions:
+getQuote() → integrates with 0x.org/swap/permit2/quote, builds the transaction.
+getPrice() → uses 0x.org/swap/permit2/price for comparison only.
+Intent model → stores each transaction intent including calldata, token details, price, and user address.
 
-### ✅ Responsive Design
+Tx sent using 0x intent: https://testnet.monadexplorer.com/tx/0x4b35bf8365453ec11865bb29822e9478b3fc25161bfffa7a7a737cc3634d2a56?tab=Overview
 
-**Gorillionaire** is fully responsive and optimized for mobile devices. The layout adapts perfectly across different screen sizes, ensuring a seamless experience on both desktop and smartphones.
+Requirements Checklist
 
-### ✅ Visual Appeal
+- Uses 0x Swap API ✅ Yes
+- Uses actual transaction (not only pricing) ✅ Yes
+- Transaction data saved & linked to user ✅ Yes
+- Project is technically sound & production-ready ✅ Yes
 
-The UI has a modern and engaging visual design — with a harmonious color palette, smooth transitions, and thoughtfully crafted components. The platform is not only functional but also aesthetically pleasing, making it enjoyable to use.
+#### Additional Notes
 
-### ✨ Why This Matters
+The integration leverages the Permit2 flow on Monad using 0x's latest endpoint. We use real-time price oracles and slippage-aware quoting to ensure accuracy. The backend is easily extendable to include trade execution or signature relays if needed.
 
-We believe that a great user experience is key to onboarding more people into decentralized finance. By focusing on design, accessibility, and responsiveness, **Gorillionaire** offers a seamless and inclusive experience that leverages the performance power of **Monad**.
+### Envio
+
+HyperIndex Usage:
+The Gorillionaire Indexer leverages Envio HyperIndex to track on-chain events on the Monad Testnet blockchain. The indexing system tracks event processing, token transfer analysis, and triggers notifications to users.
+
+Monad On-Chain Data Focus
+Our system is entirely focused on Monad on-chain data, monitoring token transfers and listings specifically from the Monad blockchain. The indexer handles custom types such as Chog_Transfer, Molandak_Transfer, Moyaki_Transfer, and TokenListed on Uniswap.
+
+This indexer is integrated with a live backend and deployed dashboard, delivering trading insights via a Telegram alert system and API endpoint.
+
+Additional Notes:
+Real-time notifications via Telegram bot integration.
+Spike detection algorithm identifies sudden increases in transfer activity.
+Whale transfers are highlighted and posted both to our backend and Telegram in real time to users.
+To check how we integrated it, refer to:
+
+- https://github.com/gorilli-team/gorillionaire/blob/main/envio-indexer/src/EventHandlers.ts
+- https://github.com/gorilli-team/gorillionaire/blob/main/envio-indexer/src/FactoryHandlers.ts
+
+Config file:
+
+- https://github.com/gorilli-team/gorillionaire/blob/main/envio-indexer/config.yaml
+
+Check README:
+
+- https://github.com/gorilli-team/gorillionaire/blob/main/envio-indexer/README.md
+
+### Nillion
+
+We integrated SecretVault in our Monad AI agent system to store encrypted signals. (Schema Id: e6864651-902e-4fdc-98e5-50149fcec5a4). The integration ensures that sensitive data, such as the signal text and events are securely encrypted and distributed across multiple nilDB nodes. The only field left unencrypted is created_at, as it does not contain private information.
+
+- Privacy Preservation:
+  Our approach guarantees thoughtful privacy preservation. All user-generated signal data is encrypted before being stored. Furthermore, NFT-based access control ensures that only authorized users (NFT holders) can retrieve and decrypt this information. This mechanism creates a secure and decentralized permission layer over the encrypted data.
+
+- SecretVault Collection Created with Encrypted Fields:
+  We successfully created a SecretVault collection based on the "Gorillionaire - Generated Signals" schema, where both signal_text and events fields are encrypted using SecretVault's %share format.
+
+- Secure Storage Implementation:
+  Data is encrypted and stored across three separate nilDB nodes, ensuring distribution and confidentiality by design.
+
+- Automatic Polling and Updates:
+  Our system fetches new signals from MongoDB every 30 minutes, encrypts them, and updates the SecretVault collection automatically, ensuring real-time data protection.
+
+### Privy
+
+- Wallet-based authentication: Users can easily access the platform via Privy's onboarding flow, with support for Web3 wallets, email, Google, Apple, Discord, and Twitter.
+- Embedded wallets: For users without a wallet, Privy allows for embedded wallet generation, lowering the entry barrier.
+- Custom authentication flow: Auth setup is handled via the Privy Dashboard, where login preferences and wallet behavior were configured.
+- Backend authentication: All authenticated user actions to our backend API are protected using Privy-issued tokens (used as Bearer tokens in API calls).
+- User management & persistence: The backend securely stores and updates the Privy authentication tokens, ensuring secure and persistent access handling.
+
+## 12. License
+
+The project has been developed for the Monad EVM/ACCATHON. All the files are licensed under the [MIT License](./LICENSE). We reserve the rights to change the license for further production deployment of the entire project.
