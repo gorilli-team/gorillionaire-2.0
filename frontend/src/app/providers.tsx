@@ -36,7 +36,7 @@ const wagmiConfig = createConfig({
   chains: [monadChain],
   connectors: [
     coinbaseWallet({
-      appName: "Your App Name",
+      appName: "Gorillionaire",
       preference: "smartWalletOnly",
       version: "4",
     }),
@@ -47,7 +47,6 @@ const wagmiConfig = createConfig({
   },
 });
 
-// Client per React Query
 const queryClient = new QueryClient();
 
 export function Providers({ children }: { children: ReactNode }) {
