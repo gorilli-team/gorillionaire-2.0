@@ -38,11 +38,12 @@ async function handleNewListing(
   try {
     // Store the token in the database via a POST request to the backend
     const response = await fetch(
-      `${process.env.API_BASE_URL}/events/listings`,
+      `${process.env.ENVIO_API_BASE_URL}/events/listings`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "x-api-key": process.env.ENVIO_BACKEND_API_KEY || "",
         },
         body: JSON.stringify({
           tokenAddress: entity.id.toString(),

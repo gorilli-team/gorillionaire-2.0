@@ -85,11 +85,12 @@ export class TransferTracker {
       ) {
         try {
           const response = await fetch(
-            `${process.env.API_BASE_URL}/events/spike`,
+            `${process.env.ENVIO_API_BASE_URL}/events/spike`,
             {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
+                "x-api-key": process.env.ENVIO_BACKEND_API_KEY || "",
               },
               body: JSON.stringify({
                 tokenName,
