@@ -63,16 +63,20 @@ NEXT_PUBLIC_PRIVY_APP_ID=
   </div>
 </div>
 
-### ✅ Trading View 
-We’ve paid attention to accessibility standards to make **Gorillionaire** inclusive for everyone:
-- High-contrast color schemes for better visibility and readability.
-- Clear visual hierarchy and semantic structure.
-- Keyboard navigation and screen reader compatibility for users with motor or visual impairments.
+### ✅ TradingView Lightweight Charts
 
-We leveraged Google Lighthouse, a powerful web auditing tool, to rigorously assess and optimize our platform's accessibility. Our meticulous approach has yielded impressive results, with accessibility scores consistently ranging between 92% and 96% across both desktop and mobile platforms. This achievement underscores our commitment to creating an inclusive digital experience that ensures usability for all users, regardless of their abilities or the device they're using.
+**Gorillionaire** leverages **TradingView Lightweight Charts** to deliver professional-grade trading visualization with minimal overhead. This powerful charting solution provides smooth, real-time monitoring of token prices and market trends.
+
+Key Features
+
+- Interactive Time Range Selection**: Easily switch between 1D, 1W, 1M, and All-time views
+- Real-time Price Statistics**: Monitor current price and percentage changes (1h, 6h, 24h)
+- All-Time High/Low Markers**: Instantly visualize important price thresholds
+- Interactive Tooltips**: Hover over the chart to see precise price data and timestamps
+- Data Export**: Download historical price data as CSV for further analysis
 
 <div style="width: 100%;">
-    <img src="public/accessibility.png"/>
+    <img src="public/chart.png"/>
 </div>
 
 ### ✅ Accessibility  
