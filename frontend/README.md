@@ -29,6 +29,23 @@ yarn dev
 4- Open: [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 
+### ✅ Wallet Connection with Privy
+Gorillionaire leverages Privy's advanced authentication infrastructure to provide a seamless and secure wallet connection experience. Our integration supports:
+
+Multiple login methods: Email, Google, Apple, Discord, Twitter, and Web3 wallets
+Embedded wallet creation for users without existing crypto wallets
+Simplified onboarding with flexible authentication options
+
+While currently integrated with the Monad testnet, our Privy setup prepares the groundwork for future financial integrations. The configuration includes preliminary MoonPay funding support, though full cryptocurrency purchasing features are not yet activated in the testnet environment.
+
+<div style="display: flex; justify-content: center; gap: 10px;">
+  <div style="width: 50%;">
+    <img src="public/privy_provider.png" style="width: 100%; object-fit: cover;"/>
+  </div>
+  <div style="width: 50%;">
+    <img src="public/privy_wallet.png" style="width: 100%; object-fit: cover;"/>
+  </div>
+</div>
 
 ### ✅ Accessibility  
 We’ve paid attention to accessibility standards to make **Gorillionaire** inclusive for everyone:
@@ -36,13 +53,38 @@ We’ve paid attention to accessibility standards to make **Gorillionaire** incl
 - Clear visual hierarchy and semantic structure.
 - Keyboard navigation and screen reader compatibility for users with motor or visual impairments.
 
-![Accessibility Desktop & Mobile Site](public/accessibility.png)
+We leveraged Google Lighthouse, a powerful web auditing tool, to rigorously assess and optimize our platform's accessibility. Our meticulous approach has yielded impressive results, with accessibility scores consistently ranging between 92% and 96% across both desktop and mobile platforms. This achievement underscores our commitment to creating an inclusive digital experience that ensures usability for all users, regardless of their abilities or the device they're using.
+
+<div style="width: 100%;">
+    <img src="public/accessibility.png"/>
+</div>
 
 
-### ✅ Responsive Design  
-**Gorillionaire** is fully responsive and optimized for mobile devices. The layout adapts perfectly across different screen sizes, ensuring a seamless experience on both desktop and smartphones.
+### ✅ Responsiveness  
+**Gorillionaire** was meticulously designed with a mobile-first and adaptive approach. Our development focused on creating a seamless user experience across various devices and screen sizes.
 
-<p align="center">
-  <img src="public/responsive.png" width="48%" style="padding-right: 10px;"/> 
-  <img src="public/responsive_1.png" width="48%"/>
-</p>
+Key responsive design features include:
+- Adaptive layout that dynamically adjusts to different screen sizes.
+- Hamburger menu for mobile navigation, ensuring intuitive interaction on smaller screens.
+- Flexible grid systems and responsive components.
+- Touch-friendly interfaces for mobile devices.
+- Optimized performance across desktop and smartphone platforms.
+
+<br>
+
+Signal Section Mobile:
+<div style="display: flex; justify-content: center; gap: 10px;">
+  <div style="width: 50%;">
+    <img src="public/responsive.png" style="width: 100%; object-fit: cover;"/>
+  </div>
+  <div style="width: 50%;">
+    <img src="public/responsive_1.png" style="width: 100%; object-fit: cover;"/>
+  </div>
+</div>
+<br>
+Signals Section Desktop:
+<div style="padding-top:10px;">
+  <div style="width: 100%;">
+    <img src="public/responsive_desktop.png" style="width: 100%; object-fit: cover;"/>
+  </div>
+</div>
