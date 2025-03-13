@@ -36,7 +36,7 @@ const wagmiConfig = createConfig({
   chains: [monadChain],
   connectors: [
     coinbaseWallet({
-      appName: "Your App Name",
+      appName: "Gorillionaire",
       preference: "smartWalletOnly",
       version: "4",
     }),
