@@ -25,6 +25,11 @@ router.get("/:token", async (req, res) => {
 // Example of how to broadcast a new event when it's created
 router.post("/", async (req, res) => {
   try {
+    const apiKey = req.headers["x-api-key"];
+    if (apiKey !== process.env.INDEXER_API_KEY) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
     const {
       tokenName,
       tokenSymbol,
