@@ -23,7 +23,6 @@ app.use(function (req, res, next) {
 
 // Routes
 app.use("/events/spike", require("./routes/events/spike"));
-app.use("/events/token", require("./routes/events/token"));
 app.use("/events/listings", require("./routes/events/listings"));
 app.use("/events/transfers", require("./routes/events/transfers"));
 app.use("/events/prices", require("./routes/events/prices"));
