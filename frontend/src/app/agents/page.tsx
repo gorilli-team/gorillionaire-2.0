@@ -10,7 +10,7 @@ const AgentsPage = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="flex bg-gray-100 text-gray-800 overflow-x-hidden">
+    <div className="flex min-h-screen bg-gray-100 text-gray-800">
       {/* Mobile menu button */}
       <button
         className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-full bg-gray-200"
@@ -39,14 +39,13 @@ const AgentsPage = () => {
       {/* Sidebar */}
       <div
         className={`
-          fixed inset-y-0 left-0 lg:relative
+          fixed lg:static
           ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
           transition-transform duration-300 ease-in-out
           z-40 lg:z-0
           bg-white
           shadow-xl lg:shadow-none
           w-64 lg:w-auto
-          overflow-y-auto
         `}
       >
         <Sidebar
@@ -64,9 +63,9 @@ const AgentsPage = () => {
       )}
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col w-full">
+      <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
-        <div className="pt-2 lg:pt-0 pb-4">
+        <div className="flex-1 overflow-y-auto">
           <AgentsComponent />
         </div>
       </div>
