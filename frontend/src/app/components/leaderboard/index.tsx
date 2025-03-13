@@ -26,20 +26,23 @@ const LeaderboardComponent = () => {
   const [filteredInvestors, setFilteredInvestors] = useState<Investor[]>([]);
   const [investors, setInvestors] = useState<Investor[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
+  const [investorCount, setInvestorCount] = useState(0);
 
   const { address } = useAccount();
 
-  const onPageChange = (page: number) => setCurrentPage(page);
+  const onPageChange = (page: number) => {
+    fetchLeaderboard(page);
+  };
   const onActivitiesPageChange = (page: number) => setActivitiesPage(page);
 
-  const fetchLeaderboard = async () => {
+  const fetchLeaderboard = async (currentPage: number) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/activity/track/leaderboard`
+        `${process.env.NEXT_PUBLIC_API_URL}/activity/track/leaderboard?page=${currentPage}`
       );
       const data = await response.json();
-      console.log("leaderboard", data);
       setInvestors(data.users || []);
+      setInvestorCount(data.pagination.total);
     } catch (error) {
       console.error("Error fetching leaderboard:", error);
       setInvestors([]);
@@ -63,12 +66,12 @@ const LeaderboardComponent = () => {
 
   // Fetch data when component mounts and when address changes
   useEffect(() => {
-    fetchLeaderboard();
+    fetchLeaderboard(currentPage);
     fetchMe();
 
     // Set up an interval to refresh data every 30 seconds
     const interval = setInterval(() => {
-      fetchLeaderboard();
+      fetchLeaderboard(currentPage);
       fetchMe();
     }, 30000);
 
@@ -91,7 +94,7 @@ const LeaderboardComponent = () => {
 
   // Pagination logic for investors
   const itemsPerPage = 10;
-  const totalInvestorPages = Math.ceil(filteredInvestors.length / itemsPerPage);
+  const totalInvestorPages = Math.ceil(investorCount / itemsPerPage);
 
   // Get current investors for table based on page
   const indexOfLastInvestor = currentPage * itemsPerPage;
@@ -277,7 +280,7 @@ const LeaderboardComponent = () => {
                 {/* Mobile View */}
                 <div className="sm:hidden space-y-4">
                   {currentInvestors.map((investor) => (
-                                          <div
+                    <div
                       key={investor.address}
                       className={`border rounded-lg p-3 space-y-3 hover:border-gray-300 transition-colors ${
                         isCurrentUserAddress(investor.address)
@@ -384,9 +387,9 @@ const LeaderboardComponent = () => {
           <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row items-center justify-between px-1 sm:px-0">
             <span className="text-sm text-gray-500 mb-3 sm:mb-0 font-bold">
               <span className="font-normal">Showing</span>{" "}
-              {filteredInvestors.length > 0 ? indexOfFirstInvestor + 1 : 0}-
-              {Math.min(indexOfLastInvestor, filteredInvestors.length)}{" "}
-              <span className="font-normal">of</span> {filteredInvestors.length}
+              {investorCount > 0 ? indexOfFirstInvestor + 1 : 0}-
+              {Math.min(indexOfLastInvestor, investorCount)}{" "}
+              <span className="font-normal">of</span> {investorCount}
             </span>
             <div className="flex-grow flex justify-center">
               <Pagination
