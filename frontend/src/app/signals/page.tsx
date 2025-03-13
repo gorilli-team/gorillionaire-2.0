@@ -13,6 +13,7 @@ const SignalsPage = () => {
     <div className="flex bg-gray-100 text-gray-800">
       {/* Mobile menu button */}
       <button
+        aria-label="hamburger menu"
         className="lg:hidden fixed top-4 left-4 z-40 p-2 rounded-full bg-gray-200"
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
       >

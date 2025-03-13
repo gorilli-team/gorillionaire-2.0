@@ -13,6 +13,7 @@ const LeaderboardPage = () => {
     <div className="flex h-screen bg-gray-100 text-gray-800 overflow-hidden">
       {/* Mobile menu button - adjusted positioning */}
       <button
+        aria-label="hamburger menu"
         className="rounded-full lg:hidden fixed top-4 left-4 z-50 p-2 bg-gray-200"
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
       >
