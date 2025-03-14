@@ -1,7 +1,8 @@
 <div id="readme-top" align="center">
-  <a href="">
-    <img src="./docs/img/gorillionaire-logo.svg" alt="Gorillionaire Logo" width="220" height="55">
-  </a>
+  <div id="readme-top" align="center">
+    <img src="./frontend/public/fav.png" alt="Gorillionaire Logo" height="55">
+    <h1>Gorillionaire</h1>
+  </div>
 
   <p align="center" style="font-size: 24px">
     <strong>AI Crypto Signals & Gamified Trading platform</strong>
