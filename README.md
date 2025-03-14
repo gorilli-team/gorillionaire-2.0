@@ -118,7 +118,7 @@ Each folder contains its own README with detailed setup instructions and environ
 <a href="https://nillion.com/"><img src="./docs/img/nillion-logo.jpg" alt="Nillion Logo" width="50" height="50"></a>
 <a href="https://envio.dev/"><img src="./docs/img/envio-logo.png" alt="Envio Logo" width="120" height="50"></a>
 
-| Sponsor     | Integration method    | Description                                                                                                                                                         | Link to the bounty                                                                                                                                         |
+| Sponsor     | Integration method    | Description                                                                                                                                                         | How we used it                                                                                                                                        |
 | ----------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Privy       | Wallet authentication | Users can easily access the platform with their wallet thanks to Privy, which smoothens the onboarding process with crypto/fiat onramping.                          | [Link](#privy)                                                                                                                                           |
 | 0x Swap API | Swap tokens           | Users can execute their trade according to the signal generated thanks to 0x Swap API, which allows them to find the best swap opportunity available on the market. | [Link](#0x)    |
@@ -209,7 +209,9 @@ We acquire information regarding transfers, spikes, new listings, token holders,
 
 All the data are then stored on MongoDB (except for the MON price which is rendered on the frontend).
 
-More details [here]().
+More details here: 
+- https://github.com/gorilli-team/gorillionaire/blob/main/app/backend
+- https://github.com/gorilli-team/gorillionaire/tree/main/envio-indexer
 
 ### 9.2 Data polling
 
@@ -398,7 +400,7 @@ We leave this hackathon with not just a product, but with stronger technical ski
 
 ## 11. User Experience
 
-We put strong emphasis on delivering an intuitive and accessible user experience with **Gorillionaire**, ensuring users of all backgrounds — from DeFi veterans to first-time traders — can navigate and use the platform effortlessly.
+We put strong emphasis on delivering an intuitive and accessible user experience with **Gorillionaire**, ensuring users of all backgrounds — from DeFi veterans to first-time traders — can navigate and use the platform effortlessly. The interface is fully responsive and adheres to accessibility standards to accommodate users with diverse needs.
 To discover more check: [frontend README](./frontend/README.md)
 
 ## 12. Bounties Extra Info
@@ -435,6 +437,8 @@ Requirements Checklist
 
 The integration leverages the Permit2 flow on Monad using 0x's latest endpoint. We use real-time price oracles and slippage-aware quoting to ensure accuracy. The backend is easily extendable to include trade execution or signature relays if needed.
 
+<br>
+
 ### Envio
 
 HyperIndex Usage:
@@ -462,6 +466,8 @@ Check README:
 
 - https://github.com/gorilli-team/gorillionaire/blob/main/envio-indexer/README.md
 
+<br>
+
 ### Nillion
 
 We integrated SecretVault in our Monad AI agent system to store encrypted signals. (Schema Id: e6864651-902e-4fdc-98e5-50149fcec5a4). The integration ensures that sensitive data, such as the signal text and events are securely encrypted and distributed across multiple nilDB nodes. The only field left unencrypted is created_at, as it does not contain private information.
@@ -478,6 +484,8 @@ We integrated SecretVault in our Monad AI agent system to store encrypted signal
 - Automatic Polling and Updates:
   Our system fetches new signals from MongoDB every 30 minutes, encrypts them, and updates the SecretVault collection automatically, ensuring real-time data protection.
 
+<br>
+
 ### Privy
 
 - Wallet-based authentication: Users can easily access the platform via Privy's onboarding flow, with support for Web3 wallets, email, Google, Apple, Discord, and Twitter.
@@ -485,6 +493,11 @@ We integrated SecretVault in our Monad AI agent system to store encrypted signal
 - Custom authentication flow: Auth setup is handled via the Privy Dashboard, where login preferences and wallet behavior were configured.
 - Backend authentication: All authenticated user actions to our backend API are protected using Privy-issued tokens (used as Bearer tokens in API calls).
 - User management & persistence: The backend securely stores and updates the Privy authentication tokens, ensuring secure and persistent access handling.
+
+Check FRONTEND README:
+- https://github.com/gorilli-team/gorillionaire/blob/main/frontend/README.md
+
+<br>
 
 ## 12. License
 
