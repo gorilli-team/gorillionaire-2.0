@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "Gorillionaire - Generated Signals",
+    "title": "Gorillionaire 2.0 - Generated Signals",
     "type": "array",
     "items": {
       "type": "object",

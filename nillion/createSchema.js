@@ -11,7 +11,7 @@ async function main() {
     await org.init();
 
     // create a new collectionschema
-    const newSchema = await org.createSchema(schema, 'Gorillionaire - Generated Signals');
+    const newSchema = await org.createSchema(schema, 'Gorillionaire 2.0 - Generated Signals');
     console.log('📚 New Schema:', newSchema);
   } catch (error) {
     console.error('❌ Failed to use SecretVaultWrapper:', error.message);
