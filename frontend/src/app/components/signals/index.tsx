@@ -82,7 +82,7 @@ const SIGNAL_EXPIRATION_TIME = 3 * 24 * 60 * 60 * 1000;
 
 const parseSignalText = (signalText: string) => {
   const symbol = signalText.match(/CHOG|DAK|YAKI|MON/)?.[0];
-  const amountMatch = signalText.match(/\d+\.\d+/)?.[0];
+  const amountMatch = signalText.match(/\d+(\.\d+)?/)?.[0];
   const amount = amountMatch ? Number(amountMatch) : 0;
 
   return { symbol, amount };
