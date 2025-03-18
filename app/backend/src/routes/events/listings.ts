@@ -37,7 +37,7 @@ router.post("/", async (req, res) => {
     const id = uuidv4();
     const timestamp = new Date().toISOString();
     const provider = new ethers.JsonRpcProvider(
-      "https://testnet-rpc.monad.xyz"
+      "https://monad-testnet.drpc.org"
     );
     const contract = new ethers.Contract(tokenAddress, ERC20Abi, provider);
     const name = await contract.name();
