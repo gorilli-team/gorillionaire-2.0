@@ -159,7 +159,6 @@ const Signals = () => {
         `${process.env.NEXT_PUBLIC_API_URL}/token/holders/user/${user.wallet.address}`
       );
       const data = await response.json();
-      console.log("Token holders:", data);
 
       if (
         data.code === 0 &&
@@ -168,7 +167,6 @@ const Signals = () => {
         Array.isArray(data.result.data)
       ) {
         data.result.data.forEach((token: ApiTokenHolder) => {
-          console.log(`Setting ${token.symbol} balance to ${token.balance}`);
           if (token.symbol === "MON") {
             setMonBalance(parseFloat(token.balance));
           } else if (token.symbol === "CHOG") {
@@ -187,7 +185,6 @@ const Signals = () => {
 
   useEffect(() => {
     if (user?.wallet?.address) {
-      console.log("User logged in, fetching holder data");
       fetchHolderData();
     }
   }, [user?.wallet?.address]);
@@ -202,7 +199,6 @@ const Signals = () => {
       const scaledMonPrice = Number(monPrice) / 1e8;
       setMonPrice(scaledMonPrice);
 
-      console.log("Fetching price data");
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/events/prices/latest`
       );
@@ -230,7 +226,6 @@ const Signals = () => {
   };
 
   useEffect(() => {
-    console.log("Fetching price data");
     fetchPriceData();
   }, []);
 
@@ -291,7 +286,6 @@ const Signals = () => {
         `${process.env.NEXT_PUBLIC_API_URL}/trade/completed`
       );
       const data: ApiTrade[] = await response.json();
-      console.log("Completed trades response:", data);
 
       const formattedTrades = data.map((trade: ApiTrade) => ({
         user: trade.userAddress,
@@ -314,8 +308,11 @@ const Signals = () => {
 
   const [tradeSignals, setTradeSignals] = useState<TradeSignal[]>([]);
   const [pastSignals, setPastSignals] = useState<TradeSignal[]>([]);
-
   const [isLoading, setIsLoading] = useState(true);
+
+  const sortSignals = (a: TradeSignal, b: TradeSignal) => {
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  };
 
   useEffect(() => {
     const fetchSignals = async () => {
@@ -333,11 +330,13 @@ const Signals = () => {
                 new Date(Date.now() - SIGNAL_EXPIRATION_TIME)
           );
           setTradeSignals(
-            data.filter(
-              (signal) => !pastSignals.map((s) => s._id).includes(signal._id)
-            )
+            data
+              .filter(
+                (signal) => !pastSignals.map((s) => s._id).includes(signal._id)
+              )
+              .sort(sortSignals)
           );
-          setPastSignals(pastSignals);
+          setPastSignals(pastSignals.sort(sortSignals));
           setIsLoading(false);
         }
       } catch (error) {
@@ -359,11 +358,14 @@ const Signals = () => {
       setPastSignals((prev) => {
         const signal = tradeSignals.find((s) => s._id === signalId);
         if (!signal) return prev;
-        return [{ ...signal, userSignal: { choice: "No" } }, ...prev];
+        return [
+          { ...signal, userSignal: { choice: "No" } } as TradeSignal,
+          ...prev,
+        ].sort(sortSignals);
       });
 
       setTradeSignals((prev) =>
-        prev.filter((signal) => signal._id !== signalId)
+        prev.filter((signal) => signal._id !== signalId).sort(sortSignals)
       );
     },
     [tradeSignals]
@@ -372,8 +374,6 @@ const Signals = () => {
   const onYes = useCallback(
     async (token: Token, amount: number, type: "Buy" | "Sell") => {
       if (!user?.wallet?.address) return;
-
-      console.log("token & amount", token, amount);
 
       // for sells we need to convert percentage to amount, for buys change gets handled backend/side
       const sellAmount =
@@ -565,8 +565,6 @@ const Signals = () => {
     },
     [tradeSignals, selectedOptions, onYes, onNo, tokens, user?.wallet?.address]
   );
-
-  console.log("object tokens", tokens);
 
   if (isLoading) {
     return <LoadingOverlay />;
