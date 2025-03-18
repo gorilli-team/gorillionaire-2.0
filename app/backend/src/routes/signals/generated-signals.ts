@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import GeneratedSignal from "../../models/GeneratedSignal";
 import UserSignal from "../../models/UserSignal";
 import UserAuth from "../../models/UserAuth";
