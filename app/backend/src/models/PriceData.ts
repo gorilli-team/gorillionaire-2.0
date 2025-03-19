@@ -10,6 +10,14 @@ const priceDataSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  lastHourPrice: {
+    type: Number,
+    required: true,
+  },
+  lastHourPriceChange: {
+    type: Number,
+    required: true,
+  },
   timestamp: {
     type: Date,
     default: Date.now,

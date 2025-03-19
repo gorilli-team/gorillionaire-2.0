@@ -88,9 +88,23 @@ export default class PriceOracle {
         );
         if (!token) continue;
 
+        const currentPrice = parseFloat(priceData.priceUsd);
+        const lastPrice = await PriceData.findOne({
+          tokenSymbol: token.symbol,
+          timestamp: {
+            $lte: new Date(Date.now() - 1000 * 60 * 60),
+          },
+        })
+          .sort({ timestamp: -1 })
+          .limit(1);
+
+        const lastPriceChange = lastPrice ? currentPrice - lastPrice.price : 0;
+
         await PriceData.create({
           tokenSymbol: token.symbol,
-          price: parseFloat(priceData.priceUsd),
+          price: currentPrice,
+          lastHourPrice: lastPrice ? lastPrice.price : 0,
+          lastHourPriceChange: lastPriceChange,
           timestamp: new Date(priceData.timestamp * 1000),
           blockNumber: 0, // We don't get block numbers from Codex API
           address: priceData.poolAddress,
