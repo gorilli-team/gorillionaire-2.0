@@ -1,2 +1,2 @@
-web: cd app/backend && npm install -g yarn && yarn install && yarn start
+web: cd app/backend && npm install && npm start
 
