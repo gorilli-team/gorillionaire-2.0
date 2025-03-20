@@ -4,7 +4,7 @@
   "license": "UNLICENSED",
   "main": "index.ts",
   "scripts": {
-    "start": "npx tsc && node src/server.js",
+    "start": "yarn tsc && node src/server.js",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "start-gendoc": "node swagger.js"
   },
