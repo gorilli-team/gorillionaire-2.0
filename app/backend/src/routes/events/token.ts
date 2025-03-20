@@ -3,8 +3,8 @@
 import express, { Request, Response } from "express";
 import Transfer from "../../models/Transfer";
 import Spike from "../../models/Spike";
-import { v4 as uuidv4 } from "uuid";
-import { broadcastEvent } from "../../websocket";
+import { TokenEvent } from "../../types/events";
+import PriceData from "../../models/PriceData";
 
 const router = express.Router();
 
@@ -121,7 +121,7 @@ router.get(
 
       let filteredTransfers: any[] = [];
       let filteredSpikes: any[] = [];
-
+      let filteredPriceSpikes: any[] = [];
       if (
         req.query.type === "TRANSFER" ||
         req.query.type === "ALL" ||
@@ -133,7 +133,7 @@ router.get(
         });
 
         // Map transfers to events and calculate impact
-        const allTransfers = transfers.map((transfer) => {
+        const transferEvents: TokenEvent[] = transfers.map((transfer) => {
           const amount = Number(transfer.amount) / 1e18;
           let impact =
             amount > 1000000 ? "HIGH" : amount > 500000 ? "MEDIUM" : "LOW";
@@ -159,12 +159,12 @@ router.get(
         });
 
         // Apply impact filter if provided
-        filteredTransfers = allTransfers;
+        filteredTransfers = transferEvents;
         if (
           req.query.impact &&
           ["HIGH", "MEDIUM", "LOW"].includes(req.query.impact)
         ) {
-          filteredTransfers = allTransfers.filter(
+          filteredTransfers = transferEvents.filter(
             (transfer) => transfer.impact === req.query.impact
           );
         }
@@ -179,7 +179,7 @@ router.get(
         const allSpikes = await Spike.find(query).sort({ blockTimestamp: -1 });
 
         //map spikes to events
-        const allSpikesEvents = allSpikes.map((spike) => {
+        const spikeEvents: TokenEvent[] = allSpikes.map((spike) => {
           const increasePercentage =
             ((spike.thisHourTransfers - spike.previousHourTransfers) /
               spike.previousHourTransfers) *
@@ -206,18 +206,67 @@ router.get(
         });
 
         // Apply impact filter if provided
-        filteredSpikes = allSpikesEvents;
+        filteredSpikes = spikeEvents;
         if (
           req.query.impact &&
           ["HIGH", "MEDIUM", "LOW"].includes(req.query.impact)
         ) {
-          filteredSpikes = allSpikesEvents.filter(
+          filteredSpikes = spikeEvents.filter(
             (spike) => spike.impact === req.query.impact
           );
         }
       }
+
+      if (
+        req.query.type === "PRICE_CHANGE" ||
+        req.query.type === "ALL" ||
+        !req.query.type
+      ) {
+        //get all price spikes
+        const allPriceSpikes = await PriceData.find(query).sort({
+          blockTimestamp: -1,
+        });
+
+        //map price spikes to events
+        const priceSpikeEvents: TokenEvent[] = allPriceSpikes.map(
+          (priceSpike) => ({
+            id: priceSpike.id,
+            type: "PRICE_CHANGE",
+            blockTimestamp: Math.floor(
+              new Date(priceSpike.timestamp).getTime() / 1000
+            ),
+            timestamp: new Date(priceSpike.timestamp).toLocaleString(),
+            description: `Price spike of ${priceSpike.lastHourPriceChange.toFixed(
+              2
+            )}%`,
+            value: priceSpike.lastHourPrice.toFixed(2),
+            impact:
+              Math.abs(priceSpike.lastHourPriceChange) > 10
+                ? "HIGH"
+                : Math.abs(priceSpike.lastHourPriceChange) > 5
+                ? "MEDIUM"
+                : "LOW",
+          })
+        );
+
+        // Apply impact filter if provided
+        filteredPriceSpikes = priceSpikeEvents;
+        if (
+          req.query.impact &&
+          ["HIGH", "MEDIUM", "LOW"].includes(req.query.impact)
+        ) {
+          filteredPriceSpikes = priceSpikeEvents.filter(
+            (priceSpike) => priceSpike.impact === req.query.impact
+          );
+        }
+      }
+
       //add spikes to events
-      let filteredEvents = [...filteredTransfers, ...filteredSpikes];
+      let filteredEvents = [
+        ...filteredTransfers,
+        ...filteredSpikes,
+        ...filteredPriceSpikes,
+      ];
 
       //sort events by blockTimestamp
       filteredEvents.sort((a, b) => b.blockTimestamp - a.blockTimestamp);
@@ -265,4 +314,4 @@ router.get(
   }
 );
 
-module.exports = router;
+export default router;

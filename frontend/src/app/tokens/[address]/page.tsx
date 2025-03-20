@@ -479,7 +479,11 @@ export default function TokenPage() {
       <div
         className={`
           fixed lg:relative
-          ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+          ${
+            isMobileMenuOpen
+              ? "translate-x-0"
+              : "-translate-x-full lg:translate-x-0"
+          }
           transition-transform duration-300 ease-in-out
           z-30 lg:z-0
           bg-white
@@ -487,7 +491,10 @@ export default function TokenPage() {
           h-full
         `}
       >
-        <Sidebar selectedPage={selectedPage} setSelectedPage={setSelectedPage} />
+        <Sidebar
+          selectedPage={selectedPage}
+          setSelectedPage={setSelectedPage}
+        />
       </div>
 
       {/* Overlay for mobile */}
@@ -567,6 +574,7 @@ export default function TokenPage() {
                     <option value="ALL">All Events</option>
                     <option value="ACTIVITY_SPIKE">Activity Spike</option>
                     <option value="TRANSFER">Transfer</option>
+                    <option value="PRICE_CHANGE">Price Change</option>
                   </select>
                   <select
                     aria-label="Filter events by level"
@@ -896,4 +904,3 @@ function generateRandomEvents(
     (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
   );
 }
-
