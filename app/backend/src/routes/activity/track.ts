@@ -49,33 +49,35 @@ router.post("/signin", async (req, res) => {
       await newUserActivity.save();
       res.json({ message: "User activity created" });
     } else {
-      //update user activity
-      userActivity.lastSignIn = new Date();
-      //check if the user has connected their account in the last 24 hours
-      const lastSignIn = new Date(userActivity.lastSignIn);
-      const oneDayAgo = new Date();
-      const twoDaysAgo = new Date();
-      oneDayAgo.setDate(oneDayAgo.getDate() - 1);
-      twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+      // Get the current date and calculate time thresholds
+      const currentTimestamp = Date.now();
+      const lastSignInTimestamp = userActivity.lastSignIn.getTime();
+      const oneDayAgo = currentTimestamp - 24 * 60 * 60 * 1000;
+      const twoDaysAgo = currentTimestamp - 48 * 60 * 60 * 1000;
 
-      if (lastSignIn < twoDaysAgo) {
-        // More than 48 hours ago - reset streak to 1
-        userActivity.streak = 1;
-      } else if (lastSignIn < oneDayAgo) {
-        // Between 24 and 48 hours ago - increment streak
+      if (lastSignInTimestamp > oneDayAgo) {
+        // User had activity in the last 24 hours, do nothing
+        await userActivity.save();
+        res.json({ message: "User already signed in today" });
+      } else if (lastSignInTimestamp > twoDaysAgo) {
+        // User had activity between 24 and 48 hours ago
         userActivity.streak += 1;
         userActivity.points += 10;
+        userActivity.lastSignIn = new Date(currentTimestamp);
         userActivity.activitiesList.push({
           name: "Streak Extended",
           points: 10,
-          date: new Date(),
+          date: new Date(currentTimestamp),
         });
+        await userActivity.save();
+        res.json({ message: "Streak extended and points awarded" });
       } else {
-        // Less than 24 hours ago - keep same streak
-        // Do nothing to maintain current streak
+        // User had activity more than 48 hours ago
+        userActivity.streak = 1;
+        userActivity.lastSignIn = new Date(currentTimestamp);
+        await userActivity.save();
+        res.json({ message: "Streak reset" });
       }
-      await userActivity.save();
-      res.json({ message: "User activity updated" });
     }
   } catch (error) {
     console.error("Error fetching points:", error);
