@@ -4,7 +4,7 @@
   "license": "UNLICENSED",
   "main": "index.ts",
   "scripts": {
-    "start": "node src/server.ts",
+    "start": "tsc && node src/server.js",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "start-gendoc": "node swagger.js"
   },
