@@ -1,0 +1,11 @@
+{
+  "name": "gorillionaire-proto",
+  "version": "1.0.0",
+  "description": "Protocol Buffers for Gorillionaire",
+  "scripts": {
+    "generate": "./generator.sh"
+  },
+  "dependencies": {
+    "ts-proto": "^1.165.0"
+  }
+} 
