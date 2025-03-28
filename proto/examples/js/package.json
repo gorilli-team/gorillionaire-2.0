@@ -1,0 +1,18 @@
+{
+  "name": "proto-example",
+  "version": "1.0.0",
+  "description": "Example of using generated protobuf code in TypeScript",
+  "main": "index.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node index.ts"
+  },
+  "dependencies": {
+    "ts-proto": "^1.165.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.1",
+    "@types/node": "^20.0.0"
+  }
+} 
