@@ -1,36 +1,14 @@
-type Chog_Transfer {
+type TokenHourlySnapshot {
   id: ID!
-  from: String!
-  to: String!
-  value: BigInt!
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: String!
+  lastUpdatedAt: Int!
+  tokenAddress: String!
+  transferCount: Int!
 }
 
-type Molandak_Transfer {
+type TokenAggregateSwaps {
   id: ID!
-  from: String!
-  to: String!
-  value: BigInt!
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: String!
-}
-
-type Moyaki_Transfer {
-  id: ID!
-  from: String!
-  to: String!
-  value: BigInt!
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: String!
-}
-
-type TokenListed {
-  id: ID!
-  blockNumber: Int!
-  blockTimestamp: Int!
-  transactionHash: String!
+  tokenAddress: String!
+  avgAmount: BigInt!
+  transferCount: Int!
+  lastUpdatedAt: Int!
 }
