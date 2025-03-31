@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "github.com/gorilli/gorillionaire-2.0/gen/v1/go/proto/envio";
+
+// EnvioPriceEvent contains the price event details
+message EnvioPriceEvent {
+    string FromAddress = 1;
+    string ToAddress = 2;
+    string Amount = 3;
+    string BlockNumber = 4;
+    string BlockTimestamp = 5;
+    string TransactionHash = 6;
+    string TokenSymbol = 7;
+    string TokenName = 8;
+    string TokenAddress = 9;
+    int32 TokenDecimals = 10;
+    int32 ThisHourTransfers = 11;
+}
