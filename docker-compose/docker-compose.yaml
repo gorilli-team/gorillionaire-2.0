@@ -1,0 +1,38 @@
+services:
+  envio:
+    build:
+      context: ../envio-indexer
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+  nats:
+    image: nats:latest
+    ports:
+      - "4222:4222"
+      - "6222:6222"
+      - "8222:8222"
+    command: >
+      -m 8222
+  timeseries:
+    image: timescale/timescaledb:2.18.1-pg17
+    environment:
+      - POSTGRES_DB=timeseries
+      - POSTGRES_USER=gorilli
+      - POSTGRES_PASSWORD=gorilli
+    ports:
+      - "5452:5432"
+    volumes:
+      - ./timeseries:/var/lib/postgresql/data
+    restart: always
+    user: "999:999"
+  migrations:
+    build:
+      context: ../migrations
+      dockerfile: Dockerfile
+    depends_on:
+      - timeseries
+    env_file:
+      - .env
+    # volumes:
+    #   - ./migrations:/app/data
+    # restart: always

@@ -1,0 +1,7 @@
+go 1.24.1
+
+use (
+	./events/envio
+	./proto/gen/v1/go/proto/v1
+	./database/timeseries
+)
