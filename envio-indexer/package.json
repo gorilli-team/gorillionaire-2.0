@@ -9,7 +9,13 @@
     "codegen": "envio codegen",
     "dev": "envio dev",
     "test": "pnpm mocha",
-    "start": "ts-node generated/src/Index.bs.js"
+    "start": "ts-node generated/src/Index.bs.js",
+    "db-up": "node -e 'require(`./generated/src/db/Migrations.bs.js`).runUpMigrations(true)'",
+    "db-down": "node -e 'require(`./generated/src/db/Migrations.bs.js`).runDownMigrations(true)'",
+    "db-setup": "node -e 'require(`./generated/src/db/Migrations.bs.js`).runUpMigrations(true, true)'",
+    "print-benchmark-summary": "node -e 'require(`./generated/src/Benchmark.bs.js`).Summary.printSummary()'",
+    "start:envio": "npm run db-up && npm run start"
+
   },
   "devDependencies": {
     "@types/chai": "^4.3.11",
@@ -22,7 +28,7 @@
     "mocha": "10.2.0"
   },
   "dependencies": {
-    "envio": "2.13.0"
+    "envio": "^2.16.0"
   },
   "optionalDependencies": {
     "generated": "./generated"

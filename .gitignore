@@ -95,3 +95,4 @@ extra
 
 # docker compose temp files
 docker-compose/timeseries/
+experiment/
