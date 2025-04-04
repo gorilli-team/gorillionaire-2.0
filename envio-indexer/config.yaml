@@ -1,36 +1,22 @@
 # yaml-language-server: $schema=./node_modules/envio/evm.schema.json
 name: envio-indexer
+
+contracts:
+
 networks:
   - id: 10143
     start_block: 0
     contracts:
-      - name: Chog
-        address:
-          - 0xE0590015A873bF326bd645c3E1266d4db41C4E6B
-        handler: src/EventHandlers.ts
+      - name: Token
+        handler: src/TokenHandlers.ts
         events:
           - event: Transfer(address indexed from, address indexed to, uint256 value)
-
-      - name: Molandak
-        address:
-          - 0x0F0BDEbF0F83cD1EE3974779Bcb7315f9808c714
-        handler: src/EventHandlers.ts
-        events:
-          - event: Transfer(address indexed from, address indexed to, uint256 value)
-
-      - name: Moyaki
-        address:
-          - 0xfe140e1dCe99Be9F4F15d657CD9b7BF622270C50
-        handler: src/EventHandlers.ts
-        events:
-          - event: Transfer(address indexed from, address indexed to, uint256 value)
-
       - name: UniswapPoolFactory
-        address:
-          - 0x961235a9020B05C44DF1026D956D1F4D78014276
+        address: 0x961235a9020B05C44DF1026D956D1F4D78014276
         handler: src/FactoryHandlers.ts
         events:
           - event: PoolCreated(address indexed token0, address indexed token1, uint24 indexed fee, int24 tickSpacing, address pool)
+
 field_selection:
   transaction_fields:
     - "hash"
