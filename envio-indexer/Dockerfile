@@ -3,16 +3,23 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
+
 WORKDIR /app
 
-COPY package.json .
+# Install global CLI tools required during build
+# RUN npm install -g cross-env rimraf rollup husky
 
-RUN npm install --only=production
-# RUN curl -fsSL https://get.pnpm.io/install.sh | sh -
-# ENV PATH="/root/.local/share/pnpm:${PATH}"
-# RUN ln -s /root/.local/share/pnpm/pnpm /usr/local/bin/pnpm
+# Install deps
+COPY package*.json ./
+RUN npm install 
+
+# Copy code
 COPY . .
 
+# Regenerate types/code
+RUN rm -rf generated && npm run codegen && npm run build
+
+# Install deps and build generated module
 EXPOSE 8080
 
-CMD ["pnpm", "envio", "dev"]
+CMD ["npm", "run", "start:envio"]
