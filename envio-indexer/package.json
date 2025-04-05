@@ -28,7 +28,9 @@
     "mocha": "10.2.0"
   },
   "dependencies": {
-    "envio": "^2.16.0"
+    "envio": "^2.16.0",
+    "protobufjs": "^7.4.0",
+    "nats": "^2.29.3"
   },
   "optionalDependencies": {
     "generated": "./generated"

@@ -18,3 +18,9 @@ message EnvioPriceEvent {
     int32 TokenDecimals = 10;
     int32 ThisHourTransfers = 11;
 }
+
+// EnvioNewPair contains the new pair details
+message EnvioNewPair {
+    string Token0Address = 1;
+    string Token1Address = 2;
+}

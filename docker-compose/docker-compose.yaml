@@ -45,7 +45,7 @@ services:
       start_period: 5s
     env_file:
       - .env
-  envio:
+  envio-indexer:
     build:
       context: ../envio-indexer
       dockerfile: Dockerfile
@@ -63,6 +63,7 @@ services:
       - "6222:6222"
       - "8222:8222"
     command: >
+      -DV
       -m 8222
   timeseries:
     image: timescale/timescaledb:2.18.1-pg17

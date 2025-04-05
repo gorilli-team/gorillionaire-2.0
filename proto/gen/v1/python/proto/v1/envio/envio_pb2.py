@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14v1/envio/envio.proto\x12\x05proto\"\xff\x01\n\x0f\x45nvioPriceEvent\x12\x13\n\x0b\x46romAddress\x18\x01 \x01(\t\x12\x11\n\tToAddress\x18\x02 \x01(\t\x12\x0e\n\x06\x41mount\x18\x03 \x01(\t\x12\x13\n\x0b\x42lockNumber\x18\x04 \x01(\t\x12\x16\n\x0e\x42lockTimestamp\x18\x05 \x01(\t\x12\x17\n\x0fTransactionHash\x18\x06 \x01(\t\x12\x13\n\x0bTokenSymbol\x18\x07 \x01(\t\x12\x11\n\tTokenName\x18\x08 \x01(\t\x12\x14\n\x0cTokenAddress\x18\t \x01(\t\x12\x15\n\rTokenDecimals\x18\n \x01(\x05\x12\x19\n\x11ThisHourTransfers\x18\x0b \x01(\x05\x42<Z:github.com/gorilli/gorillionaire-2.0/gen/v1/go/proto/enviob\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14v1/envio/envio.proto\x12\x05proto\"\xff\x01\n\x0f\x45nvioPriceEvent\x12\x13\n\x0b\x46romAddress\x18\x01 \x01(\t\x12\x11\n\tToAddress\x18\x02 \x01(\t\x12\x0e\n\x06\x41mount\x18\x03 \x01(\t\x12\x13\n\x0b\x42lockNumber\x18\x04 \x01(\t\x12\x16\n\x0e\x42lockTimestamp\x18\x05 \x01(\t\x12\x17\n\x0fTransactionHash\x18\x06 \x01(\t\x12\x13\n\x0bTokenSymbol\x18\x07 \x01(\t\x12\x11\n\tTokenName\x18\x08 \x01(\t\x12\x14\n\x0cTokenAddress\x18\t \x01(\t\x12\x15\n\rTokenDecimals\x18\n \x01(\x05\x12\x19\n\x11ThisHourTransfers\x18\x0b \x01(\x05\"<\n\x0c\x45nvioNewPair\x12\x15\n\rToken0Address\x18\x01 \x01(\t\x12\x15\n\rToken1Address\x18\x02 \x01(\tB<Z:github.com/gorilli/gorillionaire-2.0/gen/v1/go/proto/enviob\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'v1.envio.envio_pb2', globals())
@@ -23,4 +23,6 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._serialized_options = b'Z:github.com/gorilli/gorillionaire-2.0/gen/v1/go/proto/envio'
   _ENVIOPRICEEVENT._serialized_start=32
   _ENVIOPRICEEVENT._serialized_end=287
+  _ENVIONEWPAIR._serialized_start=289
+  _ENVIONEWPAIR._serialized_end=349
 # @@protoc_insertion_point(module_scope)
