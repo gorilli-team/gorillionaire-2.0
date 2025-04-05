@@ -82,11 +82,13 @@ func main() {
 	// Create subscriptions for each route
 	for _, route := range cfg.Routes {
 		// Create batch subscription for better performance
+		log.Printf("Creating subscription for %s", route.Pattern)
 		sub, err := natsClient.Subscribe(&subscription.Options{
 			Subject:     route.Pattern,
 			BatchSize:   route.ChannelSize,
 			BatchWindow: time.Second,
 			BatchHandler: handler.BatchHandlerFunc(func(ctx context.Context, msgs []*message.Message) error {
+				log.Printf("Received %d messages", len(msgs))
 				for _, msg := range msgs {
 					// Get worker from registry
 					worker, ok := registry.Get(route.WorkerName)
@@ -105,6 +107,7 @@ func main() {
 					if err := worker.Process(ctx, event); err != nil {
 						log.Printf("Error processing message: %v", err)
 					}
+					log.Printf("Processed message: %v", msg.Data)
 				}
 				return nil
 			}),

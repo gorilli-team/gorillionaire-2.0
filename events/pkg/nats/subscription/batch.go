@@ -2,6 +2,7 @@ package subscription
 
 import (
 	"fmt"
+	"log"
 	"sync"
 	"time"
 
@@ -41,6 +42,7 @@ func newBatchSubscription(conn *nats.Conn, opts *Options) (*batchSubscription, e
 	}
 
 	// Create NATS subscription
+	log.Printf("Creating subscription for %s", opts.Subject)
 	natsSub, err := conn.Subscribe(opts.Subject, sub.handleMessage)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create subscription: %w", err)

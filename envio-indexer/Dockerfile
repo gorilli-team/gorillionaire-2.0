@@ -2,12 +2,9 @@ FROM node:20-slim
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
-
+ENV CI=true
 
 WORKDIR /app
-
-# Install global CLI tools required during build
-# RUN npm install -g cross-env rimraf rollup husky
 
 # Install deps
 COPY package*.json ./
