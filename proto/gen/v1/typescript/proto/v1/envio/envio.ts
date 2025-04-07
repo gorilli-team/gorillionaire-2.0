@@ -7,8 +7,6 @@
 /* eslint-disable */
 import _m0 from "protobufjs/minimal";
 
-export const protobufPackage = "proto";
-
 /** EnvioPriceEvent contains the price event details */
 export interface EnvioPriceEvent {
   FromAddress: string;
@@ -22,6 +20,12 @@ export interface EnvioPriceEvent {
   TokenAddress: string;
   TokenDecimals: number;
   ThisHourTransfers: number;
+}
+
+/** EnvioNewPair contains the new pair details */
+export interface EnvioNewPair {
+  Token0Address: string;
+  Token1Address: string;
 }
 
 function createBaseEnvioPriceEvent(): EnvioPriceEvent {
@@ -225,10 +229,10 @@ export const EnvioPriceEvent = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<EnvioPriceEvent>, I>>(base?: I): EnvioPriceEvent {
-    return EnvioPriceEvent.fromPartial(base ?? ({} as any));
+  create(base?: DeepPartial<EnvioPriceEvent>): EnvioPriceEvent {
+    return EnvioPriceEvent.fromPartial(base ?? {});
   },
-  fromPartial<I extends Exact<DeepPartial<EnvioPriceEvent>, I>>(object: I): EnvioPriceEvent {
+  fromPartial(object: DeepPartial<EnvioPriceEvent>): EnvioPriceEvent {
     const message = createBaseEnvioPriceEvent();
     message.FromAddress = object.FromAddress ?? "";
     message.ToAddress = object.ToAddress ?? "";
@@ -245,17 +249,87 @@ export const EnvioPriceEvent = {
   },
 };
 
+function createBaseEnvioNewPair(): EnvioNewPair {
+  return { Token0Address: "", Token1Address: "" };
+}
+
+export const EnvioNewPair = {
+  encode(message: EnvioNewPair, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.Token0Address !== "") {
+      writer.uint32(10).string(message.Token0Address);
+    }
+    if (message.Token1Address !== "") {
+      writer.uint32(18).string(message.Token1Address);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): EnvioNewPair {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEnvioNewPair();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.Token0Address = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.Token1Address = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): EnvioNewPair {
+    return {
+      Token0Address: isSet(object.Token0Address) ? globalThis.String(object.Token0Address) : "",
+      Token1Address: isSet(object.Token1Address) ? globalThis.String(object.Token1Address) : "",
+    };
+  },
+
+  toJSON(message: EnvioNewPair): unknown {
+    const obj: any = {};
+    if (message.Token0Address !== "") {
+      obj.Token0Address = message.Token0Address;
+    }
+    if (message.Token1Address !== "") {
+      obj.Token1Address = message.Token1Address;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<EnvioNewPair>): EnvioNewPair {
+    return EnvioNewPair.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<EnvioNewPair>): EnvioNewPair {
+    const message = createBaseEnvioNewPair();
+    message.Token0Address = object.Token0Address ?? "";
+    message.Token1Address = object.Token1Address ?? "";
+    return message;
+  },
+};
+
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-export type DeepPartial<T> = T extends Builtin ? T
+type DeepPartial<T> = T extends Builtin ? T
   : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
-
-type KeysOfUnion<T> = T extends T ? keyof T : never;
-export type Exact<P, I extends P> = P extends Builtin ? P
-  : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
 
 function isSet(value: any): boolean {
   return value !== null && value !== undefined;

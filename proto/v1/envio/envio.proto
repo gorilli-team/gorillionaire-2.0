@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package proto;
+package proto.envio;
 
 option go_package = "github.com/gorilli/gorillionaire-2.0/gen/v1/go/proto/envio";
 
@@ -17,4 +17,10 @@ message EnvioPriceEvent {
     string TokenAddress = 9;
     int32 TokenDecimals = 10;
     int32 ThisHourTransfers = 11;
+}
+
+// EnvioNewPair contains the new pair details
+message EnvioNewPair {
+    string Token0Address = 1;
+    string Token1Address = 2;
 }

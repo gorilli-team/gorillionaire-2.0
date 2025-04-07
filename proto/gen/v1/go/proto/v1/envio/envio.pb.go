@@ -146,6 +146,59 @@ func (x *EnvioPriceEvent) GetThisHourTransfers() int32 {
 	return 0
 }
 
+// EnvioNewPair contains the new pair details
+type EnvioNewPair struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Token0Address string                 `protobuf:"bytes,1,opt,name=Token0Address,proto3" json:"Token0Address,omitempty"`
+	Token1Address string                 `protobuf:"bytes,2,opt,name=Token1Address,proto3" json:"Token1Address,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EnvioNewPair) Reset() {
+	*x = EnvioNewPair{}
+	mi := &file_v1_envio_envio_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EnvioNewPair) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EnvioNewPair) ProtoMessage() {}
+
+func (x *EnvioNewPair) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_envio_envio_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EnvioNewPair.ProtoReflect.Descriptor instead.
+func (*EnvioNewPair) Descriptor() ([]byte, []int) {
+	return file_v1_envio_envio_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *EnvioNewPair) GetToken0Address() string {
+	if x != nil {
+		return x.Token0Address
+	}
+	return ""
+}
+
+func (x *EnvioNewPair) GetToken1Address() string {
+	if x != nil {
+		return x.Token1Address
+	}
+	return ""
+}
+
 var File_v1_envio_envio_proto protoreflect.FileDescriptor
 
 const file_v1_envio_envio_proto_rawDesc = "" +
@@ -163,7 +216,10 @@ const file_v1_envio_envio_proto_rawDesc = "" +
 	"\fTokenAddress\x18\t \x01(\tR\fTokenAddress\x12$\n" +
 	"\rTokenDecimals\x18\n" +
 	" \x01(\x05R\rTokenDecimals\x12,\n" +
-	"\x11ThisHourTransfers\x18\v \x01(\x05R\x11ThisHourTransfersB<Z:github.com/gorilli/gorillionaire-2.0/gen/v1/go/proto/enviob\x06proto3"
+	"\x11ThisHourTransfers\x18\v \x01(\x05R\x11ThisHourTransfers\"Z\n" +
+	"\fEnvioNewPair\x12$\n" +
+	"\rToken0Address\x18\x01 \x01(\tR\rToken0Address\x12$\n" +
+	"\rToken1Address\x18\x02 \x01(\tR\rToken1AddressB<Z:github.com/gorilli/gorillionaire-2.0/gen/v1/go/proto/enviob\x06proto3"
 
 var (
 	file_v1_envio_envio_proto_rawDescOnce sync.Once
@@ -177,9 +233,10 @@ func file_v1_envio_envio_proto_rawDescGZIP() []byte {
 	return file_v1_envio_envio_proto_rawDescData
 }
 
-var file_v1_envio_envio_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_v1_envio_envio_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_v1_envio_envio_proto_goTypes = []any{
 	(*EnvioPriceEvent)(nil), // 0: proto.EnvioPriceEvent
+	(*EnvioNewPair)(nil),    // 1: proto.EnvioNewPair
 }
 var file_v1_envio_envio_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -200,7 +257,7 @@ func file_v1_envio_envio_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_v1_envio_envio_proto_rawDesc), len(file_v1_envio_envio_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   1,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

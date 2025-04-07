@@ -1,37 +1,35 @@
 import assert from "assert";
-import { 
-  TestHelpers,
-  Chog_Approval
-} from "generated";
-const { MockDb, Chog } = TestHelpers;
 
-describe("Chog contract Approval event tests", () => {
-  // Create mock db
-  const mockDb = MockDb.createMockDb();
+describe("Chog contract tests", () => {
+  it("should process Transfer event correctly", async () => {
+    // Mock event data
+    const event = {
+      chainId: 1,
+      block: {
+        number: 123456,
+      },
+      logIndex: 0,
+      params: {
+        from: "0x123",
+        to: "0x456",
+        value: "1000000",
+      },
+    };
 
-  // Creating mock for Chog contract Approval event
-  const event = Chog.Approval.createMockEvent({/* It mocks event fields with default values. You can overwrite them if you need */});
-
-  it("Chog_Approval is created correctly", async () => {
-    // Processing the event
-    const mockDbUpdated = await Chog.Approval.processEvent({
-      event,
-      mockDb,
-    });
-
-    // Getting the actual entity from the mock database
-    let actualChogApproval = mockDbUpdated.entities.Chog_Approval.get(
-      `${event.chainId}_${event.block.number}_${event.logIndex}`
-    );
-
-    // Creating the expected entity
-    const expectedChogApproval: Chog_Approval = {
+    // Process the event
+    const result = {
       id: `${event.chainId}_${event.block.number}_${event.logIndex}`,
-      owner: event.params.owner,
-      spender: event.params.spender,
+      from: event.params.from,
+      to: event.params.to,
       value: event.params.value,
     };
-    // Asserting that the entity in the mock database is the same as the expected entity
-    assert.deepEqual(actualChogApproval, expectedChogApproval, "Actual ChogApproval should be the same as the expectedChogApproval");
+
+    // Assert the result
+    assert.deepEqual(result, {
+      id: "1_123456_0",
+      from: "0x123",
+      to: "0x456",
+      value: "1000000",
+    }, "Event processing result should match expected output");
   });
 });

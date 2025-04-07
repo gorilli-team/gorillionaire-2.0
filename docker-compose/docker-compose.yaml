@@ -1,28 +1,99 @@
 services:
-  envio:
+  envio-postgres:
+    image: postgres:16
+    restart: always
+    ports:
+      - "${ENVIO_PG_PORT:-5433}:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${ENVIO_POSTGRES_PASSWORD:-testing}
+      POSTGRES_USER: ${ENVIO_PG_USER:-postgres}
+      POSTGRES_DB: ${ENVIO_PG_DATABASE:-envio-dev}
+    env_file:
+      - .env
+  graphql-engine:
+    image: hasura/graphql-engine:v2.43.0
+    ports:
+      - "${HASURA_EXTERNAL_PORT:-8084}:8080"
+    user: 1001:1001
+    depends_on:
+      - "envio-postgres"
+    restart: always
+    environment:
+      # TODO: refine migrations. For now we will run hasura setup via custom scripts, rather than standard migrations.
+      # See details of this image here: https://hasura.io/docs/latest/graphql/core/migrations/advanced/auto-apply-migrations.html
+      # HASURA_GRAPHQL_MIGRATIONS_DIR: /hasura-migrations
+      # HASURA_GRAPHQL_METADATA_DIR: /hasura-metadata
+      HASURA_GRAPHQL_DATABASE_URL: postgres://${ENVIO_PG_USER:-postgres}:${ENVIO_POSTGRES_PASSWORD:-testing}@envio-postgres:5432/${ENVIO_PG_DATABASE:-envio-dev}
+      HASURA_GRAPHQL_ENABLE_CONSOLE: ${HASURA_GRAPHQL_ENABLE_CONSOLE:-true} # can make this default to false once we are further in our development.
+      HASURA_GRAPHQL_ENABLED_LOG_TYPES:
+        startup, http-log, webhook-log, websocket-log,
+        query-log
+      HASURA_GRAPHQL_NO_OF_RETRIES: 10
+      HASURA_GRAPHQL_ADMIN_SECRET: ${HASURA_GRAPHQL_ADMIN_SECRET:-testing}
+      HASURA_GRAPHQL_STRINGIFY_NUMERIC_TYPES: "true"
+      PORT: 8080
+      HASURA_GRAPHQL_UNAUTHORIZED_ROLE: public
+    healthcheck:
+      # CMD from a GH issue thread, no curl or wget installed with image
+      # but hasura comes with a /healthz public endpoint for checking server health
+      test: timeout 1s bash -c ':> /dev/tcp/127.0.0.1/8080' || exit 1
+      interval: 5s
+      timeout: 2s
+      retries: 50
+      start_period: 5s
+    env_file:
+      - .env
+  envio-indexer:
     build:
       context: ../envio-indexer
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
+    depends_on:
+      - "envio-postgres"
+      - "graphql-engine"
+    env_file:
+      - .env
   nats:
     image: nats:latest
     ports:
       - "4222:4222"
       - "6222:6222"
       - "8222:8222"
+    volumes:
+      - ./nats.conf:/etc/nats/nats.conf
+      - ./nats-data:/data
     command: >
+      -js
+      -DV
       -m 8222
-  timeseries:
+      -p 4222
+      -c /etc/nats/nats.conf
+  nats-init:
+    image: natsio/nats-box
+    depends_on:
+      - nats
+    entrypoint: ["/bin/sh", "-c"]
+    command: |
+      "
+      sleep 2 &&
+      nats -s nats://host.docker.internal:4222 stream add GORILLIONER --config /etc/nats/gorillioner.stream.conf
+      "
+    volumes:
+      - ./configs/gorillioner.stream.conf:/etc/nats/gorillioner.stream.conf
+
+  gorillioner-db:
     image: timescale/timescaledb:2.18.1-pg17
     environment:
-      - POSTGRES_DB=timeseries
+      - POSTGRES_DB=gorillioner
       - POSTGRES_USER=gorilli
       - POSTGRES_PASSWORD=gorilli
     ports:
       - "5452:5432"
     volumes:
-      - ./timeseries:/var/lib/postgresql/data
+      - ./gorillioner-db:/var/lib/postgresql/data
     restart: always
     user: "999:999"
   migrations:
@@ -30,9 +101,12 @@ services:
       context: ../migrations
       dockerfile: Dockerfile
     depends_on:
-      - timeseries
+      - gorillioner-db
     env_file:
       - .env
     # volumes:
     #   - ./migrations:/app/data
     # restart: always
+volumes:
+  db_data:
+  nats_data:

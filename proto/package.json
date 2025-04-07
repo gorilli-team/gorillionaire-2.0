@@ -1,11 +1,23 @@
 {
-  "name": "gorillionaire-proto",
+  "name": "@proto/v1",
   "version": "1.0.0",
   "description": "Protocol Buffers for Gorillionaire",
+  "main": "gen/v1/typescript/proto/v1/envio/envio.js",
+  "types": "gen/v1/typescript/proto/v1/envio/envio.d.ts",
+  "exports": {
+    "./envio": {
+      "types": "./gen/v1/typescript/proto/v1/envio/envio.d.ts",
+      "default": "./gen/v1/typescript/proto/v1/envio/envio.js"
+    }
+  },
   "scripts": {
-    "generate": "./generator.sh"
+    "generate": "./generator.sh",
+    "postgenerate": "cp -r gen/v1/typescript/proto ../envio-indexer/src/proto"
   },
   "dependencies": {
     "ts-proto": "^1.165.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
   }
 } 

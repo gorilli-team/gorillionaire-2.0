@@ -43,7 +43,12 @@ echo "Generating TypeScript code..."
 protoc \
     --plugin=protoc-gen-ts_proto=./node_modules/.bin/protoc-gen-ts_proto \
     --ts_proto_out=$TYPESCRIPT_OUT_DIR \
-    --ts_proto_opt=outputServices=grpc-web,env=node,esModuleInterop=true \
+    --ts_proto_opt=outputServices=grpc-web,env=node,esModuleInterop=true,outputClientImpl=grpc-web,outputServices=nice-grpc,useOptionals=messages,exportCommonSymbols=false,useDate=true,useExactTypes=false,stringEnums=true,outputJsonMethods=true,outputPartial=true,onlyTypes=false \
     ./v1/envio/envio.proto
+
+# Compile TypeScript to JavaScript
+echo "Compiling TypeScript to JavaScript..."
+cd $TYPESCRIPT_OUT_DIR
+tsc --project tsconfig.json
 
 echo "Protobuf files generated successfully."
