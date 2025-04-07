@@ -1,56 +1,56 @@
 package main
 
 import (
-	"context"
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"github.com/gorilli/gorillionaire-2.0/events/envio/internal/workers/envio"
+	"github.com/gorilli/gorillionaire-2.0/events/envio/internal/types"
+	envio_worker "github.com/gorilli/gorillionaire-2.0/events/envio/internal/workers/envio"
 	"github.com/gorilli/gorillionaire-2.0/events/pkg/nats/client"
 	"github.com/gorilli/gorillionaire-2.0/events/pkg/nats/config"
 	"github.com/gorilli/gorillionaire-2.0/events/pkg/nats/handler"
-	"github.com/gorilli/gorillionaire-2.0/events/pkg/nats/message"
 	"github.com/gorilli/gorillionaire-2.0/events/pkg/nats/subscription"
-	"github.com/gorilli/gorillionaire-2.0/events/pkg/nats/workers"
 	// "github.com/jackc/pgx/v4/pgxpool"
 )
 
 const (
-	ENVIO_SUBJECT     = "envio.>"
-	TIMESCALE_SUBJECT = "timeseries.>"
+	ENVIO_PRICE_SUBJECT   = "gorillioner.envio.price"
+	ENVIO_NEWPAIR_SUBJECT = "gorillioner.envio.newpair"
+	TIMESCALE_SUBJECT     = "timeseries.>"
 )
-
-type Config struct {
-	NatsURL          string
-	TimescaleSubject string
-	Routes           []RouteConfig
-}
 
 func main() {
 	// Create context
 	// ctx := context.Background()
 
+	// Register workers
+	envioPriceWorker := envio_worker.NewEnvioPriceWorker(envio_worker.Config{
+		// Pool: pool,
+	})
+	envioNewPairWorker := envio_worker.NewEnvioNewPairWorker(envio_worker.Config{
+		// Pool: pool,
+	})
+
 	// Configuration
-	cfg := Config{
+	cfg := types.Config{
 		NatsURL:          getEnvOrDefault("NATS_URL", "nats://localhost:4222"),
 		TimescaleSubject: getEnvOrDefault("TIMESCALE_URL", TIMESCALE_SUBJECT),
-		Routes: []RouteConfig{
+		Routes: []types.RouteConfig{
 			{
-				Pattern:     ENVIO_SUBJECT,
+				Pattern:     ENVIO_PRICE_SUBJECT,
 				Workers:     10,
 				ChannelSize: 1000,
-				WorkerName:  "envio",
+				Worker:      envioPriceWorker,
 			},
-			// {
-			// 	Pattern:     TIMESCALE_SUBJECT,
-			// 	Workers:     5,
-			// 	ChannelSize: 1000,
-			// 	WorkerName:  "timeseries",
-			// },
+			{
+				Pattern:     ENVIO_NEWPAIR_SUBJECT,
+				Workers:     10,
+				ChannelSize: 1000,
+				Worker:      envioNewPairWorker,
+			},
 		},
 	}
 
@@ -58,59 +58,23 @@ func main() {
 	natsClient, err := client.New(&config.Config{
 		URL:            cfg.NatsURL,
 		ConnectTimeout: 10 * time.Second,
+		UseJetStream:   true,
 	})
 	if err != nil {
 		log.Fatalf("Failed to create NATS client: %v", err)
 	}
 	defer natsClient.Close()
 
-	// Connect to TimescaleDB
-	// pool, err := pgxpool.Connect(ctx, cfg.TimescaleSubject)
-	// if err != nil {
-	// 	log.Fatalf("Failed to connect to TimescaleDB: %v", err)
-	// }
-	// defer pool.Close()
-
-	// Create and populate worker registry
-	registry := workers.NewRegistry()
-	// Register envio worker
-	envioWorker := envio.NewEnvioWorker(envio.Config{
-		// Pool: pool,
-	})
-	registry.Register(envioWorker)
-
 	// Create subscriptions for each route
 	for _, route := range cfg.Routes {
 		// Create batch subscription for better performance
 		log.Printf("Creating subscription for %s", route.Pattern)
 		sub, err := natsClient.Subscribe(&subscription.Options{
-			Subject:     route.Pattern,
-			BatchSize:   route.ChannelSize,
-			BatchWindow: time.Second,
-			BatchHandler: handler.BatchHandlerFunc(func(ctx context.Context, msgs []*message.Message) error {
-				log.Printf("Received %d messages", len(msgs))
-				for _, msg := range msgs {
-					// Get worker from registry
-					worker, ok := registry.Get(route.WorkerName)
-					if !ok {
-						return fmt.Errorf("worker %s not found", route.WorkerName)
-					}
-
-					// Convert message to event
-					event := &workers.Event{
-						Timestamp: time.Now().Format(time.RFC3339),
-						Data:      msg.Data,
-						Route:     msg.Subject,
-					}
-
-					// Process message
-					if err := worker.Process(ctx, event); err != nil {
-						log.Printf("Error processing message: %v", err)
-					}
-					log.Printf("Processed message: %v", msg.Data)
-				}
-				return nil
-			}),
+			Subject:      route.Pattern,
+			BatchSize:    route.ChannelSize,
+			BatchWindow:  time.Second,
+			UseJetStream: true,
+			BatchHandler: handler.BatchHandlerFunc(route.Worker.ProcessBatch),
 		})
 		if err != nil {
 			log.Fatalf("Failed to create subscription for %s: %v", route.Pattern, err)

@@ -25,6 +25,9 @@ type Config struct {
 
 	// TLS settings
 	TLSConfig *TLSConfig `json:"tls_config" yaml:"tls_config"`
+
+	// JetStream settings
+	UseJetStream bool `json:"use_jetstream" yaml:"use_jetstream"`
 }
 
 // TLSConfig holds TLS configuration

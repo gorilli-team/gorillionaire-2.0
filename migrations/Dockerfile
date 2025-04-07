@@ -19,4 +19,4 @@ COPY ./data/ /app/data
 COPY --from=builder /app/migration /app/migration
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
-CMD ["/app/migration", "-dir", "/app/data/timeseries", "-a", "up"]
+CMD ["/app/migration", "-dir", "/app/data/gorillioner", "-a", "up"]

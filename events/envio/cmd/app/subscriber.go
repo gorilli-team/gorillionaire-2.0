@@ -3,11 +3,11 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"sync"
 	"time"
 
+	"github.com/gorilli/gorillionaire-2.0/events/pkg/nats/message"
 	"github.com/gorilli/gorillionaire-2.0/events/pkg/nats/workers"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/nats-io/nats.go"
@@ -18,19 +18,19 @@ import (
 // envio.orders.update -> route: "orders.update"
 // envio.payments.process -> route: "payments.process"
 
-type Event struct {
-	Timestamp time.Time `json:"timestamp"`
-	Data      any       `json:"data"`
-	Route     string    `json:"route"`
-}
+// type Event struct {
+// 	Timestamp time.Time `json:"timestamp"`
+// 	Data      []byte    `json:"data"`
+// 	Route     string    `json:"route"`
+// }
 
 type RouteConfig struct {
-	Pattern     string        // NATS subject pattern (e.g., "envio.*")
-	Workers     int           // Number of workers for this route
-	ChannelSize int           // Size of the channel buffer
-	WorkerName  string        // Name of the worker implementation to use
-	BatchSize   int           // Number of events to batch together
-	BatchWindow time.Duration // Maximum time to wait before processing a batch
+	Pattern     string         // NATS subject pattern (e.g., "envio.*")
+	Workers     int            // Number of workers for this route
+	ChannelSize int            // Size of the channel buffer
+	Worker      workers.Worker // Name of the worker implementation to use
+	BatchSize   int            // Number of events to batch together
+	BatchWindow time.Duration  // Maximum time to wait before processing a batch
 }
 
 type SubscriberConfig struct {
@@ -40,7 +40,7 @@ type SubscriberConfig struct {
 }
 
 type routeWorkerPool struct {
-	events      chan *Event
+	messages    chan *message.Message
 	workers     int
 	worker      workers.Worker
 	batchSize   int
@@ -72,15 +72,15 @@ func NewSubscriber(config SubscriberConfig, nc *nats.Conn, registry *workers.Reg
 	// Initialize worker pools for each route
 	for _, route := range config.Routes {
 		// Get worker implementation from registry
-		worker, ok := registry.Get(route.WorkerName)
-		if !ok {
-			return nil, fmt.Errorf("worker implementation not found for: %s", route.WorkerName)
-		}
+		// worker, ok := registry.Get(route.WorkerName)
+		// if !ok {
+		// 	return nil, fmt.Errorf("worker implementation not found for: %s", route.WorkerName)
+		// }
 
 		s.routePools[route.Pattern] = &routeWorkerPool{
-			events:      make(chan *Event, route.ChannelSize),
+			messages:    make(chan *message.Message, route.ChannelSize),
 			workers:     route.Workers,
-			worker:      worker,
+			worker:      route.Worker,
 			batchSize:   route.BatchSize,
 			batchWindow: route.BatchWindow,
 		}
@@ -99,19 +99,19 @@ func (s *Subscriber) Start() error {
 		}
 
 		// Subscribe to the route pattern with queue group for load balancing
-		_, err := s.nc.QueueSubscribe(pattern, pattern, func(msg *nats.Msg) {
-			var event Event
-			if err := json.Unmarshal(msg.Data, &event); err != nil {
+		_, err := s.nc.QueueSubscribe(pattern, pattern, func(natsMsg *nats.Msg) {
+			var msg message.Message
+			if err := json.Unmarshal(natsMsg.Data, &msg); err != nil {
 				log.Printf("Error unmarshaling event for subject %s: %v", msg.Subject, err)
 				return
 			}
 
 			// Add route information
-			event.Route = msg.Subject
+			msg.Route = msg.Subject
 
 			// Send to the appropriate worker pool
 			select {
-			case pool.events <- &event:
+			case pool.messages <- &msg:
 			default:
 				log.Printf("Channel full for route pattern %s, dropping event", pattern)
 			}
@@ -134,7 +134,7 @@ func (s *Subscriber) batchWorker(id int, pattern string, pool *routeWorkerPool) 
 	defer s.wg.Done()
 	log.Printf("Starting batch worker %d for pattern %s using %s worker", id, pattern, pool.worker.Name())
 
-	batch := make([]*workers.Event, 0, pool.batchSize)
+	batch := make([]*message.Message, 0, pool.batchSize)
 	timer := time.NewTimer(pool.batchWindow)
 	defer timer.Stop()
 
@@ -146,36 +146,36 @@ func (s *Subscriber) batchWorker(id int, pattern string, pool *routeWorkerPool) 
 				s.processBatch(pool.worker, batch)
 			}
 			return
-		case event := <-pool.events:
+		case msg := <-pool.messages:
 			// Convert our Event to worker.Event
-			workerEvent := &workers.Event{
-				Timestamp: event.Timestamp.String(),
-				Data:      event.Data,
-				Route:     event.Route,
-			}
+			// workerEvent := &workers.Event{
+			// 	Timestamp: event.Timestamp.String(),
+			// 	Data:      event.Data,
+			// 	Route:     event.Route,
+			// }
 
-			batch = append(batch, workerEvent)
+			batch = append(batch, msg)
 
 			// Process batch if we've reached batch size
 			if len(batch) >= pool.batchSize {
 				s.processBatch(pool.worker, batch)
-				batch = make([]*workers.Event, 0, pool.batchSize)
+				batch = make([]*message.Message, 0, pool.batchSize)
 				timer.Reset(pool.batchWindow)
 			}
 		case <-timer.C:
 			// Process batch if we have any events and reached the time window
 			if len(batch) > 0 {
 				s.processBatch(pool.worker, batch)
-				batch = make([]*workers.Event, 0, pool.batchSize)
+				batch = make([]*message.Message, 0, pool.batchSize)
 			}
 			timer.Reset(pool.batchWindow)
 		}
 	}
 }
 
-func (s *Subscriber) processBatch(worker workers.Worker, batch []*workers.Event) {
+func (s *Subscriber) processBatch(worker workers.Worker, batch []*message.Message) {
 	if batchWorker, ok := worker.(interface {
-		ProcessBatch(context.Context, []*workers.Event) error
+		ProcessBatch(context.Context, []*message.Message) error
 	}); ok {
 		// Use batch processing if supported
 		if err := batchWorker.ProcessBatch(s.ctx, batch); err != nil {
@@ -183,8 +183,8 @@ func (s *Subscriber) processBatch(worker workers.Worker, batch []*workers.Event)
 		}
 	} else {
 		// Fall back to processing events individually
-		for _, event := range batch {
-			if err := worker.Process(s.ctx, event); err != nil {
+		for _, msg := range batch {
+			if err := worker.Process(s.ctx, msg); err != nil {
 				log.Printf("Error processing event: %v", err)
 			}
 		}

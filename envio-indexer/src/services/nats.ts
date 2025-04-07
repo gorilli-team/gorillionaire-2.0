@@ -7,10 +7,11 @@ const publish = async (subject: string, message: Uint8Array | string) => {
   const natsUrl = process.env.NATS_URL;
   try { 
     const nc = await connect({ servers: natsUrl });
+    const js = nc.jetstream();
     const h = headers();
     h.set('Origin', 'envio-indexer');
     h.set('Timestamp', new Date().toISOString());
-    nc.publish(subject, message, { headers: h });
+    js.publish(subject, message, { headers: h, timeout: 1000 * 60 });
     await nc.drain();
     // await nc.flush();
     // await nc.close();

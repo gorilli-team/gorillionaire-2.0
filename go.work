@@ -4,5 +4,5 @@ use (
 	./events/pkg
 	./events/envio
 	./proto/gen/v1/go/proto/v1
-	./database/timeseries
+	./database/gorillioner
 )

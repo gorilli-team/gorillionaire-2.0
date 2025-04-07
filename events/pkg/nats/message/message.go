@@ -11,6 +11,7 @@ type Message struct {
 	Data        []byte            `json:"data"`
 	Headers     map[string]string `json:"headers,omitempty"`
 	Timestamp   time.Time         `json:"timestamp"`
+	Route       string            `json:"route"`
 	ReplyTo     string            `json:"reply_to,omitempty"`
 	SequenceNum uint64            `json:"sequence_num,omitempty"`
 }

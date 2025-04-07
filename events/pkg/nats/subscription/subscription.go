@@ -34,6 +34,9 @@ type Options struct {
 
 	// Context for cancellation
 	Context context.Context
+
+	// UseJetStream for JetStream
+	UseJetStream bool
 }
 
 // Option is a function that modifies subscription options
@@ -117,4 +120,20 @@ func NewBatchSubscription(conn *nats.Conn, opts *Options) (Subscription, error) 
 		return nil, fmt.Errorf("batch handler is required")
 	}
 	return newBatchSubscription(conn, opts)
+}
+
+// NewJetStreamSubscription creates a new JetStream subscription
+func NewJetStreamSubscription(js nats.JetStreamContext, opts *Options) (Subscription, error) {
+	if opts.Handler == nil {
+		return nil, fmt.Errorf("handler is required")
+	}
+	return newJetStreamSingleSubscription(js, opts)
+}
+
+// NewJetStreamBatchSubscription creates a new JetStream batch subscription
+func NewJetStreamBatchSubscription(js nats.JetStreamContext, opts *Options) (Subscription, error) {
+	if opts.BatchHandler == nil {
+		return nil, fmt.Errorf("batch handler is required")
+	}
+	return newJetStreamBatchSubscription(js, opts)
 }

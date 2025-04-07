@@ -3,7 +3,9 @@ package client
 import (
 	"context"
 	"fmt"
+	"math"
 	"sync"
+	"time"
 
 	"github.com/gorilli/gorillionaire-2.0/events/pkg/nats/config"
 	"github.com/gorilli/gorillionaire-2.0/events/pkg/nats/message"
@@ -14,6 +16,7 @@ import (
 // Client represents a NATS client
 type Client struct {
 	conn   *nats.Conn
+	js     nats.JetStreamContext
 	config *config.Config
 	subs   map[string]subscription.Subscription
 	mu     sync.RWMutex
@@ -37,6 +40,7 @@ func New(cfg *config.Config) (*Client, error) {
 	}
 
 	if err := client.connect(); err != nil {
+
 		cancel()
 		return nil, err
 	}
@@ -44,7 +48,7 @@ func New(cfg *config.Config) (*Client, error) {
 	return client, nil
 }
 
-// connect establishes a connection to NATS
+// connect establishes a connection to NATS with exponential backoff retry
 func (c *Client) connect() error {
 	opts := []nats.Option{
 		nats.Timeout(c.config.ConnectTimeout),
@@ -67,11 +71,45 @@ func (c *Client) connect() error {
 		}
 	}
 
-	conn, err := nats.Connect(c.config.URL, opts...)
-	if err != nil {
-		return fmt.Errorf("failed to connect to NATS: %w", err)
+	var conn *nats.Conn
+	var err error
+	maxRetries := 10
+	baseDelay := 1 * time.Second
+	maxDelay := 30 * time.Second
+
+	for i := 0; i < maxRetries; i++ {
+		conn, err = nats.Connect(c.config.URL, opts...)
+		if err == nil {
+			break
+		}
+
+		if i == maxRetries-1 {
+			return fmt.Errorf("failed to connect to NATS after %d attempts: %w", maxRetries, err)
+		}
+
+		// Calculate delay with exponential backoff and jitter
+		delay := time.Duration(math.Min(float64(baseDelay*time.Duration(math.Pow(2, float64(i)))), float64(maxDelay)))
+		// Add jitter (±20%)
+		jitter := time.Duration(float64(delay) * 0.2)
+		delay = delay + time.Duration(float64(jitter)*2*(float64(time.Now().UnixNano()%2)-0.5))
+
+		select {
+		case <-c.ctx.Done():
+			return fmt.Errorf("connection attempt cancelled: %w", c.ctx.Err())
+		case <-time.After(delay):
+			// Retry after delay
+			fmt.Printf("Retrying connection in %s\n", delay)
+		}
 	}
 
+	if c.config.UseJetStream {
+		js, err := conn.JetStream()
+		if err != nil {
+			conn.Close()
+			return fmt.Errorf("failed to create JetStream context: %w", err)
+		}
+		c.js = js
+	}
 	c.conn = conn
 	return nil
 }
@@ -106,6 +144,11 @@ func (c *Client) Publish(msg *message.Message) error {
 		return fmt.Errorf("not connected to NATS")
 	}
 
+	if c.config.UseJetStream && c.js != nil {
+		_, err := c.js.Publish(msg.Subject, msg.Data)
+		return err
+	}
+
 	return c.conn.Publish(msg.Subject, msg.Data)
 }
 
@@ -118,8 +161,16 @@ func (c *Client) Subscribe(opts *subscription.Options) (subscription.Subscriptio
 		return nil, fmt.Errorf("not connected to NATS")
 	}
 
-	// Create subscription
-	sub, err := c.createSubscription(opts)
+	// Create subscription based on configuration
+	var sub subscription.Subscription
+	var err error
+
+	if c.config.UseJetStream && c.js != nil {
+		sub, err = c.createJetStreamSubscription(opts)
+	} else {
+		sub, err = c.createNatsSubscription(opts)
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -130,31 +181,18 @@ func (c *Client) Subscribe(opts *subscription.Options) (subscription.Subscriptio
 	return sub, nil
 }
 
-// createSubscription creates a new subscription based on options
-func (c *Client) createSubscription(opts *subscription.Options) (subscription.Subscription, error) {
+// createJetStreamSubscription creates a JetStream subscription
+func (c *Client) createJetStreamSubscription(opts *subscription.Options) (subscription.Subscription, error) {
 	if opts.BatchHandler != nil {
-		return c.createBatchSubscription(opts)
+		return subscription.NewJetStreamBatchSubscription(c.js, opts)
 	}
-
-	return c.createSingleSubscription(opts)
+	return subscription.NewJetStreamSubscription(c.js, opts)
 }
 
-// createSingleSubscription creates a subscription for single message handling
-func (c *Client) createSingleSubscription(opts *subscription.Options) (subscription.Subscription, error) {
-	sub, err := subscription.NewSingleSubscription(c.conn, opts)
-	if err != nil {
-		return nil, err
+// createNatsSubscription creates a regular NATS subscription
+func (c *Client) createNatsSubscription(opts *subscription.Options) (subscription.Subscription, error) {
+	if opts.BatchHandler != nil {
+		return subscription.NewBatchSubscription(c.conn, opts)
 	}
-
-	return sub, nil
-}
-
-// createBatchSubscription creates a subscription for batch message handling
-func (c *Client) createBatchSubscription(opts *subscription.Options) (subscription.Subscription, error) {
-	sub, err := subscription.NewBatchSubscription(c.conn, opts)
-	if err != nil {
-		return nil, err
-	}
-
-	return sub, nil
+	return subscription.NewSingleSubscription(c.conn, opts)
 }

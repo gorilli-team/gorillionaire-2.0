@@ -62,19 +62,38 @@ services:
       - "4222:4222"
       - "6222:6222"
       - "8222:8222"
+    volumes:
+      - ./nats.conf:/etc/nats/nats.conf
+      - ./nats-data:/data
     command: >
+      -js
       -DV
       -m 8222
-  timeseries:
+      -p 4222
+      -c /etc/nats/nats.conf
+  nats-init:
+    image: natsio/nats-box
+    depends_on:
+      - nats
+    entrypoint: ["/bin/sh", "-c"]
+    command: |
+      "
+      sleep 2 &&
+      nats -s nats://host.docker.internal:4222 stream add GORILLIONER --config /etc/nats/gorillioner.stream.conf
+      "
+    volumes:
+      - ./configs/gorillioner.stream.conf:/etc/nats/gorillioner.stream.conf
+
+  gorillioner-db:
     image: timescale/timescaledb:2.18.1-pg17
     environment:
-      - POSTGRES_DB=timeseries
+      - POSTGRES_DB=gorillioner
       - POSTGRES_USER=gorilli
       - POSTGRES_PASSWORD=gorilli
     ports:
       - "5452:5432"
     volumes:
-      - ./timeseries:/var/lib/postgresql/data
+      - ./gorillioner-db:/var/lib/postgresql/data
     restart: always
     user: "999:999"
   migrations:
@@ -82,7 +101,7 @@ services:
       context: ../migrations
       dockerfile: Dockerfile
     depends_on:
-      - timeseries
+      - gorillioner-db
     env_file:
       - .env
     # volumes:
@@ -90,3 +109,4 @@ services:
     # restart: always
 volumes:
   db_data:
+  nats_data:
