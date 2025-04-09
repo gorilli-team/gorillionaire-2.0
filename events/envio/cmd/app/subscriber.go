@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/gorilli/gorillionaire-2.0/events/pkg/nats/message"
-	"github.com/gorilli/gorillionaire-2.0/events/pkg/nats/workers"
+	"github.com/gorilli/gorillionaire-2.0/events/pkg/nats/worker"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/nats-io/nats.go"
 )
@@ -25,12 +25,12 @@ import (
 // }
 
 type RouteConfig struct {
-	Pattern     string         // NATS subject pattern (e.g., "envio.*")
-	Workers     int            // Number of workers for this route
-	ChannelSize int            // Size of the channel buffer
-	Worker      workers.Worker // Name of the worker implementation to use
-	BatchSize   int            // Number of events to batch together
-	BatchWindow time.Duration  // Maximum time to wait before processing a batch
+	Pattern     string        // NATS subject pattern (e.g., "envio.*")
+	Workers     int           // Number of workers for this route
+	ChannelSize int           // Size of the channel buffer
+	Worker      worker.Worker // Name of the worker implementation to use
+	BatchSize   int           // Number of events to batch together
+	BatchWindow time.Duration // Maximum time to wait before processing a batch
 }
 
 type SubscriberConfig struct {
@@ -42,7 +42,7 @@ type SubscriberConfig struct {
 type routeWorkerPool struct {
 	messages    chan *message.Message
 	workers     int
-	worker      workers.Worker
+	worker      worker.Worker
 	batchSize   int
 	batchWindow time.Duration
 }
@@ -54,10 +54,10 @@ type Subscriber struct {
 	cancel     context.CancelFunc
 	wg         sync.WaitGroup
 	routePools map[string]*routeWorkerPool
-	registry   *workers.Registry
+	registry   *worker.Registry
 }
 
-func NewSubscriber(config SubscriberConfig, nc *nats.Conn, registry *workers.Registry) (*Subscriber, error) {
+func NewSubscriber(config SubscriberConfig, nc *nats.Conn, registry *worker.Registry) (*Subscriber, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	s := &Subscriber{
@@ -173,7 +173,7 @@ func (s *Subscriber) batchWorker(id int, pattern string, pool *routeWorkerPool) 
 	}
 }
 
-func (s *Subscriber) processBatch(worker workers.Worker, batch []*message.Message) {
+func (s *Subscriber) processBatch(worker worker.Worker, batch []*message.Message) {
 	if batchWorker, ok := worker.(interface {
 		ProcessBatch(context.Context, []*message.Message) error
 	}); ok {

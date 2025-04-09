@@ -12,32 +12,50 @@ import (
 	"github.com/gorilli/gorillionaire-2.0/events/pkg/nats/client"
 	"github.com/gorilli/gorillionaire-2.0/events/pkg/nats/config"
 	"github.com/gorilli/gorillionaire-2.0/events/pkg/nats/handler"
+	"github.com/gorilli/gorillionaire-2.0/events/pkg/nats/publisher"
 	"github.com/gorilli/gorillionaire-2.0/events/pkg/nats/subscription"
 	// "github.com/jackc/pgx/v4/pgxpool"
 )
 
 const (
-	ENVIO_PRICE_SUBJECT   = "gorillioner.envio.price"
-	ENVIO_NEWPAIR_SUBJECT = "gorillioner.envio.newpair"
-	TIMESCALE_SUBJECT     = "timeseries.>"
+	ENVIO_PRICE_SUBJECT              = "gorillionaire.envio.price"
+	ENVIO_NEWPAIR_SUBJECT            = "gorillionaire.envio.newpair"
+	GORILLIONAIRE_DB_NEWPAIR_SUBJECT = "gorillionaire.db.newpair"
+	GORILLIONAIRE_DB_PRICE_SUBJECT   = "gorillionaire.db.price"
 )
 
 func main() {
 	// Create context
 	// ctx := context.Background()
 
+	// Create NATS client
+	natsClient, err := client.New(&config.Config{
+		URL:            getEnvOrDefault("NATS_URL", "nats://localhost:4222"),
+		ConnectTimeout: 10 * time.Second,
+		UseJetStream:   true,
+	})
+	if err != nil {
+		log.Fatalf("Failed to create NATS client: %v", err)
+	}
+	defer natsClient.Close()
+
+	publisher := publisher.NewPublisher(natsClient.JetStream())
+	// defer publisher.Stop()
 	// Register workers
 	envioPriceWorker := envio_worker.NewEnvioPriceWorker(envio_worker.Config{
 		// Pool: pool,
+		Publisher:  publisher,
+		PubSubject: GORILLIONAIRE_DB_PRICE_SUBJECT,
 	})
 	envioNewPairWorker := envio_worker.NewEnvioNewPairWorker(envio_worker.Config{
 		// Pool: pool,
+		Publisher:  publisher,
+		PubSubject: GORILLIONAIRE_DB_NEWPAIR_SUBJECT,
 	})
 
 	// Configuration
 	cfg := types.Config{
-		NatsURL:          getEnvOrDefault("NATS_URL", "nats://localhost:4222"),
-		TimescaleSubject: getEnvOrDefault("TIMESCALE_URL", TIMESCALE_SUBJECT),
+		// NatsURL: getEnvOrDefault("NATS_URL", "nats://localhost:4222"),
 		Routes: []types.RouteConfig{
 			{
 				Pattern:     ENVIO_PRICE_SUBJECT,
@@ -53,17 +71,6 @@ func main() {
 			},
 		},
 	}
-
-	// Create NATS client
-	natsClient, err := client.New(&config.Config{
-		URL:            cfg.NatsURL,
-		ConnectTimeout: 10 * time.Second,
-		UseJetStream:   true,
-	})
-	if err != nil {
-		log.Fatalf("Failed to create NATS client: %v", err)
-	}
-	defer natsClient.Close()
 
 	// Create subscriptions for each route
 	for _, route := range cfg.Routes {

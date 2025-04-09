@@ -8,7 +8,8 @@ import (
 	"time"
 
 	"github.com/gorilli/gorillionaire-2.0/events/pkg/nats/message"
-	"github.com/gorilli/gorillionaire-2.0/events/pkg/nats/workers"
+	"github.com/gorilli/gorillionaire-2.0/events/pkg/nats/publisher"
+	"github.com/gorilli/gorillionaire-2.0/events/pkg/nats/worker"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -18,10 +19,11 @@ type EnvioNewPairWorker struct {
 	batchWindow time.Duration
 	mu          sync.Mutex
 	buffer      []*envio.EnvioNewPair
-	timeseries  chan<- []*envio.EnvioNewPair
+	pub         *publisher.Publisher
+	pubSubject  string
 }
 
-var _ workers.Worker = (*EnvioNewPairWorker)(nil)
+var _ worker.Worker = (*EnvioNewPairWorker)(nil)
 
 func NewEnvioNewPairWorker(config Config) *EnvioNewPairWorker {
 	if config.BatchSize == 0 {
@@ -31,6 +33,8 @@ func NewEnvioNewPairWorker(config Config) *EnvioNewPairWorker {
 	return &EnvioNewPairWorker{
 		batchSize:   config.BatchSize,
 		batchWindow: config.BatchWindow,
+		pub:         config.Publisher,
+		pubSubject:  config.PubSubject,
 	}
 }
 
@@ -50,10 +54,28 @@ func (w *EnvioNewPairWorker) flushBuffer() {
 	if len(w.buffer) == 0 {
 		return
 	}
+	batch := &envio.EnvioNewPairBatch{
+		Events: w.buffer,
+	}
+	msg, err := proto.Marshal(batch)
+	if err != nil {
+		log.Printf("Error marshaling protobuf message: %v", err)
+		return
+	}
+
+	pubMsg := &publisher.PublishMessage{
+		Subject: w.pubSubject,
+		Data:    msg,
+	}
+
+	w.pub.Publish(pubMsg)
+	log.Printf("Flushed %d new pairs", len(w.buffer))
+	w.buffer = make([]*envio.EnvioNewPair, 0)
 }
 
 func (w *EnvioNewPairWorker) Process(ctx context.Context, msg *message.Message) error {
 	// Convert protobuf message to EnvioNewPair
+	log.Printf("Processing new pair event: %v", msg.Subject)
 	envioEvent := &envio.EnvioNewPair{}
 
 	err := proto.Unmarshal(msg.Data, envioEvent)
@@ -87,5 +109,5 @@ func (w *EnvioNewPairWorker) ProcessBatch(ctx context.Context, msgs []*message.M
 }
 
 func (w *EnvioNewPairWorker) Name() string {
-	return "gorillioner.envio.newpair"
+	return "gorillionaire.envio.newpair"
 }

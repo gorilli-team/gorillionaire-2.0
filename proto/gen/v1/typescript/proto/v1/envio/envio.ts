@@ -22,10 +22,19 @@ export interface EnvioPriceEvent {
   ThisHourTransfers: number;
 }
 
+export interface EnvioPriceEventBatch {
+  events: EnvioPriceEvent[];
+}
+
 /** EnvioNewPair contains the new pair details */
 export interface EnvioNewPair {
   Token0Address: string;
   Token1Address: string;
+  ChainName: string;
+}
+
+export interface EnvioNewPairBatch {
+  events: EnvioNewPair[];
 }
 
 function createBaseEnvioPriceEvent(): EnvioPriceEvent {
@@ -249,8 +258,69 @@ export const EnvioPriceEvent = {
   },
 };
 
+function createBaseEnvioPriceEventBatch(): EnvioPriceEventBatch {
+  return { events: [] };
+}
+
+export const EnvioPriceEventBatch = {
+  encode(message: EnvioPriceEventBatch, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.events) {
+      EnvioPriceEvent.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): EnvioPriceEventBatch {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEnvioPriceEventBatch();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.events.push(EnvioPriceEvent.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): EnvioPriceEventBatch {
+    return {
+      events: globalThis.Array.isArray(object?.events)
+        ? object.events.map((e: any) => EnvioPriceEvent.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: EnvioPriceEventBatch): unknown {
+    const obj: any = {};
+    if (message.events?.length) {
+      obj.events = message.events.map((e) => EnvioPriceEvent.toJSON(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<EnvioPriceEventBatch>): EnvioPriceEventBatch {
+    return EnvioPriceEventBatch.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<EnvioPriceEventBatch>): EnvioPriceEventBatch {
+    const message = createBaseEnvioPriceEventBatch();
+    message.events = object.events?.map((e) => EnvioPriceEvent.fromPartial(e)) || [];
+    return message;
+  },
+};
+
 function createBaseEnvioNewPair(): EnvioNewPair {
-  return { Token0Address: "", Token1Address: "" };
+  return { Token0Address: "", Token1Address: "", ChainName: "" };
 }
 
 export const EnvioNewPair = {
@@ -260,6 +330,9 @@ export const EnvioNewPair = {
     }
     if (message.Token1Address !== "") {
       writer.uint32(18).string(message.Token1Address);
+    }
+    if (message.ChainName !== "") {
+      writer.uint32(26).string(message.ChainName);
     }
     return writer;
   },
@@ -285,6 +358,13 @@ export const EnvioNewPair = {
 
           message.Token1Address = reader.string();
           continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.ChainName = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -298,6 +378,7 @@ export const EnvioNewPair = {
     return {
       Token0Address: isSet(object.Token0Address) ? globalThis.String(object.Token0Address) : "",
       Token1Address: isSet(object.Token1Address) ? globalThis.String(object.Token1Address) : "",
+      ChainName: isSet(object.ChainName) ? globalThis.String(object.ChainName) : "",
     };
   },
 
@@ -309,6 +390,9 @@ export const EnvioNewPair = {
     if (message.Token1Address !== "") {
       obj.Token1Address = message.Token1Address;
     }
+    if (message.ChainName !== "") {
+      obj.ChainName = message.ChainName;
+    }
     return obj;
   },
 
@@ -319,6 +403,66 @@ export const EnvioNewPair = {
     const message = createBaseEnvioNewPair();
     message.Token0Address = object.Token0Address ?? "";
     message.Token1Address = object.Token1Address ?? "";
+    message.ChainName = object.ChainName ?? "";
+    return message;
+  },
+};
+
+function createBaseEnvioNewPairBatch(): EnvioNewPairBatch {
+  return { events: [] };
+}
+
+export const EnvioNewPairBatch = {
+  encode(message: EnvioNewPairBatch, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.events) {
+      EnvioNewPair.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): EnvioNewPairBatch {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEnvioNewPairBatch();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.events.push(EnvioNewPair.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): EnvioNewPairBatch {
+    return {
+      events: globalThis.Array.isArray(object?.events) ? object.events.map((e: any) => EnvioNewPair.fromJSON(e)) : [],
+    };
+  },
+
+  toJSON(message: EnvioNewPairBatch): unknown {
+    const obj: any = {};
+    if (message.events?.length) {
+      obj.events = message.events.map((e) => EnvioNewPair.toJSON(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<EnvioNewPairBatch>): EnvioNewPairBatch {
+    return EnvioNewPairBatch.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<EnvioNewPairBatch>): EnvioNewPairBatch {
+    const message = createBaseEnvioNewPairBatch();
+    message.events = object.events?.map((e) => EnvioNewPair.fromPartial(e)) || [];
     return message;
   },
 };

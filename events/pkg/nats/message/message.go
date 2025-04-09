@@ -14,6 +14,7 @@ type Message struct {
 	Route       string            `json:"route"`
 	ReplyTo     string            `json:"reply_to,omitempty"`
 	SequenceNum uint64            `json:"sequence_num,omitempty"`
+	Ack         func() error      `json:"ack,omitempty"`
 }
 
 // NewMessage creates a new Message instance

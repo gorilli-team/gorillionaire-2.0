@@ -19,8 +19,17 @@ message EnvioPriceEvent {
     int32 ThisHourTransfers = 11;
 }
 
+message EnvioPriceEventBatch {
+    repeated EnvioPriceEvent events = 1;
+}
+
 // EnvioNewPair contains the new pair details
 message EnvioNewPair {
     string Token0Address = 1;
     string Token1Address = 2;
+    string ChainName = 3;
+}
+
+message EnvioNewPairBatch {
+    repeated EnvioNewPair events = 1;
 }
