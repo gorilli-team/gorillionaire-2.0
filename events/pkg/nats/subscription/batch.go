@@ -59,6 +59,7 @@ func (s *batchSubscription) handleMessage(natsMsg *nats.Msg) {
 		Data:    natsMsg.Data,
 		Headers: make(map[string]string),
 		ReplyTo: natsMsg.Reply,
+		Ack:     func() error { return natsMsg.Ack() },
 	}
 
 	// Copy headers

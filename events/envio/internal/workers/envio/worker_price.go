@@ -9,8 +9,8 @@ import (
 	"proto-v1/envio"
 
 	"github.com/gorilli/gorillionaire-2.0/events/pkg/nats/message"
-	"github.com/gorilli/gorillionaire-2.0/events/pkg/nats/workers"
-	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/gorilli/gorillionaire-2.0/events/pkg/nats/publisher"
+	"github.com/gorilli/gorillionaire-2.0/events/pkg/nats/worker"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -20,17 +20,10 @@ type EnvioPriceWorker struct {
 	batchWindow time.Duration
 	mu          sync.Mutex
 	buffer      []*envio.EnvioPriceEvent
-	timeseries  chan<- []*envio.EnvioPriceEvent
+	pub         *publisher.Publisher
 }
 
-type Config struct {
-	Pool        *pgxpool.Pool
-	BatchSize   int
-	BatchWindow time.Duration
-	Timeseries  chan<- []*envio.EnvioPriceEvent
-}
-
-var _ workers.Worker = (*EnvioPriceWorker)(nil)
+var _ worker.Worker = (*EnvioPriceWorker)(nil)
 
 func NewEnvioPriceWorker(config Config) *EnvioPriceWorker {
 	if config.BatchSize == 0 {
@@ -45,7 +38,7 @@ func NewEnvioPriceWorker(config Config) *EnvioPriceWorker {
 		batchSize:   config.BatchSize,
 		batchWindow: config.BatchWindow,
 		buffer:      make([]*envio.EnvioPriceEvent, 0, config.BatchSize),
-		timeseries:  config.Timeseries,
+		pub:         config.Publisher,
 	}
 
 	// Start background routine to flush buffer periodically
@@ -75,17 +68,29 @@ func (w *EnvioPriceWorker) flushBuffer() {
 	copy(batch, w.buffer)
 	w.buffer = w.buffer[:0]
 	w.mu.Unlock()
-
-	// Send to timeseries channel
-	select {
-	case w.timeseries <- batch:
-	default:
-		log.Printf("Warning: timeseries channel is full, dropping batch of %d events", len(batch))
+	events := &envio.EnvioPriceEventBatch{
+		Events: batch,
 	}
+	data, err := proto.Marshal(events)
+	if err != nil {
+		log.Printf("Error marshaling protobuf message: %v", err)
+		return
+	}
+
+	w.pub.Publish(&publisher.PublishMessage{
+		Subject: "gorillionaire.envio.price",
+		Data:    data,
+	})
+	// Send to timeseries channel
+	// select {
+	// case w.timeseries <- batch:
+	// default:
+	// 	log.Printf("Warning: timeseries channel is full, dropping batch of %d events", len(batch))
+	// }
 }
 
 func (w *EnvioPriceWorker) Name() string {
-	return "gorillioner.envio.price"
+	return "gorillionaire.envio.price"
 }
 
 func (w *EnvioPriceWorker) Process(ctx context.Context, msg *message.Message) error {

@@ -114,6 +114,10 @@ func (c *Client) connect() error {
 	return nil
 }
 
+func (c *Client) JetStream() nats.JetStreamContext {
+	return c.js
+}
+
 // Close closes the NATS connection
 func (c *Client) Close() {
 	c.mu.Lock()

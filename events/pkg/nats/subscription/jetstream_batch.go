@@ -25,7 +25,7 @@ func newJetStreamBatchSubscription(js nats.JetStreamContext, opts *Options) (*ba
 
 	// Create NATS subscription
 	log.Printf("Creating subscription for %s", opts.Subject)
-	natsSub, err := js.Subscribe(opts.Subject, sub.handleMessage)
+	natsSub, err := js.Subscribe(opts.Subject, sub.handleMessage, nats.ManualAck())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create subscription: %w", err)
 	}

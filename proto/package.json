@@ -12,7 +12,7 @@
   },
   "scripts": {
     "generate": "./generator.sh",
-    "postgenerate": "cp -r gen/v1/typescript/proto ../envio-indexer/src/proto"
+    "postgenerate": "cp -r gen/v1/typescript/proto/ ../envio-indexer/src/proto"
   },
   "dependencies": {
     "ts-proto": "^1.165.0"

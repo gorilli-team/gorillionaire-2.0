@@ -95,6 +95,8 @@ extra
 
 # docker compose temp files
 docker-compose/timeseries/
-docker-compose/gorillioner-db/
+docker-compose/gorillionaire-db/
 docker-compose/nats-data/
 experiment/
+events/database/main
+events/envio/main
