@@ -20,7 +20,7 @@ export interface EnvioPriceEventBatch {
 export interface EnvioNewPair {
     Token0Address: string;
     Token1Address: string;
-    ChainName: string;
+    ChainId: number;
 }
 export interface EnvioNewPairBatch {
     events: EnvioNewPair[];

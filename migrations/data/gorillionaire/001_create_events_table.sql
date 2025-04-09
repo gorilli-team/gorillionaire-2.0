@@ -4,6 +4,21 @@ CREATE SCHEMA IF NOT EXISTS gorillionaire;
 -- Create the events table
 CREATE SCHEMA IF NOT EXISTS gorillionaire;
 
+
+			Address:           tokenAddress,
+			Decimals:          tokenDecimals,
+			Symbol:            tokenInfo["symbol"].(string),
+			Name:              tokenInfo["name"].(string),
+			ImageBannerUrl:    tokenInfo["imageBannerUrl"].(string),
+			TotalSupply:       tokenInfo["totalSupply"].(string),
+			Description:       tokenInfo["description"].(string),
+			CirculatingSupply: tokenInfo["circulatingSupply"].(string),
+			IsScam:            tokenMap["isScam"].(bool),
+			NetworkId:         tokenMap["networkId"].(int),
+			CodexId:           tokenMap["id"].(string),
+			CoinMarketCapId:   tokenInfo["cmcId"].(string),
+			CreatorAddress:    tokenInfo["creatorAddress"].(string),
+
 CREATE TABLE IF NOT EXISTS gorillionaire.currency (
     id SERIAL PRIMARY KEY,
     symbol VARCHAR(20) UNIQUE NOT NULL,         -- e.g. BTC, ETH
@@ -11,19 +26,27 @@ CREATE TABLE IF NOT EXISTS gorillionaire.currency (
     description TEXT,                           -- Optional text about the currency
     type VARCHAR(50) NOT NULL DEFAULT 'coin',   -- coin, token, stablecoin, etc.
 
-    chain VARCHAR(50) NOT NULL,                 -- Ethereum, Solana, Bitcoin, etc.
-    contract_address VARCHAR(100),              -- Only for tokens, e.g. ERC-20 address
+    chain_id INT NOT NULL,                 -- Ethereum, Solana, Bitcoin, etc.
+    address VARCHAR(100),              -- Only for tokens, e.g. ERC-20 address
     decimals INT NOT NULL DEFAULT 18,           -- For formatting purposes
 
     icon_url TEXT,                              -- Optional logo or icon
     website_url TEXT,                           -- Optional external link
+    image_banner_url TEXT,                      -- Image banner URL
 
     coingecko_id VARCHAR(100),                  -- Reference to CoinGecko API
     cmc_id VARCHAR(100),                        -- CoinMarketCap ID (optional)
 
+    codex_id VARCHAR(100),                      -- Codex ID
+    creator_address VARCHAR(100),               -- Creator address
+    is_scam BOOLEAN DEFAULT FALSE,              -- Whether the currency is a scam
+    total_supply NUMERIC(38, 18),              -- Total supply of the currency
+    circulating_supply NUMERIC(38, 18),        -- Circulating supply of the currency
+    creation_date DATE,                         -- When the currency was created
+    launch_date DATE,                           -- When the token was launched
+
     is_active BOOLEAN DEFAULT TRUE,
     is_verified BOOLEAN DEFAULT FALSE,
-    launch_date DATE,                           -- When the token was launched
 
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -36,7 +59,7 @@ CREATE TABLE IF NOT EXISTS gorillionaire.pairs (
     quote_currency_id INT NOT NULL,   -- e.g. USDC in ETH/USDC
     base_token_address VARCHAR(100) NOT NULL, -- e.g. 0x0000000000000000000000000000000000000000
     quote_token_address VARCHAR(100) NOT NULL, -- e.g. 0x0000000000000000000000000000000000000000
-    chain_name VARCHAR(100) NOT NULL, -- e.g. Ethereum, Solana, Bitcoin, etc.
+    chain_id INT NOT NULL, -- e.g. Ethereum, Solana, Bitcoin, etc.
 
     symbol VARCHAR(50) UNIQUE NOT NULL,      -- e.g. ETH/USDC
     pair_type VARCHAR(20) DEFAULT 'spot',    -- spot, perpetual, futures

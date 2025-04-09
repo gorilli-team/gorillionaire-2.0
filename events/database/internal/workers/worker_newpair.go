@@ -10,6 +10,8 @@ import (
 
 	gorillionairedb "github.com/gorilli/gorillionaire-2.0/database/gorillionairedb/db"
 	"github.com/gorilli/gorillionaire-2.0/database/gorillionairedb/model"
+	"github.com/gorilli/gorillionaire-2.0/database/gorillionairedb/query"
+	"github.com/gorilli/gorillionaire-2.0/events/database/pkg/client/codex"
 	"github.com/gorilli/gorillionaire-2.0/events/pkg/nats/message"
 	"github.com/gorilli/gorillionaire-2.0/events/pkg/nats/worker"
 	"google.golang.org/protobuf/proto"
@@ -22,11 +24,14 @@ type NewPairDBWorker struct {
 	mu          sync.Mutex
 	buffer      []*envio.EnvioNewPair
 	timeseries  chan<- []*envio.EnvioNewPair
+	codexClient *codex.CodexClient
 }
 
 var _ worker.Worker = (*NewPairDBWorker)(nil)
 
 func NewNewPairDBWorker(config *Config) *NewPairDBWorker {
+	codexClient := codex.NewCodexClient()
+
 	return &NewPairDBWorker{
 		pool:        config.DB,
 		batchSize:   config.BatchSize,
@@ -34,6 +39,7 @@ func NewNewPairDBWorker(config *Config) *NewPairDBWorker {
 		mu:          sync.Mutex{},
 		buffer:      make([]*envio.EnvioNewPair, 0),
 		timeseries:  make(chan []*envio.EnvioNewPair),
+		codexClient: codexClient,
 	}
 }
 
@@ -82,15 +88,23 @@ func (w *NewPairDBWorker) process(ctx context.Context, envioNewPair *envio.Envio
 		return err
 	}
 
-	if token0info == nil {
-		w.enrichToken(envioNewPair.Token0Address)
+	if token0info == nil || token1info == nil {
+		tokensInfo, err := w.codexClient.GetTokensInfo([]string{envioNewPair.Token0Address, envioNewPair.Token1Address}, envioNewPair.ChainId)
+		if err != nil {
+			return err
+		}
+		if tokensInfo != nil {
+			return fmt.Errorf("token not found")
+		}
+		if tokensInfo[envioNewPair.Token0Address] != nil {
+			return fmt.Errorf("token0 not found")
+		}
+		if tokensInfo[envioNewPair.Token1Address] != nil {
+			return fmt.Errorf("token1 not found")
+		}
 	}
 
-	if token1info == nil {
-		w.enrichToken(envioNewPair.Token1Address)
-	}
-
-	pair, err := w.getPair(envioNewPair.Token0Address, envioNewPair.Token1Address, envioNewPair.ChainName)
+	pair, err := w.getPair(envioNewPair.Token0Address, envioNewPair.Token1Address, envioNewPair.ChainId)
 	if err != nil {
 		return err
 	}
@@ -101,7 +115,7 @@ func (w *NewPairDBWorker) process(ctx context.Context, envioNewPair *envio.Envio
 			QuoteCurrencyID:   token1info.ID,
 			BaseTokenAddress:  envioNewPair.Token0Address,
 			QuoteTokenAddress: envioNewPair.Token1Address,
-			ChainName:         envioNewPair.ChainName,
+			ChainId:           int(envioNewPair.ChainId),
 			Symbol:            token0info.Symbol + "/" + token1info.Symbol,
 		}
 	}
@@ -111,15 +125,23 @@ func (w *NewPairDBWorker) process(ctx context.Context, envioNewPair *envio.Envio
 	return nil
 }
 
-func (w *NewPairDBWorker) enrichToken(tokenAddress string) (*model.Currency, error) {
-	return nil, nil
-}
-
 func (w *NewPairDBWorker) getTokenInfo(tokenAddress string) (*model.Currency, error) {
 	return nil, nil
 }
 
-func (w *NewPairDBWorker) getPair(token0Address string, token1Address string, chainName string) (*model.Pair, error) {
+func (w *NewPairDBWorker) getPair(token0Address string, token1Address string, chainId int32) (*model.Pair, error) {
+	chainIdInt := int(chainId)
+	pair, err := query.GetPair(w.pool, &model.PairQuery{
+		BaseTokenAddress:  &token0Address,
+		QuoteTokenAddress: &token1Address,
+		ChainId:           &chainIdInt,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if len(*pair) > 0 {
+		return &(*pair)[0], nil
+	}
 	return nil, nil
 }
 

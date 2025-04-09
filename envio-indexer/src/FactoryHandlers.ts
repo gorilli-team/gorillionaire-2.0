@@ -11,7 +11,7 @@ UniswapPoolFactory.PoolCreated.contractRegister(
     const newPair: EnvioNewPair = {
       Token0Address: token0Address,
       Token1Address: token1Address,
-      ChainName: "monad",
+      ChainId: event.chainId,
     };
     const serializedNewPair = serializeEnvioNewPair(newPair);
     nats.publish(nats.NATS_NEWPAIR_SUBJECT, serializedNewPair);

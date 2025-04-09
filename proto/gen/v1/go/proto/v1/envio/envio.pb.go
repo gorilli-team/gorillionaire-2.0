@@ -195,7 +195,7 @@ type EnvioNewPair struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Token0Address string                 `protobuf:"bytes,1,opt,name=Token0Address,proto3" json:"Token0Address,omitempty"`
 	Token1Address string                 `protobuf:"bytes,2,opt,name=Token1Address,proto3" json:"Token1Address,omitempty"`
-	ChainName     string                 `protobuf:"bytes,3,opt,name=ChainName,proto3" json:"ChainName,omitempty"`
+	ChainId       int32                  `protobuf:"varint,3,opt,name=ChainId,proto3" json:"ChainId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -244,11 +244,11 @@ func (x *EnvioNewPair) GetToken1Address() string {
 	return ""
 }
 
-func (x *EnvioNewPair) GetChainName() string {
+func (x *EnvioNewPair) GetChainId() int32 {
 	if x != nil {
-		return x.ChainName
+		return x.ChainId
 	}
-	return ""
+	return 0
 }
 
 type EnvioNewPairBatch struct {
@@ -314,11 +314,11 @@ const file_v1_envio_envio_proto_rawDesc = "" +
 	" \x01(\x05R\rTokenDecimals\x12,\n" +
 	"\x11ThisHourTransfers\x18\v \x01(\x05R\x11ThisHourTransfers\"L\n" +
 	"\x14EnvioPriceEventBatch\x124\n" +
-	"\x06events\x18\x01 \x03(\v2\x1c.proto.envio.EnvioPriceEventR\x06events\"x\n" +
+	"\x06events\x18\x01 \x03(\v2\x1c.proto.envio.EnvioPriceEventR\x06events\"t\n" +
 	"\fEnvioNewPair\x12$\n" +
 	"\rToken0Address\x18\x01 \x01(\tR\rToken0Address\x12$\n" +
-	"\rToken1Address\x18\x02 \x01(\tR\rToken1Address\x12\x1c\n" +
-	"\tChainName\x18\x03 \x01(\tR\tChainName\"F\n" +
+	"\rToken1Address\x18\x02 \x01(\tR\rToken1Address\x12\x18\n" +
+	"\aChainId\x18\x03 \x01(\x05R\aChainId\"F\n" +
 	"\x11EnvioNewPairBatch\x121\n" +
 	"\x06events\x18\x01 \x03(\v2\x19.proto.envio.EnvioNewPairR\x06eventsB<Z:github.com/gorilli/gorillionaire-2.0/gen/v1/go/proto/enviob\x06proto3"
 

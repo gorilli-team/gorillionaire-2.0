@@ -270,7 +270,7 @@ exports.EnvioPriceEventBatch = {
     },
 };
 function createBaseEnvioNewPair() {
-    return { Token0Address: "", Token1Address: "", ChainName: "" };
+    return { Token0Address: "", Token1Address: "", ChainId: 0 };
 }
 exports.EnvioNewPair = {
     encode(message, writer = minimal_1.default.Writer.create()) {
@@ -280,8 +280,8 @@ exports.EnvioNewPair = {
         if (message.Token1Address !== "") {
             writer.uint32(18).string(message.Token1Address);
         }
-        if (message.ChainName !== "") {
-            writer.uint32(26).string(message.ChainName);
+        if (message.ChainId !== 0) {
+            writer.uint32(24).int32(message.ChainId);
         }
         return writer;
     },
@@ -305,10 +305,10 @@ exports.EnvioNewPair = {
                     message.Token1Address = reader.string();
                     continue;
                 case 3:
-                    if (tag !== 26) {
+                    if (tag !== 24) {
                         break;
                     }
-                    message.ChainName = reader.string();
+                    message.ChainId = reader.int32();
                     continue;
             }
             if ((tag & 7) === 4 || tag === 0) {
@@ -322,7 +322,7 @@ exports.EnvioNewPair = {
         return {
             Token0Address: isSet(object.Token0Address) ? globalThis.String(object.Token0Address) : "",
             Token1Address: isSet(object.Token1Address) ? globalThis.String(object.Token1Address) : "",
-            ChainName: isSet(object.ChainName) ? globalThis.String(object.ChainName) : "",
+            ChainId: isSet(object.ChainId) ? globalThis.Number(object.ChainId) : 0,
         };
     },
     toJSON(message) {
@@ -333,8 +333,8 @@ exports.EnvioNewPair = {
         if (message.Token1Address !== "") {
             obj.Token1Address = message.Token1Address;
         }
-        if (message.ChainName !== "") {
-            obj.ChainName = message.ChainName;
+        if (message.ChainId !== 0) {
+            obj.ChainId = Math.round(message.ChainId);
         }
         return obj;
     },
@@ -345,7 +345,7 @@ exports.EnvioNewPair = {
         const message = createBaseEnvioNewPair();
         message.Token0Address = object.Token0Address ?? "";
         message.Token1Address = object.Token1Address ?? "";
-        message.ChainName = object.ChainName ?? "";
+        message.ChainId = object.ChainId ?? 0;
         return message;
     },
 };

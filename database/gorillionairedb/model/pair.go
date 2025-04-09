@@ -8,7 +8,7 @@ type Pair struct {
 	QuoteCurrencyID   int       `json:"quote_currency_id" db:"quote_currency_id"`
 	BaseTokenAddress  string    `json:"base_token_address" db:"base_token_address"`
 	QuoteTokenAddress string    `json:"quote_token_address" db:"quote_token_address"`
-	ChainName         string    `json:"chain_name" db:"chain_name"`
+	ChainId           int       `json:"chain_id" db:"chain_id"`
 	Symbol            string    `json:"symbol" db:"symbol"`
 	PairType          string    `json:"pair_type" db:"pair_type"`
 	PoolAddress       string    `json:"pool_address" db:"pool_address"`
@@ -23,7 +23,7 @@ type PairQuery struct {
 	QuoteCurrencyID   *int
 	BaseTokenAddress  *string
 	QuoteTokenAddress *string
-	ChainName         *string
+	ChainId           *int
 	Symbol            *string
 	PairType          *string
 	PoolAddress       *string

@@ -27,7 +27,7 @@ message EnvioPriceEventBatch {
 message EnvioNewPair {
     string Token0Address = 1;
     string Token1Address = 2;
-    string ChainName = 3;
+    int32 ChainId = 3;
 }
 
 message EnvioNewPairBatch {

@@ -27,10 +27,10 @@ func NewHTTPClient(url string) *HTTPClient {
 	}
 }
 
-func (h *HTTPClient) doPost(reqURL string, values url.Values, headers map[string]string) ([]byte, error) {
+func (h *HTTPClient) doPost(reqURL string, reader io.Reader, headers map[string]string) ([]byte, error) {
 	log.Debug().Msgf("Making POST request to %s", reqURL)
 	// Create request
-	req, err := http.NewRequest("POST", reqURL, strings.NewReader(values.Encode()))
+	req, err := http.NewRequest("POST", reqURL, reader)
 	if err != nil {
 		return nil, fmt.Errorf("could not execute request! #1 (%s) on %s", err.Error(), reqURL)
 	}
@@ -52,7 +52,6 @@ func (h *HTTPClient) doGet(reqURL string, headers map[string]string) ([]byte, er
 func (h *HTTPClient) request(req *http.Request, headers map[string]string) ([]byte, error) {
 	h.limiter.Wait(context.Background())
 	for key, value := range headers {
-		log.Debug().Msgf("Setting header %s: %s", key, value)
 		req.Header.Add(key, value)
 	}
 
@@ -73,10 +72,17 @@ func (h *HTTPClient) request(req *http.Request, headers map[string]string) ([]by
 func (h *HTTPClient) Post(uri string, values url.Values, headers map[string]string) ([]byte, error) {
 	reqURL := fmt.Sprintf("%s%s", h.url, uri)
 	log.Printf("Making private API request to %s\n", reqURL)
-	resp, err := h.doPost(reqURL, values, headers)
+	reader := strings.NewReader(values.Encode())
+	resp, err := h.doPost(reqURL, reader, headers)
 	return resp, err
 }
 
+func (h *HTTPClient) QueryPost(uri string, reader io.Reader, headers map[string]string) ([]byte, error) {
+	reqURL := fmt.Sprintf("%s%s", h.url, uri)
+	log.Printf("Making private API request to %s\n", reqURL)
+	resp, err := h.doPost(reqURL, reader, headers)
+	return resp, err
+}
 func (h *HTTPClient) Get(uri string, values url.Values, headers map[string]string) ([]byte, error) {
 	reqURL := fmt.Sprintf("%s%s", h.url, uri)
 	log.Printf("Making private API request to %s\n", reqURL)
