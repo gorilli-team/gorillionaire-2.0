@@ -107,6 +107,8 @@ export async function getTradingSignal(question) {
     const chain = createTradingChain();
     const result = await chain.invoke({ question });
 
+    console.log(result);
+
     return {
       signal: result,
       context: result.context || "No context available",
@@ -124,7 +126,7 @@ export async function generateBuySignal() {
     console.log(`\n[${timestamp}] Generating trading signal...`);
 
     const answer = await getTradingSignal(
-      "Give me the best trading signal you can deduce from the context you have. Make it a BUY signal. Min Value 1 Unit. Make sure the signal is different from previous ones. Remember that both BUY and SELL signals are equally important for making money in trading. Base your signal on the actual market data and events in the context."
+      "Give me the best trading signal you can deduce from the context you have. Make it a BUY signal. Range from 1000 to 5000, always add two decimals. Like 3000.00. Min Value for Yaki is 1000 Unit. Make sure the signal is different from previous ones. Remember that both BUY and SELL signals are equally important for making money in trading. Base your signal on the actual market data and events in the context."
     );
 
     console.log(`[${timestamp}] TRADING SIGNAL:`);

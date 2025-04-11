@@ -37,6 +37,11 @@ export default function RootLayout({
           strategy="beforeInteractive"
           type="text/javascript"
         />
+        <Script
+          defer
+          src="https://cloud.umami.is/script.js"
+          data-website-id="1ac7b906-684c-46cb-95d7-f7719fb51940"
+        />
       </head>
       <body>
         <Providers>{children}</Providers>

@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { MongoClient } from "mongodb";
+import fs from "fs";
 
 const uri = process.env.MONGODB_CONNECTION_STRING;
 
@@ -76,6 +77,12 @@ export async function fetchData() {
       ...transfersDocuments.map((doc) => ({ ...doc, type: "transfer" })),
       ...pricedatasDocuments.map((doc) => ({ ...doc, type: "pricedatas" })),
     ].sort((a, b) => a.blockTimestamp - b.blockTimestamp);
+
+    //store the mergedDocuments in a file
+    fs.writeFileSync(
+      "mergedDocuments.json",
+      JSON.stringify(mergedDocuments, null, 2)
+    );
 
     const formattedData = mergedDocuments
       .map((doc) => {
