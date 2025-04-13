@@ -1,9 +1,10 @@
 go 1.24.1
 
 use (
-	./events/pkg
-	./events/envio
-	./events/database
-	./proto/gen/v1/go/proto/v1
 	./database/gorillionairedb
+	./events/database
+	./events/envio
+	./events/pkg
+	./proto/gen/v1/go/proto/v1
+	./signal/api
 )

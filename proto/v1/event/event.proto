@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package proto.event;
+
+option go_package = "github.com/gorilli/gorillionaire-2.0/proto/v1/event";
+
+service EventService {
+    rpc Subscribe(SubscribeRequest) returns (stream SubscribeResponse) {}
+}
+
+message SubscribeRequest {
+    string signal_id = 1;
+}
+
+message SignalEvent {
+    string signal_id = 1;
+    string event_type = 2;
+    string event_data = 3;
+    string created_at = 4;
+}
+
+message SubscribeResponse {
+    string signal_id = 1;
+    string event_type = 2;
+    string event_data = 3;
+    string created_at = 4;
+}
+

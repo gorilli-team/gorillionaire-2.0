@@ -3,20 +3,19 @@ package query
 import (
 	"context"
 
-	gorillionairedb "github.com/gorilli/gorillionaire-2.0/database/gorillionairedb/db"
 	"github.com/gorilli/gorillionaire-2.0/database/gorillionairedb/model"
 )
 
-func AddPair(ctx context.Context, db *gorillionairedb.DB, pair *model.Pair) error {
+func (q *Query) AddPair(ctx context.Context, pair *model.Pair) error {
 	query := `
 		INSERT INTO pairs (base_currency_id, quote_currency_id, base_token_address, quote_token_address, chain_name, symbol, pair_type, pool_address, fee_percent, is_active)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 	`
-	_, err := db.Exec(ctx, query, pair.BaseCurrencyID, pair.QuoteCurrencyID, pair.BaseTokenAddress, pair.QuoteTokenAddress, pair.ChainId, pair.Symbol, pair.PairType, pair.PoolAddress, pair.FeePercent, pair.IsActive)
+	_, err := q.db.Exec(ctx, query, pair.BaseCurrencyID, pair.QuoteCurrencyID, pair.BaseTokenAddress, pair.QuoteTokenAddress, pair.ChainId, pair.Symbol, pair.PairType, pair.PoolAddress, pair.FeePercent, pair.IsActive)
 	return err
 }
 
-func AddPairBatch(ctx context.Context, db *gorillionairedb.DB, pairs []*model.Pair) error {
+func (q *Query) AddPairBatch(ctx context.Context, pairs []*model.Pair) error {
 	query := `
 		INSERT INTO pairs (base_currency_id, quote_currency_id, base_token_address, quote_token_address, chain_name, symbol, pair_type, pool_address, fee_percent, is_active)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
@@ -34,15 +33,15 @@ func AddPairBatch(ctx context.Context, db *gorillionairedb.DB, pairs []*model.Pa
 		args[i*10+8] = pair.FeePercent
 		args[i*10+9] = pair.IsActive
 	}
-	_, err := db.Exec(ctx, query, args...)
+	_, err := q.db.Exec(ctx, query, args...)
 	return err
 }
 
-func GetPair(db *gorillionairedb.DB, pairQuery *model.PairQuery) (*[]model.Pair, error) {
+func (q *Query) GetPair(ctx context.Context, pairQuery *model.PairQuery) (*[]model.Pair, error) {
 	query := `
 		SELECT * FROM pairs WHERE base_currency_id = $1 AND quote_currency_id = $2 AND base_token_address = $3 AND quote_token_address = $4 AND chain_name = $5 AND symbol = $6 AND pair_type = $7 AND pool_address = $8 AND fee_percent = $9 AND is_active = $10
 	`
-	rows, err := db.Query(query, pairQuery.BaseCurrencyID, pairQuery.QuoteCurrencyID, pairQuery.BaseTokenAddress, pairQuery.QuoteTokenAddress, pairQuery.ChainId, pairQuery.Symbol, pairQuery.PairType, pairQuery.PoolAddress, pairQuery.FeePercent, pairQuery.IsActive)
+	rows, err := q.db.Query(ctx, query, pairQuery.BaseCurrencyID, pairQuery.QuoteCurrencyID, pairQuery.BaseTokenAddress, pairQuery.QuoteTokenAddress, pairQuery.ChainId, pairQuery.Symbol, pairQuery.PairType, pairQuery.PoolAddress, pairQuery.FeePercent, pairQuery.IsActive)
 	if err != nil {
 		return nil, err
 	}

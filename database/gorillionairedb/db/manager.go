@@ -1,4 +1,4 @@
-package gorillionairedb
+package db
 
 // import (
 // 	"context"

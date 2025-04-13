@@ -1,23 +1,29 @@
 -- +goose Up
 CREATE SCHEMA IF NOT EXISTS gorillionaire;
+CREATE OR REPLACE FUNCTION generate_objectid() RETURNS TEXT AS $$ SELECT lower(lpad(to_hex(EXTRACT(EPOCH FROM clock_timestamp())::int), 8, '0') || lpad(to_hex(floor(random() * 100000000)::int), 16, '0')); $$ LANGUAGE sql;
 
--- Create the events table
-CREATE SCHEMA IF NOT EXISTS gorillionaire;
+CREATE TABLE IF NOT EXISTS gorillionaire.users (
+    id SERIAL PRIMARY KEY,
+    company_name VARCHAR(100),
+    company_website_url TEXT,
+    active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
 
+CREATE TABLE IF NOT EXISTS gorillionaire.api_keys (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    api_key VARCHAR(100) UNIQUE NOT NULL,
+    active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
 
-			Address:           tokenAddress,
-			Decimals:          tokenDecimals,
-			Symbol:            tokenInfo["symbol"].(string),
-			Name:              tokenInfo["name"].(string),
-			ImageBannerUrl:    tokenInfo["imageBannerUrl"].(string),
-			TotalSupply:       tokenInfo["totalSupply"].(string),
-			Description:       tokenInfo["description"].(string),
-			CirculatingSupply: tokenInfo["circulatingSupply"].(string),
-			IsScam:            tokenMap["isScam"].(bool),
-			NetworkId:         tokenMap["networkId"].(int),
-			CodexId:           tokenMap["id"].(string),
-			CoinMarketCapId:   tokenInfo["cmcId"].(string),
-			CreatorAddress:    tokenInfo["creatorAddress"].(string),
+    CONSTRAINT fk_user
+        FOREIGN KEY (user_id)
+        REFERENCES gorillionaire.users(id)
+        ON DELETE CASCADE
+);
 
 CREATE TABLE IF NOT EXISTS gorillionaire.currency (
     id SERIAL PRIMARY KEY,
@@ -81,6 +87,16 @@ CREATE TABLE IF NOT EXISTS gorillionaire.pairs (
         FOREIGN KEY (quote_currency_id)
         REFERENCES gorillionaire.currency(id)
         ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS gorillionaire.signals (
+    id SERIAL PRIMARY KEY,
+    signal TEXT DEFAULT generate_objectid() NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS gorillionaire.events (

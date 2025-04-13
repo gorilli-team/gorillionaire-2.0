@@ -17,9 +17,9 @@ then
 fi
 
 # Set the paths for the output directories
-GO_OUT_DIR="./gen/v1/go/proto"
-PYTHON_OUT_DIR="./gen/v1/python/proto"
-TYPESCRIPT_OUT_DIR="./gen/v1/typescript/proto"
+GO_OUT_DIR="./gen/go/proto"
+PYTHON_OUT_DIR="./gen/python/proto"
+TYPESCRIPT_OUT_DIR="./gen/typescript/proto"
 
 # Ensure the output directories exist
 mkdir -p $GO_OUT_DIR
@@ -28,27 +28,26 @@ mkdir -p $TYPESCRIPT_OUT_DIR
 
 # Generate Go code
 echo "Generating Go code..."
-protoc \
-    --go_out=$GO_OUT_DIR \
-    --go_opt=paths=source_relative \
-    --go_opt=Mv1/envio/envio.proto=github.com/gorilli/gorillionaire-2.0/gen/v1/go/proto/envio \
-    ./v1/envio/envio.proto
+find ./v1 -name "*.proto" | xargs protoc \
+  --go_out=$GO_OUT_DIR \
+  --go_opt=paths=source_relative \
+  --go_opt=Mv1/=github.com/gorilli/gorillionaire-2.0/gen/v1/go/proto/
 
 # Generate Python code
 echo "Generating Python code..."
-protoc --python_out=$PYTHON_OUT_DIR ./v1/envio/envio.proto
+find ./v1 -name "*.proto" | xargs protoc \
+    --python_out=$PYTHON_OUT_DIR
 
 # Generate TypeScript code using ts-proto
 echo "Generating TypeScript code..."
-protoc \
+find ./v1 -name "*.proto" | xargs protoc \
     --plugin=protoc-gen-ts_proto=./node_modules/.bin/protoc-gen-ts_proto \
     --ts_proto_out=$TYPESCRIPT_OUT_DIR \
-    --ts_proto_opt=outputServices=grpc-web,env=node,esModuleInterop=true,outputClientImpl=grpc-web,outputServices=nice-grpc,useOptionals=messages,exportCommonSymbols=false,useDate=true,useExactTypes=false,stringEnums=true,outputJsonMethods=true,outputPartial=true,onlyTypes=false \
-    ./v1/envio/envio.proto
+    --ts_proto_opt=outputServices=grpc-web,env=node,esModuleInterop=true,outputClientImpl=grpc-web,outputServices=nice-grpc,useOptionals=messages,exportCommonSymbols=false,useDate=true,useExactTypes=false,stringEnums=true,outputJsonMethods=true,outputPartial=true,onlyTypes=false
 
 # Compile TypeScript to JavaScript
-echo "Compiling TypeScript to JavaScript..."
-cd $TYPESCRIPT_OUT_DIR
-tsc --project tsconfig.json
+# echo "Compiling TypeScript to JavaScript..."
+# cd $TYPESCRIPT_OUT_DIR
+# tsc --project tsconfig.json
 
 echo "Protobuf files generated successfully."

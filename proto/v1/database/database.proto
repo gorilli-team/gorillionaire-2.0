@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package proto.database;
+
+option go_package = "github.com/gorilli/gorillionaire-2.0/gen/v1/go/proto/database";
+
+message Signal {
+    int32 id = 1;
+    string signal = 2;
+    string name = 3;
+    string description = 4;
+    bool active = 5;
+}
+
+message SignalList {
+    repeated Signal signals = 1;
+}
