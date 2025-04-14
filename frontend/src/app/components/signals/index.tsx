@@ -159,7 +159,6 @@ const Signals = () => {
         `${process.env.NEXT_PUBLIC_API_URL}/token/holders/user/${user.wallet.address}`
       );
       const data = await response.json();
-      console.log("Token holders:", data);
 
       if (
         data.code === 0 &&
@@ -291,7 +290,6 @@ const Signals = () => {
         `${process.env.NEXT_PUBLIC_API_URL}/trade/completed`
       );
       const data: ApiTrade[] = await response.json();
-      console.log("Completed trades response:", data);
 
       const formattedTrades = data.map((trade: ApiTrade) => ({
         user: trade.userAddress,
@@ -565,8 +563,6 @@ const Signals = () => {
     },
     [tradeSignals, selectedOptions, onYes, onNo, tokens, user?.wallet?.address]
   );
-
-  console.log("object tokens", tokens);
 
   if (isLoading) {
     return <LoadingOverlay />;
