@@ -1,12 +1,33 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import Sidebar from "@/app/components/sidebar";
 import Header from "@/app/components/header";
+import { useAccount, useReadContract, useWriteContract } from "wagmi";
+import { abi } from "../abi/early-nft";
 
 const V2Page = () => {
+  const { address } = useAccount();
   const [selectedPage, setSelectedPage] = useState("V2");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { writeContract } = useWriteContract();
+  const { data } = useReadContract({
+    abi,
+    functionName: "balanceOf",
+    address: "0xD0f38A3Fb0F71e3d2B60e90327afde25618e1150",
+    args: [address || "0x0"],
+  });
+
+  const disabled = useMemo(() => (data ?? 0) > 0, [data]);
+
+  const onClick = useCallback(async () => {
+    if (disabled) return;
+    writeContract({
+      abi,
+      functionName: "mint",
+      address: "0xD0f38A3Fb0F71e3d2B60e90327afde25618e1150",
+    });
+  }, [writeContract, disabled]);
 
   return (
     <div className="flex h-screen bg-gray-100 text-gray-800">
@@ -120,7 +141,11 @@ const V2Page = () => {
                 </p>
               </div>
               <div className="mt-6 flex justify-center">
-                <button className="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-6 rounded-lg transition-colors">
+                <button
+                  onClick={onClick}
+                  disabled={disabled}
+                  className="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-6 rounded-lg transition-colors"
+                >
                   Mint Now
                 </button>
               </div>
