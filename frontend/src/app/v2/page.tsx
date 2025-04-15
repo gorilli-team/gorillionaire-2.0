@@ -105,16 +105,20 @@ const V2Page = () => {
                   </p>
                 </div>
               </div>
-            </div>
-
-            {/* NFT Section */}
-            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-              <h2 className="text-xl font-semibold mb-4">
+              <h2 className="text-xl font-semibold mb-4 mt-6">
                 Limited Spots Available
               </h2>
-              <p className="text-gray-700 mb-4">
-                Mint your NFT to secure your spot in our exclusive waiting list.
-              </p>
+              <div className="bg-indigo-50 p-4 rounded-lg mb-6">
+                <p className="text-gray-700 mb-4">
+                  Mint your NFT to secure your spot in our exclusive waiting
+                  list.
+                </p>
+
+                <p className="text-gray-600 mb-4">
+                  This is your opportunity to be among the first to experience
+                  the future of trading.
+                </p>
+              </div>
               <div className="mt-6 flex justify-center">
                 <button className="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-6 rounded-lg transition-colors">
                   Mint Now
