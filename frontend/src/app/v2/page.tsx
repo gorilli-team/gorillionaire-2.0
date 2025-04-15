@@ -73,6 +73,7 @@ const V2Page = () => {
             <h1 className="text-3xl font-bold mb-6 text-gray-800">
               Gorillionaire V2 🦍
             </h1>
+
             <div className="bg-white rounded-lg shadow-md p-6 mb-6">
               <h2 className="text-xl font-semibold mb-4">Coming Soon</h2>
               <p className="text-gray-700 mb-4">
@@ -124,6 +125,17 @@ const V2Page = () => {
                   Mint Now
                 </button>
               </div>
+            </div>
+
+            {/* V2 Image */}
+            <div className="mb-8 flex justify-center">
+              <img
+                src="/v2.png"
+                alt="Gorillionaire V2"
+                className="rounded-lg shadow-lg max-w-full h-auto"
+                width="1200"
+                height="675"
+              />
             </div>
           </div>
         </div>
