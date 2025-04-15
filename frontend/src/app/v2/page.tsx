@@ -18,16 +18,16 @@ const V2Page = () => {
     args: [address || "0x0"],
   });
 
-  const disabled = useMemo(() => (data ?? 0) > 0, [data]);
+  const alreadyMinted = useMemo(() => (data ?? 0) > 0, [data]);
 
   const onClick = useCallback(async () => {
-    if (disabled) return;
+    if (alreadyMinted) return;
     writeContract({
       abi,
       functionName: "mint",
       address: "0xD0f38A3Fb0F71e3d2B60e90327afde25618e1150",
     });
-  }, [writeContract, disabled]);
+  }, [writeContract, alreadyMinted]);
 
   return (
     <div className="flex h-screen bg-gray-100 text-gray-800">
@@ -144,10 +144,14 @@ const V2Page = () => {
               <div className="mt-6 flex justify-center">
                 <button
                   onClick={onClick}
-                  disabled={disabled}
-                  className="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-6 rounded-lg transition-colors"
+                  disabled={alreadyMinted}
+                  className={`${
+                    alreadyMinted
+                      ? "bg-green-600"
+                      : "bg-purple-600 hover:bg-purple-700 cursor-pointer"
+                  } text-white font-medium py-2 px-6 rounded-lg transition-colors `}
                 >
-                  Mint Now
+                  {alreadyMinted ? "NFT Minted" : "Mint Now"}
                 </button>
               </div>
             </div>
