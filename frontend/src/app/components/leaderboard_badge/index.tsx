@@ -41,10 +41,10 @@ const LeaderboardBadge: React.FC = () => {
   if (!authenticated || !positionUser) return null;
 
   return (
-    <div className="flex flex-wrap items-center bg-white border border-gray-300 rounded-2xl px-4 py-2 shadow-sm gap-4 max-w-full">
+    <div className="flex flex-wrap items-center bg-white border border-gray-300 rounded-2xl px-4 py-2 shadow-sm gap-2 md:gap-4 max-w-full">
       {/* Avatar + Address */}
-      <div className="flex items-center gap-2">
-        <div className="w-7 h-7 rounded-full overflow-hidden">
+      <div className="flex items-center gap-2 min-w-0 flex-shrink">
+        <div className="w-7 h-7 rounded-full overflow-hidden flex-shrink-0">
           <Image
             src={positionUser.avatarSrc}
             alt="avatar"
@@ -53,13 +53,13 @@ const LeaderboardBadge: React.FC = () => {
             className="object-cover"
           />
         </div>
-        <span className="text-sm font-semibold text-gray-900 break-all">
+        <span className="text-sm font-semibold text-gray-900 truncate max-w-[120px] md:max-w-[200px]">
           {positionUser.address}
         </span>
       </div>
 
       {/* Rank */}
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 flex-shrink-0">
         <Image src="/first-place.svg" alt="rank" width={16} height={16} />
         <span className="text-sm font-medium text-gray-800">
           {positionUser.rank}
@@ -74,7 +74,7 @@ const LeaderboardBadge: React.FC = () => {
       </div>
 
       {/* Points */}
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 flex-shrink-0">
         <Image src="/star.svg" alt="points" width={16} height={16} />
         <span className="text-sm font-medium text-gray-800">
           {positionUser.points} pts

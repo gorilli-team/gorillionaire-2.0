@@ -127,35 +127,38 @@ export default function Header() {
       try {
         const message = JSON.parse(event.data) as Notification;
         console.log("WebSocket notification received:", message);
-        
+
         // Debug logging to see the address comparison
         const notificationAddress = message.data?.data?.userAddress;
         console.log("Notification address:", notificationAddress);
         console.log("Current user address:", userAddress);
-        
+
         if (
-          message.type === "NOTIFICATION" && 
-          notificationAddress && userAddress &&
+          message.type === "NOTIFICATION" &&
+          notificationAddress &&
+          userAddress &&
           notificationAddress.toLowerCase() === userAddress.toLowerCase()
         ) {
           // Extract relevant data
           const { action, tokenAmount, tokenPrice, tokenSymbol } =
             message.data.data || {};
-          
+
           console.log("Address match, showing notification");
-          
+
           // Choose emoji based on action
           const actionEmoji = action === "buy" ? "💰" : "💸";
-          
+
           // Format the message for notification - using const instead of let
           const notificationMessage = `${actionEmoji} ${action?.toUpperCase()} ${tokenAmount} ${tokenSymbol} @ $${
             tokenPrice ? tokenPrice.toFixed(2) : "N/A"
           }`;
-          
+
           // Show toast notification with formatted message
           showCustomNotification(notificationMessage, "Trade Signal");
         } else {
-          console.log("Not showing notification, address doesn't match or not a notification type");
+          console.log(
+            "Not showing notification, address doesn't match or not a notification type"
+          );
         }
       } catch (error) {
         console.error("Error processing WebSocket message:", error);
@@ -237,10 +240,32 @@ export default function Header() {
         {/* Left space for mobile hamburger menu */}
         <div className="w-8 h-8 lg:hidden"></div>
 
-        <div className="flex items-center justify-end space-x-4 flex-1 my-3 ml-auto">
+        <div className="flex flex-wrap items-center justify-end space-x-4 flex-1 my-3 ml-auto">
           <div className="hidden md:block">
             <LeaderboardBadge />
           </div>
+          <a
+            href="https://t.me/monadsignals"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition-colors w-[240px]"
+            aria-label="Join our Telegram Channel for Real-time Trading Events"
+          >
+            <svg
+              className="w-5 h-5"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18 1.897-.962 6.502-1.359 8.627-.168.9-.5 1.201-.82 1.23-.697.064-1.226-.461-1.901-.903-1.056-.692-1.653-1.123-2.678-1.799-1.185-.781-.417-1.21.258-1.911.177-.184 3.247-2.977 3.307-3.23.007-.032.015-.15-.056-.212s-.041-.041-.249-.024c-.106.024-1.793 1.139-5.062 3.345-.479.329-.913.489-1.302.481-.428-.009-1.252-.241-1.865-.44-.751-.244-1.349-.374-1.297-.789.027-.216.324-.437.893-.663 3.498-1.524 5.831-2.529 6.998-3.015 3.333-1.386 4.025-1.627 4.477-1.635.099-.002.321.023.465.141.119.098.152.228.166.331.016.122.037.384.021.591z" />
+            </svg>
+            <div className="flex flex-col items-start text-sm">
+              <span className="font-medium">Join Telegram Channel</span>
+              <span className="text-xs opacity-90">
+                Get Real-time Trading Events
+              </span>
+            </div>
+          </a>
 
           {monPriceFormatted !== "0.00" && (
             <div

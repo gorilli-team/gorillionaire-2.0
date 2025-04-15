@@ -44,6 +44,13 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <div className="bg-purple-700 text-white py-2 text-center font-medium">
+          🚀 Gorillionaire v2 is coming soon!{" "}
+          <a href="/v2" className="underline font-bold hover:text-gray-200">
+            Check it out
+          </a>{" "}
+          to see what&apos;s new.
+        </div>
         <Providers>{children}</Providers>
         <Script
           id="crate-widget"

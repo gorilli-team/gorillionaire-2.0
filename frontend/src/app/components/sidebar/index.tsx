@@ -23,7 +23,7 @@ export default function Sidebar({
   };
 
   return (
-    <aside className="w-64 text-gray-800 flex flex-col bg-white h-screen sticky top-0 border-r border-gray-200 overflow-hidden">
+    <aside className="w-64 text-gray-800 flex flex-col bg-white h-screen sticky top-0 border-r border-gray-200 overflow-y-auto">
       <div
         className="h-16 text-xl font-bold flex items-center ps-6 lg:ps-6 cursor-pointer"
         onClick={handleGorillionaireClick}
@@ -82,11 +82,22 @@ export default function Sidebar({
               <span>Agents</span>
             </button>
           </li>
+          <li>
+            <button
+              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
+                selectedPage === "V2" ? "bg-gray-200" : ""
+              }`}
+              onClick={() => handlePageChange("V2")}
+            >
+              <i className="fa-solid fa-rocket pr-2"></i>
+              <span>V2 🦍</span>
+            </button>
+          </li>
         </ul>
       </nav>
 
       {/* Footer */}
-      <div className="border-t border-gray-200 p-4">
+      <div className="border-t border-gray-200 p-4 mb-16">
         <ul className="space-y-2">
           <li>
             <a
