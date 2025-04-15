@@ -865,7 +865,7 @@ const Signals = () => {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2">
-                      {signal.events.slice(0, 4).map((event, idx) => (
+                      {signal.events.slice(0, 2).map((event, idx) => (
                         <div
                           key={idx}
                           className="text-xs bg-gray-100 px-2 py-1 rounded-full whitespace-normal break-words"
@@ -933,7 +933,7 @@ const Signals = () => {
                       )}
                     </div>
                     <div className="flex flex-wrap items-center gap-2 mt-3">
-                      {signal.events.slice(0, 4).map((event, idx) => (
+                      {signal.events.slice(0, 2).map((event, idx) => (
                         <div
                           key={idx}
                           className="text-xs bg-gray-100 px-2 py-1 rounded-full whitespace-normal break-words"
