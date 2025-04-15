@@ -76,7 +76,7 @@ const V2Page = () => {
             <div className="bg-white rounded-lg shadow-md p-6 mb-6">
               <h2 className="text-xl font-semibold mb-4">Coming Soon</h2>
               <p className="text-gray-700 mb-4">
-                We're working hard on bringing you an even better Gorillionaire
+                We are working hard on bringing you an even better Gorillionaire
                 experience. Stay tuned for updates!
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
@@ -104,6 +104,21 @@ const V2Page = () => {
                     Faster and more reliable platform
                   </p>
                 </div>
+              </div>
+            </div>
+
+            {/* NFT Section */}
+            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+              <h2 className="text-xl font-semibold mb-4">
+                Limited Spots Available
+              </h2>
+              <p className="text-gray-700 mb-4">
+                Mint your NFT to secure your spot in our exclusive waiting list.
+              </p>
+              <div className="mt-6 flex justify-center">
+                <button className="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-6 rounded-lg transition-colors">
+                  Mint Now
+                </button>
               </div>
             </div>
           </div>
