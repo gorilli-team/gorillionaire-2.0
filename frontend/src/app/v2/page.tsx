@@ -1,13 +1,17 @@
 "use client";
 
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState, useEffect } from "react";
 import Sidebar from "@/app/components/sidebar";
 import Header from "@/app/components/header";
 import { useAccount, useReadContract, useWriteContract } from "wagmi";
 import { abi } from "../abi/early-nft";
+import { toast } from "react-toastify";
+import { MONAD_CHAIN_ID } from "../utils/constants";
+import { usePrivy } from "@privy-io/react-auth";
 
 const V2Page = () => {
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
+  const { login } = usePrivy();
   const [selectedPage, setSelectedPage] = useState("V2");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { writeContract } = useWriteContract();
@@ -17,17 +21,84 @@ const V2Page = () => {
     address: "0xD0f38A3Fb0F71e3d2B60e90327afde25618e1150",
     args: [address || "0x0"],
   });
+  const [chainId, setChainId] = useState<number | null>(null);
 
   const alreadyMinted = useMemo(() => (data ?? 0) > 0, [data]);
 
   const onClick = useCallback(async () => {
     if (alreadyMinted) return;
+
+    // First, check if wallet is connected
+    if (!isConnected) {
+      login();
+      return;
+    }
+
+    // Then check if we're on Monad network
+    if (chainId === null) {
+      toast.error("Unable to determine network. Please try again.", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      return;
+    }
+
+    if (chainId !== MONAD_CHAIN_ID) {
+      toast.error("Please switch to Monad network to continue", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      return;
+    }
+
+    // Proceed with minting
     writeContract({
       abi,
       functionName: "mint",
       address: "0xD0f38A3Fb0F71e3d2B60e90327afde25618e1150",
     });
-  }, [writeContract, alreadyMinted]);
+  }, [writeContract, alreadyMinted, chainId, isConnected, login]);
+
+  // Get the current chain ID
+  useEffect(() => {
+    const getChainId = async () => {
+      if (typeof window !== "undefined" && window.ethereum) {
+        try {
+          const chainId = await window.ethereum.request({
+            method: "eth_chainId",
+          });
+          setChainId(parseInt(chainId, 16));
+        } catch (error) {
+          console.error("Error getting chain ID:", error);
+        }
+      }
+    };
+
+    getChainId();
+
+    // Listen for chain changes
+    if (typeof window !== "undefined" && window.ethereum) {
+      window.ethereum.on("chainChanged", (chainId: string) => {
+        setChainId(parseInt(chainId, 16));
+      });
+    }
+
+    return () => {
+      if (typeof window !== "undefined" && window.ethereum) {
+        window.ethereum.removeListener("chainChanged", () => {});
+      }
+    };
+  }, []);
 
   return (
     <div className="flex h-screen bg-gray-100 text-gray-800">

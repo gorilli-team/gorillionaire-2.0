@@ -7,6 +7,7 @@ import {
   useConfig,
   useSignTypedData,
   useSendTransaction,
+  useChainId,
 } from "wagmi";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import { concat, erc20Abi, numberToHex, parseUnits, size } from "viem";
@@ -136,6 +137,7 @@ const Signals = () => {
   const { signTypedDataAsync } = useSignTypedData();
   const { sendTransactionAsync } = useSendTransaction();
   const wagmiConfig = useConfig();
+  const chainId = useChainId();
 
   const [moyakiBalance, setMoyakiBalance] = useState<number>(0);
   const [chogBalance, setChogBalance] = useState<number>(0);
@@ -371,6 +373,20 @@ const Signals = () => {
     async (token: Token, amount: number, type: "Buy" | "Sell") => {
       if (!user?.wallet?.address) return;
 
+      // Check if we're on Monad network
+      if (chainId !== MONAD_CHAIN_ID) {
+        toast.error("Please switch to Monad network to continue", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+        return;
+      }
+
       console.log("token & amount", token, amount);
 
       // for sells we need to convert percentage to amount, for buys change gets handled backend/side
@@ -425,6 +441,7 @@ const Signals = () => {
           gasPrice: quote?.transaction.gasPrice
             ? BigInt(quote.transaction.gasPrice)
             : undefined,
+          chainId: MONAD_CHAIN_ID,
         });
 
         await waitForTransactionReceipt(wagmiConfig, {
@@ -521,6 +538,7 @@ const Signals = () => {
       signTypedDataAsync,
       wagmiConfig,
       writeContractAsync,
+      chainId,
     ]
   );
 

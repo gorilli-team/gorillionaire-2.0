@@ -13,6 +13,8 @@ import { parseEther } from "viem";
 import { NFT_ACCESS_ADDRESS } from "../../utils/constants";
 import ACCESS_NFT_ABI from "../../../../../access-nft/abi/AccessNFTAbi.json";
 import Image from "next/image";
+import { toast } from "react-toastify";
+import { MONAD_CHAIN_ID } from "../../utils/constants";
 type Holder = {
   ownerAddress: string;
 };
@@ -30,6 +32,7 @@ type Signal = {
 const Agents = () => {
   const { isConnected, address } = useAccount();
   const { login } = usePrivy();
+  const [chainId, setChainId] = useState<number | null>(null);
   const [isMinting, setIsMinting] = useState(false);
   const [mintSuccess, setMintSuccess] = useState(false);
   const [hasNFT, setHasNFT] = useState(false);
@@ -90,19 +93,50 @@ const Agents = () => {
           );
         }
 
-        const data = await response.json();
+        // Check if the response has content
+        const text = await response.text();
+        if (!text || text.trim() === "") {
+          console.warn("Empty response received from holders API");
+          setHolders([]);
+          return;
+        }
+
+        // Try to parse the JSON
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (parseError) {
+          console.error("Error parsing JSON response:", parseError);
+          console.log("Raw response:", text);
+          setHolders([]);
+          return;
+        }
+
         console.log("Holders data:", data);
-        setHolders(data.result.data);
-        if (data.result.data.length > 0) {
-          data.result.data.forEach((holder: Holder) => {
-            if (holder.ownerAddress === address) {
-              setHasNFT(true);
-              setMintSuccess(true);
-            }
-          });
+
+        // Check if data has the expected structure
+        if (
+          data &&
+          data.result &&
+          data.result.data &&
+          Array.isArray(data.result.data)
+        ) {
+          setHolders(data.result.data);
+          if (data.result.data.length > 0) {
+            data.result.data.forEach((holder: Holder) => {
+              if (holder.ownerAddress === address) {
+                setHasNFT(true);
+                setMintSuccess(true);
+              }
+            });
+          }
+        } else {
+          console.warn("Unexpected data structure from holders API:", data);
+          setHolders([]);
         }
       } catch (error) {
         console.error("Error fetching holders:", error);
+        setHolders([]);
       }
     };
     fetchHolders();
@@ -119,6 +153,37 @@ const Agents = () => {
       setErrorMessage(error.message || "Transaction failed. Please try again.");
     }
   }, [isConfirming, isConfirmed, error]);
+
+  // Get the current chain ID
+  useEffect(() => {
+    const getChainId = async () => {
+      if (typeof window !== "undefined" && window.ethereum) {
+        try {
+          const chainId = await window.ethereum.request({
+            method: "eth_chainId",
+          });
+          setChainId(parseInt(chainId, 16));
+        } catch (error) {
+          console.error("Error getting chain ID:", error);
+        }
+      }
+    };
+
+    getChainId();
+
+    // Listen for chain changes
+    if (typeof window !== "undefined" && window.ethereum) {
+      window.ethereum.on("chainChanged", (chainId: string) => {
+        setChainId(parseInt(chainId, 16));
+      });
+    }
+
+    return () => {
+      if (typeof window !== "undefined" && window.ethereum) {
+        window.ethereum.removeListener("chainChanged", () => {});
+      }
+    };
+  }, []);
 
   const fetchSignals = async () => {
     setIsLoadingSignals(true);
@@ -150,6 +215,33 @@ const Agents = () => {
   const handleMint = () => {
     if (!isConnected) {
       login();
+      return;
+    }
+
+    // Check if we're on Monad network
+    if (chainId === null) {
+      toast.error("Unable to determine network. Please try again.", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      return;
+    }
+
+    if (chainId !== MONAD_CHAIN_ID) {
+      toast.error("Please switch to Monad network to continue", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
       return;
     }
 
