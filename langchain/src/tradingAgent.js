@@ -15,7 +15,7 @@ import { MongoClient } from "mongodb";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const SUPABASE_API_KEY = process.env.SUPABASE_API_KEY;
 const SUPABASE_URL = process.env.SUPABASE_URL_GORILLIONAIRE;
-const POLLING_INTERVAL = 15 * 60 * 1000; // 15 minutes
+const POLLING_INTERVAL = 60 * 60 * 1000; // 1 hour
 const MAX_DOCUMENTS = 500; // Limit to prevent crashes
 
 // Templates for prompts
@@ -472,15 +472,14 @@ export async function getTradingSignal(question) {
   }
 }
 
-export async function generateSignal() {
+export async function generateBuySignal() {
   const timestamp = new Date().toISOString();
 
   try {
     console.log(`\n[${timestamp}] Generating trading signal...`);
 
-    // Generate a single trading signal without specifying BUY or SELL
     const answer = await getTradingSignal(
-      "Give me the best trading signal you can deduce from the context you have. Make it either a BUY or SELL signal based on what makes the most sense given the current market data. For BUY signals, specify a nominal value with two decimals (like 3000.00). For SELL signals, specify a percentage of tokens to sell. Provide a signal with a high confidence score. Base your signal on the actual market data and events in the context."
+      "Give me the best trading signal you can deduce from the context you have. Make it a BUY signal. Range from 1000 to 5000, always add two decimals. Like 3000.00. Min Value for Yaki is 1000 Unit. Make sure the signal is different from previous ones. Remember that both BUY and SELL signals are equally important for making money in trading. Base your signal on the actual market data and events in the context."
     );
 
     console.log(`[${timestamp}] TRADING SIGNAL:`);
@@ -488,14 +487,30 @@ export async function generateSignal() {
     console.log(answer.signal.answer);
     console.log("-".repeat(50));
     console.log(`Token: ${answer.tokenSymbol}`);
-    console.log(`Action: ${answer.parsedSignal.action}`);
-    console.log(`Confidence: ${answer.parsedSignal.confidence}`);
     console.log("-".repeat(50));
-
-    return answer;
   } catch (error) {
     console.error(`[${timestamp}] Error generating signal:`, error);
-    throw error;
+  }
+}
+
+export async function generateSellSignal() {
+  const timestamp = new Date().toISOString();
+
+  try {
+    console.log(`\n[${timestamp}] Generating trading signal...`);
+
+    const answer = await getTradingSignal(
+      "Give me the best trading signal you can deduce from the context you have. Make it a SELL signal. Make sure the signal is different from previous ones. Remember that both BUY and SELL signals are equally important for making money in trading. Base your signal on the actual market data and events in the context."
+    );
+
+    console.log(`[${timestamp}] TRADING SIGNAL:`);
+    console.log("-".repeat(50));
+    console.log(answer.signal.answer);
+    console.log("-".repeat(50));
+    console.log(`Token: ${answer.tokenSymbol}`);
+    console.log("-".repeat(50));
+  } catch (error) {
+    console.error(`[${timestamp}] Error generating signal:`, error);
   }
 }
 
@@ -538,19 +553,22 @@ export function startSignalPolling(interval = POLLING_INTERVAL) {
     } seconds`
   );
 
-  // Generate a single signal (either BUY or SELL) based on market conditions
-  generateSignal();
-  const intervalId = setInterval(generateSignal, interval);
+  generateBuySignal();
+  const intervalId = setInterval(generateBuySignal, interval);
+  generateSellSignal();
+  const intervalId2 = setInterval(generateSellSignal, interval);
 
   process.on("SIGINT", () => {
     console.log("\nStopping trading signal generator...");
     clearInterval(intervalId);
+    clearInterval(intervalId2);
     process.exit(0);
   });
 
   process.on("SIGTERM", () => {
     console.log("\nStopping trading signal generator...");
     clearInterval(intervalId);
+    clearInterval(intervalId2);
     process.exit(0);
   });
 }
