@@ -15,7 +15,8 @@ import { MongoClient } from "mongodb";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const SUPABASE_API_KEY = process.env.SUPABASE_API_KEY;
 const SUPABASE_URL = process.env.SUPABASE_URL_GORILLIONAIRE;
-const POLLING_INTERVAL = 60 * 60 * 1000; // 1 hour
+const POLLING_INTERVAL = 15 * 60 * 1000; // 15 minutes
+const MAX_DOCUMENTS = 500; // Limit to prevent crashes
 
 // Templates for prompts
 const TEMPLATE_CHOG = {
@@ -74,10 +75,24 @@ answer:`,
 };
 
 function combineDocuments(docs) {
+  // Handle null or undefined docs
+  if (!docs) return "";
+
+  // If docs is not an array, make it one
+  if (!Array.isArray(docs)) {
+    console.log("Warning: docs is not an array in combineDocuments");
+    if (docs.pageContent) {
+      return docs.pageContent;
+    }
+    return "";
+  }
+
+  // Normal array processing
   const combinedDocs = docs.map((doc) => doc.pageContent).join("\n\n");
   return combinedDocs;
 }
 
+// Fixed initializeServices function with proper retriever implementation
 function initializeServices() {
   const embeddings = new OpenAIEmbeddings({ openAIApiKey: OPENAI_API_KEY });
   const llm = new ChatOpenAI({
@@ -86,13 +101,71 @@ function initializeServices() {
   });
 
   const client = createClient(SUPABASE_URL, SUPABASE_API_KEY);
+
+  // Create the standard vector store
   const vectorStore = new SupabaseVectorStore(embeddings, {
     client,
     tableName: "documents",
     queryName: "match_documents",
   });
 
-  const retriever = vectorStore.asRetriever(4); // Increased from 2 to 4 for better context
+  // Create a wrapper retriever that limits to the most recent documents
+  const retriever = {
+    getRelevantDocuments: async (query) => {
+      try {
+        console.log(`Running retrieval for query: ${query}`);
+        // Get the k most relevant documents
+        const k = 4; // Number of documents to retrieve
+
+        // First check how many documents we have in total
+        console.log("Checking document count...");
+        let count = 0;
+        try {
+          const result = await client
+            .from("documents")
+            .select("*", { count: "exact", head: true });
+
+          count = result.count || 0;
+          console.log(`Total documents in database: ${count}`);
+        } catch (countError) {
+          console.error("Error getting document count:", countError);
+          // Proceed with standard retrieval
+          return await vectorStore.similaritySearch(query, k);
+        }
+
+        // If we have more than MAX_DOCUMENTS, we need to limit
+        if (count > MAX_DOCUMENTS) {
+          console.log(
+            `Too many documents (${count}), limiting to most recent ${MAX_DOCUMENTS}`
+          );
+
+          try {
+            // Standard similarity search but with a limit
+            const docs = await vectorStore.similaritySearch(query, k);
+            console.log(`Retrieved ${docs.length} documents`);
+            return docs;
+          } catch (searchError) {
+            console.error("Error in similarity search:", searchError);
+            return [];
+          }
+        } else {
+          // Standard retrieval if under the limit
+          const docs = await vectorStore.similaritySearch(query, k);
+          console.log(`Retrieved ${docs.length} documents`);
+          return docs;
+        }
+      } catch (error) {
+        console.error("Error in retriever:", error);
+        // Always return an array even if there's an error
+        return [];
+      }
+    },
+
+    // Make sure the invoke method mirrors getRelevantDocuments for LangChain compatibility
+    invoke: async (query) => {
+      return await retriever.getRelevantDocuments(query);
+    },
+  };
 
   return { llm, retriever };
 }
@@ -105,11 +178,33 @@ function extractTokenFromTemplate(template) {
   return null;
 }
 
-// Enhanced filtering function with debugging output
+// Enhanced filtering function with debugging output and error handling
 function filterDocumentsByToken(docs, tokenSymbol) {
   if (!tokenSymbol) {
     console.log("No token symbol provided for filtering");
     return docs;
+  }
+
+  // Make sure docs is an array
+  if (!Array.isArray(docs)) {
+    console.log("Warning: docs is not an array:", typeof docs);
+    if (!docs) {
+      console.log("docs is null or undefined, returning empty array");
+      return [];
+    }
+    // If it's not an array, try to convert it to one or return empty array
+    try {
+      if (typeof docs === "object") {
+        console.log("Attempting to convert object to array");
+        docs = [docs];
+      } else {
+        console.log("Cannot convert to array, returning empty array");
+        return [];
+      }
+    } catch (err) {
+      console.error("Error converting docs to array:", err);
+      return [];
+    }
   }
 
   // Log what we're trying to filter for
@@ -120,12 +215,20 @@ function filterDocumentsByToken(docs, tokenSymbol) {
   if (docs.length > 0) {
     console.log(
       "Sample document content (first 200 chars):",
-      docs[0].pageContent.substring(0, 200)
+      docs[0].pageContent
+        ? docs[0].pageContent.substring(0, 200)
+        : "No pageContent found"
     );
   }
 
   // More aggressive filtering - only keep documents that are primarily about the target token
   const filteredDocs = docs.filter((doc) => {
+    // Make sure doc has pageContent
+    if (!doc || !doc.pageContent) {
+      console.log("Document has no pageContent, skipping");
+      return false;
+    }
+
     // Count occurrences of each token name
     const chogCount = (doc.pageContent.match(/\bCHOG\b/g) || []).length;
     const dakCount = (doc.pageContent.match(/\bDAK\b/g) || []).length;
@@ -196,7 +299,7 @@ function createTradingChain(TEMPLATE) {
     .pipe(llm)
     .pipe(outputParser);
 
-  // Modified retrieverChain with explicit token filtering
+  // Modified retrieverChain with explicit token filtering and error handling
   const retrieverChain = RunnableSequence.from([
     (prevResult) => {
       // Explicitly add token to query to help retrieval
@@ -204,10 +307,25 @@ function createTradingChain(TEMPLATE) {
       console.log(`Enhanced retrieval query: ${enhancedQuery}`);
       return enhancedQuery;
     },
-    retriever,
+    async (query) => {
+      try {
+        const docs = await retriever.getRelevantDocuments(query);
+        console.log(
+          `Retrieved ${docs?.length || 0} documents for ${tokenSymbol}`
+        );
+        return docs;
+      } catch (error) {
+        console.error(`Error retrieving documents for ${tokenSymbol}:`, error);
+        return [];
+      }
+    },
     (docs) => {
-      console.log(`Retrieved ${docs.length} documents for ${tokenSymbol}`);
-      return filterDocumentsByToken(docs, tokenSymbol);
+      try {
+        return filterDocumentsByToken(docs, tokenSymbol);
+      } catch (error) {
+        console.error(`Error filtering documents for ${tokenSymbol}:`, error);
+        return docs; // Return original docs on filter error
+      }
     },
     combineDocuments,
   ]);
@@ -272,24 +390,44 @@ export async function getTradingSignal(question) {
 
     // Collect all results from different templates
     for (const TEMPLATE of TEMPLATES) {
-      // Create a dedicated chain for each template
-      const chain = createTradingChain(TEMPLATE);
+      try {
+        // Create a dedicated chain for each template
+        const chain = createTradingChain(TEMPLATE);
 
-      // Get signal for this template with the original question
-      const tempResult = await chain.invoke({ question });
-      const signalInfo = extractSignalInfo(tempResult.answer);
+        // Get signal for this template with the original question
+        const tempResult = await chain.invoke({ question });
 
-      // Add the result with its parsed information
-      allResults.push({
-        ...tempResult,
-        parsedSignal: signalInfo,
-        confidence: signalInfo.confidence,
-      });
+        if (!tempResult || !tempResult.answer) {
+          console.log(
+            `No valid result for ${extractTokenFromTemplate(
+              TEMPLATE
+            )}, skipping`
+          );
+          continue;
+        }
 
-      // Log for debugging
-      console.log(
-        `Generated ${signalInfo.action} signal for ${signalInfo.symbol} with confidence ${signalInfo.confidence}`
-      );
+        const signalInfo = extractSignalInfo(tempResult.answer);
+
+        // Add the result with its parsed information
+        allResults.push({
+          ...tempResult,
+          parsedSignal: signalInfo,
+          confidence: signalInfo.confidence,
+        });
+
+        // Log for debugging
+        console.log(
+          `Generated ${signalInfo.action} signal for ${signalInfo.symbol} with confidence ${signalInfo.confidence}`
+        );
+      } catch (err) {
+        console.error(
+          `Error generating signal for template ${extractTokenFromTemplate(
+            TEMPLATE
+          )}:`,
+          err
+        );
+        // Continue with other templates even if one fails
+      }
     }
 
     // Check if we have any valid results
@@ -334,14 +472,15 @@ export async function getTradingSignal(question) {
   }
 }
 
-export async function generateBuySignal() {
+export async function generateSignal() {
   const timestamp = new Date().toISOString();
 
   try {
     console.log(`\n[${timestamp}] Generating trading signal...`);
 
+    // Generate a single trading signal without specifying BUY or SELL
     const answer = await getTradingSignal(
-      "Give me the best trading signal you can deduce from the context you have. Make it a BUY signal. Range from 1000 to 5000, always add two decimals. Like 3000.00. Min Value for Yaki is 1000 Unit. Make sure the signal is different from previous ones. Remember that both BUY and SELL signals are equally important for making money in trading. Base your signal on the actual market data and events in the context."
+      "Give me the best trading signal you can deduce from the context you have. Make it either a BUY or SELL signal based on what makes the most sense given the current market data. For BUY signals, specify a nominal value with two decimals (like 3000.00). For SELL signals, specify a percentage of tokens to sell. Provide a signal with a high confidence score. Base your signal on the actual market data and events in the context."
     );
 
     console.log(`[${timestamp}] TRADING SIGNAL:`);
@@ -349,30 +488,14 @@ export async function generateBuySignal() {
     console.log(answer.signal.answer);
     console.log("-".repeat(50));
     console.log(`Token: ${answer.tokenSymbol}`);
+    console.log(`Action: ${answer.parsedSignal.action}`);
+    console.log(`Confidence: ${answer.parsedSignal.confidence}`);
     console.log("-".repeat(50));
+
+    return answer;
   } catch (error) {
     console.error(`[${timestamp}] Error generating signal:`, error);
-  }
-}
-
-export async function generateSellSignal() {
-  const timestamp = new Date().toISOString();
-
-  try {
-    console.log(`\n[${timestamp}] Generating trading signal...`);
-
-    const answer = await getTradingSignal(
-      "Give me the best trading signal you can deduce from the context you have. Make it a SELL signal. Make sure the signal is different from previous ones. Remember that both BUY and SELL signals are equally important for making money in trading. Base your signal on the actual market data and events in the context."
-    );
-
-    console.log(`[${timestamp}] TRADING SIGNAL:`);
-    console.log("-".repeat(50));
-    console.log(answer.signal.answer);
-    console.log("-".repeat(50));
-    console.log(`Token: ${answer.tokenSymbol}`);
-    console.log("-".repeat(50));
-  } catch (error) {
-    console.error(`[${timestamp}] Error generating signal:`, error);
+    throw error;
   }
 }
 
@@ -415,22 +538,19 @@ export function startSignalPolling(interval = POLLING_INTERVAL) {
     } seconds`
   );
 
-  generateBuySignal();
-  const intervalId = setInterval(generateBuySignal, interval);
-  generateSellSignal();
-  const intervalId2 = setInterval(generateSellSignal, interval);
+  // Generate a single signal (either BUY or SELL) based on market conditions
+  generateSignal();
+  const intervalId = setInterval(generateSignal, interval);
 
   process.on("SIGINT", () => {
     console.log("\nStopping trading signal generator...");
     clearInterval(intervalId);
-    clearInterval(intervalId2);
     process.exit(0);
   });
 
   process.on("SIGTERM", () => {
     console.log("\nStopping trading signal generator...");
     clearInterval(intervalId);
-    clearInterval(intervalId2);
     process.exit(0);
   });
 }
