@@ -192,7 +192,7 @@ const V2Page = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
         <div className="flex-1 overflow-y-auto">
-          <div className="max-w-4xl mx-auto p-8">
+          <div className="w-full p-8">
             {alreadyMinted && tokenId !== null ? (
               <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
                 <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-4">
@@ -265,7 +265,7 @@ const V2Page = () => {
                     </div>
 
                     {/* NFT Image */}
-                    <div className="w-full md:w-1/2">
+                    <div className="w-full md:w-1/3">
                       <div className="aspect-square w-full bg-gradient-to-br from-purple-100 to-indigo-100 rounded-lg flex items-center justify-center border-2 border-purple-200 overflow-hidden">
                         <Image
                           src="/earlygorilla.jpg"
@@ -386,6 +386,41 @@ const V2Page = () => {
                         </button>
                       </div>
                     </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Grid of NFTs */}
+            {alreadyMinted && (
+              <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-white text-2xl">🎨</span>
+                    <h1 className="text-xl font-bold text-white">
+                      Upcoming NFT Collection - The more you hold, the faster
+                      you get in
+                    </h1>
+                  </div>
+                </div>
+
+                <div className="p-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    {Array.from({ length: 20 }).map((_, index) => (
+                      <div
+                        key={index}
+                        className="aspect-square bg-gradient-to-br from-purple-100 to-indigo-100 rounded-lg flex items-center justify-center border-2 border-purple-200 relative group"
+                      >
+                        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-lg">
+                          <span className="text-white font-medium">
+                            Coming Soon
+                          </span>
+                        </div>
+                        <div className="w-full h-full flex items-center justify-center">
+                          <span className="text-4xl">🖼️</span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
