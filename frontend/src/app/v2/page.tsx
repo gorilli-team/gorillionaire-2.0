@@ -33,15 +33,8 @@ const V2Page = () => {
     address: "0xD0f38A3Fb0F71e3d2B60e90327afde25618e1150",
   });
 
-  // Read user's token ID (first one if they have multiple)
-  const { data: userTokenIdData } = useReadContract({
-    abi,
-    functionName: "nextTokenId",
-    address: "0xD0f38A3Fb0F71e3d2B60e90327afde25618e1150",
-  });
-
-  const effectiveTokenId =
-    address && balanceData && balanceData > 0 ? userTokenIdData : undefined;
+  // Set token ID if user has NFT
+  const effectiveTokenId = address && balanceData && balanceData > 0 ? 1 : null;
 
   console.log("effectiveTokenId", effectiveTokenId);
 
@@ -223,6 +216,14 @@ const V2Page = () => {
                           <p className="text-lg font-semibold">
                             {nameData || "Gorillionaire V2"}
                           </p>
+                          <a
+                            href="https://testnet.monadexplorer.com/address/0xD0f38A3Fb0F71e3d2B60e90327afde25618e1150"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-purple-600 hover:text-purple-700 underline"
+                          >
+                            View on Explorer
+                          </a>
                         </div>
 
                         <div>
