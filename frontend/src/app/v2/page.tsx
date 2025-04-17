@@ -10,41 +10,6 @@ import { MONAD_CHAIN_ID } from "../utils/constants";
 import { usePrivy } from "@privy-io/react-auth";
 import Image from "next/image";
 
-const CountdownTimer = ({ endDate }: { endDate: Date }) => {
-  const [timeLeft, setTimeLeft] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-  });
-
-  useEffect(() => {
-    const calculateTimeLeft = () => {
-      const difference = endDate.getTime() - new Date().getTime();
-
-      if (difference > 0) {
-        setTimeLeft({
-          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-          minutes: Math.floor((difference / 1000 / 60) % 60),
-          seconds: Math.floor((difference / 1000) % 60),
-        });
-      }
-    };
-
-    calculateTimeLeft();
-    const timer = setInterval(calculateTimeLeft, 1000);
-
-    return () => clearInterval(timer);
-  }, [endDate]);
-
-  return (
-    <div className="text-white text-sm font-medium">
-      {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s
-    </div>
-  );
-};
-
 const V2Page = () => {
   const { address, isConnected } = useAccount();
   const { login } = usePrivy();
@@ -53,28 +18,13 @@ const V2Page = () => {
   const { writeContract } = useWriteContract();
   const [tokenId, setTokenId] = useState<number | null>(null);
 
-  // NFT Contracts array
+  // NFT Contract
   const firstNFT = {
     address: "0xD0f38A3Fb0F71e3d2B60e90327afde25618e1150" as `0x${string}`,
     name: "Early Gorilla",
     isMintable: true,
     endDate: new Date("2025-04-17"),
   };
-
-  const nftContracts = [
-    {
-      address: "0x0" as `0x${string}`,
-      name: "Gorillionaire NFT #1",
-      isMintable: true,
-      endDate: new Date("2025-04-20"),
-    },
-    {
-      address: "0x0" as `0x${string}`,
-      name: "Gorillionaire NFT #2",
-      isMintable: true,
-      endDate: new Date("2025-04-24"),
-    },
-  ];
 
   // Read NFT balance for the first contract
   const { data: balanceData } = useReadContract({
@@ -448,64 +398,6 @@ const V2Page = () => {
                 </div>
               </div>
             )}
-
-            {/* Grid of NFTs */}
-            {/* {alreadyMinted && (
-              <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-white text-2xl">🎨</span>
-                    <h1 className="text-xl font-bold text-white">
-                      Upcoming NFT Collection - The more you hold, the faster
-                      you get in
-                    </h1>
-                  </div>
-                </div>
-
-                <div className="p-6">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                    {Array.from({ length: 20 }).map((_, index) => {
-                      const nftContract = nftContracts[index];
-                      const isMintable = nftContract?.isMintable;
-                      const hasEndDate = nftContract?.endDate;
-
-                      return (
-                        <div
-                          key={index}
-                          className="aspect-square bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl flex items-center justify-center border border-purple-100 relative group shadow-sm hover:shadow-md transition-all duration-200"
-                        >
-                          {isMintable ? (
-                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl">
-                              <button
-                                onClick={onClick}
-                                disabled={alreadyMinted}
-                                className="px-4 py-2 rounded-lg font-medium text-white bg-purple-600 hover:bg-purple-700 transition-all duration-200 mb-2"
-                              >
-                                MINT NFT
-                              </button>
-                              {hasEndDate && (
-                                <CountdownTimer endDate={nftContract.endDate} />
-                              )}
-                            </div>
-                          ) : (
-                            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple-600/80 to-indigo-600/80 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-xl">
-                              <span className="text-white font-medium">
-                                Coming Soon
-                              </span>
-                            </div>
-                          )}
-                          <div className="w-full h-full flex flex-col items-center justify-center p-3">
-                            <span className="text-2xl font-bold text-purple-600">
-                              {index + 1}
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            )} */}
           </div>
         </div>
       </div>
