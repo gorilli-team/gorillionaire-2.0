@@ -8,6 +8,7 @@ import { abi } from "../abi/early-nft";
 import { toast } from "react-toastify";
 import { MONAD_CHAIN_ID } from "../utils/constants";
 import { usePrivy } from "@privy-io/react-auth";
+import Image from "next/image";
 
 const V2Page = () => {
   const { address, isConnected } = useAccount();
@@ -15,15 +16,52 @@ const V2Page = () => {
   const [selectedPage, setSelectedPage] = useState("V2");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { writeContract } = useWriteContract();
-  const { data } = useReadContract({
+  const [tokenId, setTokenId] = useState<number | null>(null);
+
+  // Read NFT balance
+  const { data: balanceData } = useReadContract({
     abi,
     functionName: "balanceOf",
     address: "0xD0f38A3Fb0F71e3d2B60e90327afde25618e1150",
     args: [address || "0x0"],
   });
+
+  // Read total supply
+  const { data: totalSupplyData } = useReadContract({
+    abi,
+    functionName: "nextTokenId",
+    address: "0xD0f38A3Fb0F71e3d2B60e90327afde25618e1150",
+  });
+
+  // Read user's token ID (first one if they have multiple)
+  const { data: userTokenIdData } = useReadContract({
+    abi,
+    functionName: "nextTokenId",
+    address: "0xD0f38A3Fb0F71e3d2B60e90327afde25618e1150",
+  });
+
+  const effectiveTokenId =
+    address && balanceData && balanceData > 0 ? userTokenIdData : undefined;
+
+  console.log("effectiveTokenId", effectiveTokenId);
+
+  // Read collection name
+  const { data: nameData } = useReadContract({
+    abi,
+    functionName: "name",
+    address: "0xD0f38A3Fb0F71e3d2B60e90327afde25618e1150",
+  });
+
   const [chainId, setChainId] = useState<number | null>(null);
 
-  const alreadyMinted = useMemo(() => (data ?? 0) > 0, [data]);
+  const alreadyMinted = useMemo(() => (balanceData ?? 0) > 0, [balanceData]);
+
+  // Effect to set token ID when balance changes
+  useEffect(() => {
+    if (alreadyMinted && effectiveTokenId) {
+      setTokenId(Number(effectiveTokenId));
+    }
+  }, [alreadyMinted, effectiveTokenId]);
 
   const onClick = useCallback(async () => {
     if (alreadyMinted) return;
@@ -101,10 +139,10 @@ const V2Page = () => {
   }, []);
 
   return (
-    <div className="flex h-screen bg-gray-100 text-gray-800">
+    <div className="flex min-h-screen bg-gray-100 text-gray-800">
       {/* Mobile menu button */}
       <button
-        className="lg:hidden fixed top-4 left-4 z-40 p-2 rounded-full bg-gray-200"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-full bg-gray-200"
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         aria-label="Toggle menu"
       >
@@ -130,17 +168,17 @@ const V2Page = () => {
       {/* Sidebar */}
       <div
         className={`
-          fixed lg:relative
+          fixed lg:static
           ${
             isMobileMenuOpen
               ? "translate-x-0"
               : "-translate-x-full lg:translate-x-0"
           }
           transition-transform duration-300 ease-in-out
-          z-30 lg:z-0
+          z-40 lg:z-0
           bg-white
           shadow-xl lg:shadow-none
-          h-full
+          w-64 lg:w-auto
         `}
       >
         <Sidebar
@@ -149,94 +187,208 @@ const V2Page = () => {
         />
       </div>
 
-      {/* Overlay for mobile */}
+      {/* Overlay */}
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
-        <div className="flex-1 p-8 overflow-y-auto">
-          <div className="max-w-4xl mx-auto">
-            <h1 className="text-3xl font-bold mb-6 text-gray-800">
-              Gorillionaire V2 🦍
-            </h1>
+        <div className="flex-1 overflow-y-auto">
+          <div className="max-w-4xl mx-auto p-8">
+            {alreadyMinted && tokenId !== null ? (
+              <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+                <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-white text-2xl">🎫</span>
+                    <h1 className="text-xl font-bold text-white">
+                      Your V2 Access NFT
+                    </h1>
+                  </div>
+                </div>
 
-            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-              <h2 className="text-xl font-semibold mb-4">Coming Soon</h2>
-              <p className="text-gray-700 mb-4">
-                We are working hard on bringing you an even better Gorillionaire
-                experience. Stay tuned for updates!
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                <div className="border border-gray-200 rounded-lg p-4">
-                  <h3 className="font-medium text-lg mb-2">Enhanced Signals</h3>
-                  <p className="text-gray-600">
-                    More accurate and timely trading signals
-                  </p>
-                </div>
-                <div className="border border-gray-200 rounded-lg p-4">
-                  <h3 className="font-medium text-lg mb-2">Improved UI</h3>
-                  <p className="text-gray-600">
-                    Better user experience and interface
-                  </p>
-                </div>
-                <div className="border border-gray-200 rounded-lg p-4">
-                  <h3 className="font-medium text-lg mb-2">New Features</h3>
-                  <p className="text-gray-600">
-                    Exciting new capabilities for traders
-                  </p>
-                </div>
-                <div className="border border-gray-200 rounded-lg p-4">
-                  <h3 className="font-medium text-lg mb-2">Performance</h3>
-                  <p className="text-gray-600">
-                    Faster and more reliable platform
-                  </p>
+                <div className="p-6">
+                  <div className="flex flex-col-reverse md:flex-row gap-6">
+                    {/* NFT Details */}
+                    <div className="w-full md:w-1/2">
+                      <div className="space-y-4">
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-500">
+                            Collection
+                          </h3>
+                          <p className="text-lg font-semibold">
+                            {nameData || "Gorillionaire V2"}
+                          </p>
+                        </div>
+
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-500">
+                            Token ID
+                          </h3>
+                          <p className="text-lg font-semibold">
+                            #{tokenId} <span className="text-gray-400">OF</span>{" "}
+                            #{totalSupplyData ? Number(totalSupplyData) : "..."}
+                          </p>
+                        </div>
+
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-500">
+                            Owner
+                          </h3>
+                          <a
+                            href={`https://testnet.monadexplorer.com/address/${address}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-lg font-medium text-purple-600 hover:text-purple-700 truncate block"
+                          >
+                            {address}
+                          </a>
+                        </div>
+
+                        <div className="pt-4">
+                          <div className="bg-purple-50 rounded-lg p-4">
+                            <div className="flex items-center">
+                              <div className="w-2 h-2 bg-purple-400 rounded-full mr-2"></div>
+                              <p className="text-sm text-purple-700">
+                                You are on the V2 waitlist! Stay tuned for
+                                updates.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* NFT Image */}
+                    <div className="w-full md:w-1/2">
+                      <div className="aspect-square w-full bg-gradient-to-br from-purple-100 to-indigo-100 rounded-lg flex items-center justify-center border-2 border-purple-200 overflow-hidden">
+                        <Image
+                          src="/earlygorilla.jpg"
+                          alt="Your V2 Access NFT"
+                          width={800}
+                          height={800}
+                          className="w-full h-full object-cover"
+                          priority
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <h2 className="text-xl font-semibold mb-4 mt-6">
-                Limited Spots Available
-              </h2>
-              <div className="bg-indigo-50 p-4 rounded-lg mb-6">
-                <p className="text-gray-700 mb-4">
-                  Mint your NFT to secure your spot in our exclusive waiting
-                  list.
-                </p>
+            ) : (
+              <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+                {/* Purple gradient header */}
+                <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-white text-2xl">🦍</span>
+                    <h1 className="text-xl font-bold text-white">
+                      Gorillionaire V2 - Coming Soon
+                    </h1>
+                  </div>
+                </div>
 
-                <p className="text-gray-600 mb-4">
-                  This is your opportunity to be among the first to experience
-                  the future of trading.
-                </p>
-              </div>
-              <div className="mt-6 flex justify-center">
-                <button
-                  onClick={onClick}
-                  disabled={alreadyMinted}
-                  className={`${
-                    alreadyMinted
-                      ? "bg-green-600"
-                      : "bg-purple-600 hover:bg-purple-700 cursor-pointer"
-                  } text-white font-medium py-2 px-6 rounded-lg transition-colors `}
-                >
-                  {alreadyMinted ? "NFT Minted" : "Mint Now"}
-                </button>
-              </div>
-            </div>
+                <div className="p-6">
+                  <div className="flex flex-col-reverse md:flex-row gap-6">
+                    {/* Info Section */}
+                    <div className="w-full">
+                      <div className="bg-indigo-50 p-4 rounded-lg mb-6">
+                        <p className="text-indigo-800 font-medium">
+                          We are working hard on bringing you an even better
+                          Gorillionaire experience
+                        </p>
+                        <p className="text-indigo-700 text-sm mt-1">
+                          Stay tuned for updates and secure your spot in our
+                          exclusive waiting list
+                        </p>
+                      </div>
 
-            {/* V2 Image */}
-            <div className="mb-8 flex justify-center">
-              <img
-                src="/v2.png"
-                alt="Gorillionaire V2"
-                className="rounded-lg shadow-lg max-w-full h-auto"
-                width="1200"
-                height="675"
-              />
-            </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-2xl">📈</span>
+                            <h3 className="font-medium text-lg">
+                              Enhanced Signals
+                            </h3>
+                          </div>
+                          <p className="text-gray-600">
+                            More accurate and timely trading signals with
+                            advanced analytics
+                          </p>
+                        </div>
+
+                        <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-2xl">✨</span>
+                            <h3 className="font-medium text-lg">Improved UI</h3>
+                          </div>
+                          <p className="text-gray-600">
+                            Better user experience and interface with modern
+                            design
+                          </p>
+                        </div>
+
+                        <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-2xl">🚀</span>
+                            <h3 className="font-medium text-lg">
+                              New Features
+                            </h3>
+                          </div>
+                          <p className="text-gray-600">
+                            Exciting new capabilities for traders and enhanced
+                            tools
+                          </p>
+                        </div>
+
+                        <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-2xl">⚡️</span>
+                            <h3 className="font-medium text-lg">Performance</h3>
+                          </div>
+                          <p className="text-gray-600">
+                            Faster and more reliable platform with optimized
+                            infrastructure
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="bg-gray-100 p-4 rounded-lg mt-6">
+                        <div className="flex items-center">
+                          <div className="w-2 h-2 bg-yellow-400 rounded-full mr-2"></div>
+                          <p className="text-sm text-gray-700">
+                            Join the{" "}
+                            <span className="font-medium">Gorillionaires</span>{" "}
+                            waiting list by minting your NFT
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="mt-6 flex justify-center">
+                        <button
+                          onClick={onClick}
+                          disabled={alreadyMinted}
+                          className={`w-full py-3 px-4 rounded-lg font-medium text-white ${
+                            alreadyMinted || !isConnected
+                              ? "bg-gray-400"
+                              : "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+                          } transition-all duration-200 flex items-center justify-center`}
+                        >
+                          {!isConnected
+                            ? "Connect Wallet to Mint"
+                            : alreadyMinted
+                            ? "NFT Minted"
+                            : "Mint NFT to Join Waitlist"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
