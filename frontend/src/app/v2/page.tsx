@@ -250,7 +250,7 @@ const V2Page = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
         <div className="flex-1 overflow-y-auto">
-          <div className="w-full p-8">
+          <div className="w-full max-w-5xl mx-auto p-4 md:p-6">
             {alreadyMinted && tokenId !== null ? (
               <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
                 <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-4">
@@ -450,7 +450,7 @@ const V2Page = () => {
             )}
 
             {/* Grid of NFTs */}
-            {alreadyMinted && (
+            {/* {alreadyMinted && (
               <div className="bg-white rounded-lg shadow-md overflow-hidden">
                 <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-4">
                   <div className="flex items-center gap-2">
@@ -505,7 +505,7 @@ const V2Page = () => {
                   </div>
                 </div>
               </div>
-            )}
+            )} */}
           </div>
         </div>
       </div>
