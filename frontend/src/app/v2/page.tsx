@@ -266,7 +266,7 @@ const V2Page = () => {
 
                     {/* NFT Image */}
                     <div className="w-full md:w-1/3">
-                      <div className="aspect-square w-full bg-gradient-to-br from-purple-100 to-indigo-100 rounded-lg flex items-center justify-center border-2 border-purple-200 overflow-hidden">
+                      <div className="aspect-square w-full bg-gradient-to-br from-purple-100 to-indigo-100 rounded-lg flex border-2 border-purple-200 overflow-hidden">
                         <Image
                           src="/earlygorilla.jpg"
                           alt="Your V2 Access NFT"
@@ -409,15 +409,17 @@ const V2Page = () => {
                     {Array.from({ length: 20 }).map((_, index) => (
                       <div
                         key={index}
-                        className="aspect-square bg-gradient-to-br from-purple-100 to-indigo-100 rounded-lg flex items-center justify-center border-2 border-purple-200 relative group"
+                        className="aspect-square bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl flex items-center justify-center border border-purple-100 relative group shadow-sm hover:shadow-md transition-all duration-200"
                       >
-                        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-lg">
+                        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple-600/80 to-indigo-600/80 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-xl">
                           <span className="text-white font-medium">
                             Coming Soon
                           </span>
                         </div>
-                        <div className="w-full h-full flex items-center justify-center">
-                          <span className="text-4xl">🖼️</span>
+                        <div className="w-full h-full flex flex-col items-center justify-center p-3">
+                          <span className="text-2xl font-bold text-purple-600">
+                            {index + 1}
+                          </span>
                         </div>
                       </div>
                     ))}
