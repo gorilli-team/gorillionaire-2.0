@@ -14,6 +14,7 @@ import { NFT_ACCESS_ADDRESS } from "../../utils/constants";
 import { abi } from "../../abi/access-nft";
 import Image from "next/image";
 import { MONAD_CHAIN_ID } from "../../utils/constants";
+
 type Holder = {
   ownerAddress: string;
 };
@@ -69,7 +70,7 @@ const Agents = () => {
     }
   }, [nftBalance]);
 
-  const { writeContract, data: hash, error } = useWriteContract();
+  const { writeContractAsync, data: hash, error } = useWriteContract();
 
   const { isLoading: isConfirming, isSuccess: isConfirmed } =
     useWaitForTransactionReceipt({
@@ -108,8 +109,6 @@ const Agents = () => {
           setHolders([]);
           return;
         }
-
-        console.log("Holders data:", data);
 
         // Check if data has the expected structure
         if (
@@ -194,7 +193,7 @@ const Agents = () => {
 
     try {
       // Call mint function with 1 MON as payment
-      writeContract({
+      await writeContractAsync({
         address: NFT_ACCESS_ADDRESS,
         abi,
         chainId: MONAD_CHAIN_ID,
