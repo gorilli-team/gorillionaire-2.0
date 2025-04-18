@@ -7,7 +7,8 @@ import {
   useConfig,
   useSignTypedData,
   useSendTransaction,
-  useChainId,
+  useSwitchChain,
+  useAccount,
 } from "wagmi";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import { concat, erc20Abi, numberToHex, parseUnits, size } from "viem";
@@ -15,6 +16,7 @@ import { getTimeAgo } from "@/app/utils/time";
 import { LoadingOverlay } from "../ui/LoadingSpinner";
 import {
   MON_ADDRESS,
+  MONAD_CHAIN_ID,
   PERMIT2_ADDRESS,
   WMONAD_ADDRESS,
 } from "@/app/utils/constants";
@@ -77,7 +79,6 @@ type TradeSignal = {
   };
 };
 
-const MONAD_CHAIN_ID = 10143;
 const MAX_SIGNALS = 5;
 const SIGNAL_EXPIRATION_TIME = 3 * 24 * 60 * 60 * 1000;
 
@@ -136,8 +137,9 @@ const Signals = () => {
   const { writeContractAsync } = useWriteContract();
   const { signTypedDataAsync } = useSignTypedData();
   const { sendTransactionAsync } = useSendTransaction();
+  const { switchChain } = useSwitchChain();
   const wagmiConfig = useConfig();
-  const chainId = useChainId();
+  const { chainId } = useAccount();
 
   const [moyakiBalance, setMoyakiBalance] = useState<number>(0);
   const [chogBalance, setChogBalance] = useState<number>(0);
@@ -386,8 +388,6 @@ const Signals = () => {
         });
         return;
       }
-
-      console.log("token & amount", token, amount);
 
       // for sells we need to convert percentage to amount, for buys change gets handled backend/side
       const sellAmount =
@@ -752,37 +752,48 @@ const Signals = () => {
                       </span>
                     </div>
 
-                    <div className="flex items-center mb-3">
-                      <div className="inline-flex rounded-full border border-gray-300 overflow-hidden">
-                        <button
-                          className={`px-3 py-1 text-sm flex items-center justify-center w-16 ${
-                            selectedOptions[signal._id] === "No"
-                              ? "bg-gray-200 text-gray-700"
-                              : "bg-white text-gray-500"
-                          }`}
-                          onClick={() => handleOptionSelect(signal._id, "No")}
-                        >
-                          <span>No</span>
-                          {selectedOptions[signal._id] === "No" && (
-                            <span className="ml-1">•</span>
-                          )}
-                        </button>
-                        <button
-                          className={`px-3 py-1 text-sm flex items-center justify-center w-16 ${
-                            selectedOptions[signal._id] === "Yes" ||
-                            !selectedOptions[signal._id]
-                              ? "bg-violet-700 text-white"
-                              : "bg-white text-gray-500"
-                          }`}
-                          onClick={() => handleOptionSelect(signal._id, "Yes")}
-                        >
-                          <span>Yes</span>
-                          {selectedOptions[signal._id] === "Yes" && (
-                            <span className="ml-1">•</span>
-                          )}
-                        </button>
+                    {chainId === MONAD_CHAIN_ID ? (
+                      <div className="flex items-center mb-3">
+                        <div className="inline-flex rounded-full border border-gray-300 overflow-hidden">
+                          <button
+                            className={`px-3 py-1 text-sm flex items-center justify-center w-16 ${
+                              selectedOptions[signal._id] === "No"
+                                ? "bg-gray-200 text-gray-700"
+                                : "bg-white text-gray-500"
+                            }`}
+                            onClick={() => handleOptionSelect(signal._id, "No")}
+                          >
+                            <span>No</span>
+                            {selectedOptions[signal._id] === "No" && (
+                              <span className="ml-1">•</span>
+                            )}
+                          </button>
+                          <button
+                            className={`px-3 py-1 text-sm flex items-center justify-center w-16 ${
+                              selectedOptions[signal._id] === "Yes" ||
+                              !selectedOptions[signal._id]
+                                ? "bg-violet-700 text-white"
+                                : "bg-white text-gray-500"
+                            }`}
+                            onClick={() =>
+                              handleOptionSelect(signal._id, "Yes")
+                            }
+                          >
+                            <span>Yes</span>
+                            {selectedOptions[signal._id] === "Yes" && (
+                              <span className="ml-1">•</span>
+                            )}
+                          </button>
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      <button
+                        className={`px-3 py-1 mb-3 text-sm flex items-center justify-center bg-violet-700 text-white rounded-full`}
+                        onClick={() => switchChain({ chainId: MONAD_CHAIN_ID })}
+                      >
+                        Switch to Monad
+                      </button>
+                    )}
 
                     <div className="flex flex-wrap items-center gap-2">
                       {signal.events.slice(0, 2).map((event, idx) => (
@@ -794,6 +805,7 @@ const Signals = () => {
                         </div>
                       ))}
                     </div>
+
                     <div className="text-xs text-gray-400 mt-2">
                       {getTimeAgo(signal.created_at)}
                     </div>
@@ -850,37 +862,48 @@ const Signals = () => {
                       </span>
                     </div>
 
-                    <div className="flex items-center mb-3">
-                      <div className="inline-flex rounded-full border border-gray-300 overflow-hidden">
-                        <button
-                          className={`px-3 py-1 text-sm flex items-center justify-center w-16 ${
-                            selectedOptions[signal._id] === "No"
-                              ? "bg-gray-200 text-gray-700"
-                              : "bg-white text-gray-500"
-                          }`}
-                          onClick={() => handleOptionSelect(signal._id, "No")}
-                        >
-                          <span>No</span>
-                          {selectedOptions[signal._id] === "No" && (
-                            <span className="ml-1">•</span>
-                          )}
-                        </button>
-                        <button
-                          className={`px-3 py-1 text-sm flex items-center justify-center w-16 ${
-                            selectedOptions[signal._id] === "Yes" ||
-                            !selectedOptions[signal._id]
-                              ? "bg-violet-700 text-white"
-                              : "bg-white text-gray-500"
-                          }`}
-                          onClick={() => handleOptionSelect(signal._id, "Yes")}
-                        >
-                          <span>Yes</span>
-                          {selectedOptions[signal._id] === "Yes" && (
-                            <span className="ml-1">•</span>
-                          )}
-                        </button>
+                    {chainId === MONAD_CHAIN_ID ? (
+                      <div className="flex items-center mb-3">
+                        <div className="inline-flex rounded-full border border-gray-300 overflow-hidden">
+                          <button
+                            className={`px-3 py-1 text-sm flex items-center justify-center w-16 ${
+                              selectedOptions[signal._id] === "No"
+                                ? "bg-gray-200 text-gray-700"
+                                : "bg-white text-gray-500"
+                            }`}
+                            onClick={() => handleOptionSelect(signal._id, "No")}
+                          >
+                            <span>No</span>
+                            {selectedOptions[signal._id] === "No" && (
+                              <span className="ml-1">•</span>
+                            )}
+                          </button>
+                          <button
+                            className={`px-3 py-1 text-sm flex items-center justify-center w-16 ${
+                              selectedOptions[signal._id] === "Yes" ||
+                              !selectedOptions[signal._id]
+                                ? "bg-violet-700 text-white"
+                                : "bg-white text-gray-500"
+                            }`}
+                            onClick={() =>
+                              handleOptionSelect(signal._id, "Yes")
+                            }
+                          >
+                            <span>Yes</span>
+                            {selectedOptions[signal._id] === "Yes" && (
+                              <span className="ml-1">•</span>
+                            )}
+                          </button>
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      <button
+                        className={`px-3 py-1 mb-3 text-sm flex items-center justify-center bg-violet-700 text-white rounded-full`}
+                        onClick={() => switchChain({ chainId: MONAD_CHAIN_ID })}
+                      >
+                        Switch to Monad
+                      </button>
+                    )}
 
                     <div className="flex flex-wrap items-center gap-2">
                       {signal.events.slice(0, 2).map((event, idx) => (
