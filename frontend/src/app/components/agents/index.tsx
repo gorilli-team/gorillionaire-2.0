@@ -7,13 +7,12 @@ import {
   useReadContract,
   useWriteContract,
   useWaitForTransactionReceipt,
+  useSwitchChain,
 } from "wagmi";
 import { usePrivy } from "@privy-io/react-auth";
-import { parseEther } from "viem";
 import { NFT_ACCESS_ADDRESS } from "../../utils/constants";
-import ACCESS_NFT_ABI from "../../../../../access-nft/abi/AccessNFTAbi.json";
+import { abi } from "../../abi/access-nft";
 import Image from "next/image";
-import { toast } from "react-toastify";
 import { MONAD_CHAIN_ID } from "../../utils/constants";
 type Holder = {
   ownerAddress: string;
@@ -30,9 +29,9 @@ type Signal = {
 };
 
 const Agents = () => {
-  const { isConnected, address } = useAccount();
+  const { isConnected, address, chainId } = useAccount();
+  const { switchChain } = useSwitchChain();
   const { login } = usePrivy();
-  const [chainId, setChainId] = useState<number | null>(null);
   const [isMinting, setIsMinting] = useState(false);
   const [mintSuccess, setMintSuccess] = useState(false);
   const [hasNFT, setHasNFT] = useState(false);
@@ -48,27 +47,25 @@ const Agents = () => {
   // Add state for raw JSON
   const [rawJsonResponse, setRawJsonResponse] = useState<string>("");
 
-  useReadContract({
+  const { data: price } = useReadContract({
     address: NFT_ACCESS_ADDRESS,
-    abi: ACCESS_NFT_ABI,
+    abi,
     functionName: "s_price",
     query: { enabled: isConnected },
   });
 
   const { data: nftBalance } = useReadContract({
     address: NFT_ACCESS_ADDRESS,
-    abi: ACCESS_NFT_ABI,
+    abi,
     functionName: "balanceOf",
-    args: [address],
+    args: [address ?? "0x1"],
     query: { enabled: isConnected && !!address },
   });
 
   useEffect(() => {
-    if (typeof nftBalance === "bigint" || typeof nftBalance === "number") {
-      if (nftBalance > 0) {
-        setHasNFT(true);
-        setMintSuccess(true);
-      }
+    if (Number(nftBalance) > 0) {
+      setHasNFT(true);
+      setMintSuccess(true);
     }
   }, [nftBalance]);
 
@@ -154,37 +151,6 @@ const Agents = () => {
     }
   }, [isConfirming, isConfirmed, error]);
 
-  // Get the current chain ID
-  useEffect(() => {
-    const getChainId = async () => {
-      if (typeof window !== "undefined" && window.ethereum) {
-        try {
-          const chainId = await window.ethereum.request({
-            method: "eth_chainId",
-          });
-          setChainId(parseInt(chainId, 16));
-        } catch (error) {
-          console.error("Error getting chain ID:", error);
-        }
-      }
-    };
-
-    getChainId();
-
-    // Listen for chain changes
-    if (typeof window !== "undefined" && window.ethereum) {
-      window.ethereum.on("chainChanged", (chainId: string) => {
-        setChainId(parseInt(chainId, 16));
-      });
-    }
-
-    return () => {
-      if (typeof window !== "undefined" && window.ethereum) {
-        window.ethereum.removeListener("chainChanged", () => {});
-      }
-    };
-  }, []);
-
   const fetchSignals = async () => {
     setIsLoadingSignals(true);
     setSignalError("");
@@ -212,36 +178,14 @@ const Agents = () => {
     }
   };
 
-  const handleMint = () => {
+  const handleMint = async () => {
     if (!isConnected) {
       login();
       return;
     }
 
-    // Check if we're on Monad network
-    if (chainId === null) {
-      toast.error("Unable to determine network. Please try again.", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-      return;
-    }
-
     if (chainId !== MONAD_CHAIN_ID) {
-      toast.error("Please switch to Monad network to continue", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+      switchChain({ chainId: MONAD_CHAIN_ID });
       return;
     }
 
@@ -252,9 +196,10 @@ const Agents = () => {
       // Call mint function with 1 MON as payment
       writeContract({
         address: NFT_ACCESS_ADDRESS,
-        abi: ACCESS_NFT_ABI,
+        abi,
+        chainId: MONAD_CHAIN_ID,
         functionName: "mint",
-        value: parseEther("1"), // 1 MON = 1 * 10^18 wei
+        value: price, // 1 MON = 1 * 10^18 wei
       });
     } catch (err) {
       console.error("Mint error:", err);
@@ -427,8 +372,10 @@ const Agents = () => {
                       </>
                     ) : hasNFT ? (
                       "You Already Own This NFT"
-                    ) : (
+                    ) : chainId === MONAD_CHAIN_ID ? (
                       "Mint NFT to Fuel Your Trading Agents"
+                    ) : (
+                      "Switch to Monad chain to unlock access to signals"
                     )}
                   </button>
                 )}
