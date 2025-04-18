@@ -7,12 +7,14 @@ import {
   useReadContract,
   useWriteContract,
   useWaitForTransactionReceipt,
+  useSwitchChain,
 } from "wagmi";
 import { usePrivy } from "@privy-io/react-auth";
-import { parseEther } from "viem";
 import { NFT_ACCESS_ADDRESS } from "../../utils/constants";
-import ACCESS_NFT_ABI from "../../../../../access-nft/abi/AccessNFTAbi.json";
+import { abi } from "../../abi/access-nft";
 import Image from "next/image";
+import { MONAD_CHAIN_ID } from "../../utils/constants";
+
 type Holder = {
   ownerAddress: string;
 };
@@ -28,7 +30,8 @@ type Signal = {
 };
 
 const Agents = () => {
-  const { isConnected, address } = useAccount();
+  const { isConnected, address, chainId } = useAccount();
+  const { switchChain } = useSwitchChain();
   const { login } = usePrivy();
   const [isMinting, setIsMinting] = useState(false);
   const [mintSuccess, setMintSuccess] = useState(false);
@@ -45,31 +48,29 @@ const Agents = () => {
   // Add state for raw JSON
   const [rawJsonResponse, setRawJsonResponse] = useState<string>("");
 
-  useReadContract({
+  const { data: price } = useReadContract({
     address: NFT_ACCESS_ADDRESS,
-    abi: ACCESS_NFT_ABI,
+    abi,
     functionName: "s_price",
     query: { enabled: isConnected },
   });
 
   const { data: nftBalance } = useReadContract({
     address: NFT_ACCESS_ADDRESS,
-    abi: ACCESS_NFT_ABI,
+    abi,
     functionName: "balanceOf",
-    args: [address],
+    args: [address ?? "0x1"],
     query: { enabled: isConnected && !!address },
   });
 
   useEffect(() => {
-    if (typeof nftBalance === "bigint" || typeof nftBalance === "number") {
-      if (nftBalance > 0) {
-        setHasNFT(true);
-        setMintSuccess(true);
-      }
+    if (Number(nftBalance) > 0) {
+      setHasNFT(true);
+      setMintSuccess(true);
     }
   }, [nftBalance]);
 
-  const { writeContract, data: hash, error } = useWriteContract();
+  const { writeContractAsync, data: hash, error } = useWriteContract();
 
   const { isLoading: isConfirming, isSuccess: isConfirmed } =
     useWaitForTransactionReceipt({
@@ -90,19 +91,48 @@ const Agents = () => {
           );
         }
 
-        const data = await response.json();
-        console.log("Holders data:", data);
-        setHolders(data.result.data);
-        if (data.result.data.length > 0) {
-          data.result.data.forEach((holder: Holder) => {
-            if (holder.ownerAddress === address) {
-              setHasNFT(true);
-              setMintSuccess(true);
-            }
-          });
+        // Check if the response has content
+        const text = await response.text();
+        if (!text || text.trim() === "") {
+          console.warn("Empty response received from holders API");
+          setHolders([]);
+          return;
+        }
+
+        // Try to parse the JSON
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (parseError) {
+          console.error("Error parsing JSON response:", parseError);
+          console.log("Raw response:", text);
+          setHolders([]);
+          return;
+        }
+
+        // Check if data has the expected structure
+        if (
+          data &&
+          data.result &&
+          data.result.data &&
+          Array.isArray(data.result.data)
+        ) {
+          setHolders(data.result.data);
+          if (data.result.data.length > 0) {
+            data.result.data.forEach((holder: Holder) => {
+              if (holder.ownerAddress === address) {
+                setHasNFT(true);
+                setMintSuccess(true);
+              }
+            });
+          }
+        } else {
+          console.warn("Unexpected data structure from holders API:", data);
+          setHolders([]);
         }
       } catch (error) {
         console.error("Error fetching holders:", error);
+        setHolders([]);
       }
     };
     fetchHolders();
@@ -147,9 +177,14 @@ const Agents = () => {
     }
   };
 
-  const handleMint = () => {
+  const handleMint = async () => {
     if (!isConnected) {
       login();
+      return;
+    }
+
+    if (chainId !== MONAD_CHAIN_ID) {
+      switchChain({ chainId: MONAD_CHAIN_ID });
       return;
     }
 
@@ -158,11 +193,12 @@ const Agents = () => {
 
     try {
       // Call mint function with 1 MON as payment
-      writeContract({
+      await writeContractAsync({
         address: NFT_ACCESS_ADDRESS,
-        abi: ACCESS_NFT_ABI,
+        abi,
+        chainId: MONAD_CHAIN_ID,
         functionName: "mint",
-        value: parseEther("1"), // 1 MON = 1 * 10^18 wei
+        value: price, // 1 MON = 1 * 10^18 wei
       });
     } catch (err) {
       console.error("Mint error:", err);
@@ -335,8 +371,10 @@ const Agents = () => {
                       </>
                     ) : hasNFT ? (
                       "You Already Own This NFT"
-                    ) : (
+                    ) : chainId === MONAD_CHAIN_ID ? (
                       "Mint NFT to Fuel Your Trading Agents"
+                    ) : (
+                      "Switch to Monad chain to unlock access to signals"
                     )}
                   </button>
                 )}
