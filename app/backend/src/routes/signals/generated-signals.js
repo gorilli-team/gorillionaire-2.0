@@ -29,11 +29,16 @@ router.get("/", async (req, res) => {
         signal.events = signal.events[0].split("\n\n").map((event) => {
           const splitEvents = event.split("\n");
           const splitEvents2 = splitEvents.map((splitEvent) => {
-            return splitEvent.split("\n\n");
+            const items = splitEvent.split("\n\n");
+            return items.filter(
+              (item) => item && item.toString().trim() !== ""
+            );
           });
           return splitEvents2;
         });
-        signal.events = signal.events.flat();
+        signal.events = signal.events
+          .flat()
+          .filter((item) => item && item.toString().trim() !== "");
       }
     });
 

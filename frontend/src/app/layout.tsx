@@ -43,7 +43,7 @@ export default function RootLayout({
           data-website-id="1ac7b906-684c-46cb-95d7-f7719fb51940"
         />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <div className="bg-purple-700 text-white py-2 text-center font-medium">
           🚀 Gorillionaire v2 is coming soon!{" "}
           <a href="/v2" className="underline font-bold hover:text-gray-200">

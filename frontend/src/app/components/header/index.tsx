@@ -216,7 +216,7 @@ export default function Header() {
   // Set up price fetching interval
   useEffect(() => {
     fetchPrice(); // Initial fetch
-    const interval = setInterval(fetchPrice, 3000);
+    const interval = setInterval(fetchPrice, 60000);
     return () => clearInterval(interval);
   }, [fetchPrice]);
 

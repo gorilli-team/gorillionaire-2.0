@@ -80,7 +80,7 @@ type TradeSignal = {
 };
 
 const MAX_SIGNALS = 5;
-const SIGNAL_EXPIRATION_TIME = 3 * 24 * 60 * 60 * 1000;
+//const SIGNAL_EXPIRATION_TIME = 1 * 1 * 60 * 60 * 1000;
 
 const parseSignalText = (signalText: string) => {
   const symbol = signalText.match(/CHOG|DAK|YAKI|MON/)?.[0];
@@ -328,12 +328,7 @@ const Signals = () => {
         const data = await response.json();
         if (data && Array.isArray(data)) {
           // pastSignals are signals that have a userSignal or that are 3 days old
-          const pastSignals = data.filter(
-            (signal) =>
-              signal.userSignal ||
-              new Date(signal.created_at) <
-                new Date(Date.now() - SIGNAL_EXPIRATION_TIME)
-          );
+          const pastSignals = data.filter((signal) => signal.userSignal);
           setTradeSignals(
             data.filter(
               (signal) => !pastSignals.map((s) => s._id).includes(signal._id)
@@ -795,16 +790,19 @@ const Signals = () => {
                       </button>
                     )}
 
-                    <div className="flex flex-wrap items-center gap-2">
-                      {signal.events.slice(0, 2).map((event, idx) => (
-                        <div
-                          key={idx}
-                          className="text-xs bg-gray-100 px-2 py-1 rounded-full whitespace-normal break-words"
-                        >
-                          {event}
+                    {signal.events.length > 0 &&
+                      signal.events[0].length > 0 && (
+                        <div className="flex flex-wrap items-center gap-2">
+                          {signal.events.slice(0, 2).map((event, idx) => (
+                            <div
+                              key={idx}
+                              className="text-xs bg-gray-100 px-2 py-1 rounded-full whitespace-normal break-words"
+                            >
+                              {event}
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
+                      )}
 
                     <div className="text-xs text-gray-400 mt-2">
                       {getTimeAgo(signal.created_at)}
@@ -929,7 +927,9 @@ const Signals = () => {
             <div className="bg-white rounded-lg shadow p-4">
               <div className="flex items-center m-4 px-4">
                 <span className="text-yellow-500 text-2xl mr-2">🕰️</span>
-                <span className="font-bold text-2xl">Past Signals</span>
+                <span className="font-bold text-2xl">
+                  Your Signal Decisions
+                </span>
               </div>
               <div>
                 {pastSignals.map((signal, index) => (
