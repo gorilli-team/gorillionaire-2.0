@@ -1,0 +1,20 @@
+on:
+  push:
+    branches:
+      - '**'
+
+env:
+  ENVIRONMENT: development
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS Credentials
+        uses: ./.github/workflows/aws_credentilas.yaml
+        with:
+          environment: ${{ env.ENVIRONMENT }}
+      - name: Terraform Deploy Infra
+        uses: ./.github/workflows/aws_deploy_infra.yaml
+        with:
+          environment: ${{ env.ENVIRONMENT }}
