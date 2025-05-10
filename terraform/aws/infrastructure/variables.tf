@@ -1,5 +1,5 @@
-variable "vpc_cidr" {
-  description = "CIDR block for VPC"
+variable "project_name" {
+  description = "Name of the project"
   type        = string
 }
 
@@ -8,18 +8,12 @@ variable "environment" {
   type        = string
 }
 
-variable "project_name" {
-  description = "Name of the project"
+variable "vpc_cidr" {
+  description = "CIDR block for VPC"
   type        = string
 }
 
 variable "availability_zones" {
   description = "List of availability zones"
   type        = list(string)
-}
-
-variable "az_count" {
-  description = "Number of availability zones to use"
-  type        = number
-  default     = 2
 } 
