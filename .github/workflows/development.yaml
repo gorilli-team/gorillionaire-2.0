@@ -2,15 +2,17 @@ on:
   push:
     branches:
       - '**'
-permissions:
-  id-token: write
-  contents: read
+
 
 jobs:
   configure-aws:
+    permissions:
+      id-token: write
+      contents: read
     uses: ./.github/workflows/aws_credentials.yaml
     with:
       environment: development
+    secrets:
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
       AWS_DEPLOY_ROLE: ${{ secrets.AWS_DEPLOY_ROLE }}
 
