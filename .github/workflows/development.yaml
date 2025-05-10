@@ -3,12 +3,13 @@ on:
     branches:
       - '**'
 
+permissions:
+    id-token: write
+    contents: read
 
 jobs:
   configure-aws:
-    permissions:
-      id-token: write
-      contents: read
+
     uses: ./.github/workflows/aws_credentials.yaml
     with:
       environment: development
