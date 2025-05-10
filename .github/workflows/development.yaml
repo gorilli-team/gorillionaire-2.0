@@ -2,6 +2,9 @@ on:
   push:
     branches:
       - '**'
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   configure-aws:
