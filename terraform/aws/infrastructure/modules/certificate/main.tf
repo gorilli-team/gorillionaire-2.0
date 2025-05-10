@@ -1,8 +1,6 @@
 locals {
   # Add wildcard domain if enabled
-  domain_names = var.use_wildcard ? 
-    concat([var.domain_name, "*.${var.domain_name}"], var.subject_alternative_names) :
-    concat([var.domain_name], var.subject_alternative_names)
+  domain_names = var.use_wildcard ? concat([var.domain_name, "*.${var.domain_name}"], var.subject_alternative_names) : concat([var.domain_name], var.subject_alternative_names)
 
   # Merge default tags with additional tags
   certificate_tags = merge(
@@ -20,9 +18,7 @@ resource "aws_acm_certificate" "cert" {
   validation_method = "DNS"
 
   # Add wildcard domain if enabled
-  subject_alternative_names = var.use_wildcard ? 
-    concat(["*.${var.domain_name}"], var.subject_alternative_names) :
-    var.subject_alternative_names
+  subject_alternative_names = var.use_wildcard ? concat(["*.${var.domain_name}"], var.subject_alternative_names) : var.subject_alternative_names
 
   lifecycle {
     create_before_destroy = true
@@ -36,7 +32,7 @@ resource "aws_cloudwatch_event_rule" "certificate_renewal" {
   name                = "${var.project_name}-${var.environment}-cert-renewal"
   description         = "Trigger certificate renewal before expiration"
   schedule_expression = "rate(1 day)"
-  is_enabled         = true
+  state              = "ENABLED"
 
   tags = local.certificate_tags
 }

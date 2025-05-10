@@ -21,7 +21,7 @@ jobs:
 
       - name: Deploy infrastructure
         run: |
-          cd terraform/aws/infrastructure/${{ inputs.environment }}
+          cd terraform/aws/infrastructure/environments/${{ inputs.environment }}
           terraform init
           terraform plan -out=plan.tfplan
           terraform apply plan.tfplan
