@@ -100,3 +100,5 @@ docker-compose/nats-data/
 experiment/
 events/database/main
 events/envio/main
+
+.terraform*
