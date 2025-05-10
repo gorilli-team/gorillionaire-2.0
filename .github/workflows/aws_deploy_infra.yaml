@@ -6,6 +6,12 @@ on:
       environment:
         required: true
         type: string
+      aws_region:
+        required: true
+        type: string
+      project_name:
+        required: true
+        type: string
 
 jobs:
   deploy:
@@ -23,5 +29,8 @@ jobs:
         run: |
           cd terraform/aws/infrastructure/environments/${{ inputs.environment }}
           terraform init
-          terraform plan -out=plan.tfplan
+          terraform plan -out=plan.tfplan \
+            -var="aws_region=${{ inputs.aws_region }}" \
+            -var="project_name=${{ inputs.project_name }}" \
+            -var="environment=${{ inputs.environment }}"
           terraform apply plan.tfplan
