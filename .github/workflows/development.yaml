@@ -12,10 +12,10 @@ jobs:
     uses: ./.github/workflows/aws_credentials.yaml
     with:
       environment: development
-      aws_region: ${{ vars.AWS_REGION }}
     secrets:
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
       AWS_DEPLOY_ROLE: ${{ secrets.AWS_DEPLOY_ROLE }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
 
   deploy-infra:
     needs: configure-aws
