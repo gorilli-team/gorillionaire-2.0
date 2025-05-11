@@ -5,6 +5,9 @@ on:
 
 jobs:
   deploy-infra:
+    permissions:
+      id-token: write
+      contents: read
     uses: ./.github/workflows/aws_deploy_infra.yaml
     with:
       environment: development
