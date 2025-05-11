@@ -9,7 +9,7 @@ jobs:
     with:
       environment: development
       project_name: ${{ vars.PROJECT_NAME }}
-      aws_region: ${{ secrets.AWS_REGION }}
+      aws_region: ${{ vars.AWS_REGION }}
     secrets:
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
       AWS_DEPLOY_ROLE: ${{ secrets.AWS_DEPLOY_ROLE }}
