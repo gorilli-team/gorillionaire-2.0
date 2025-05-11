@@ -5,21 +5,14 @@ on:
 
 jobs:
   deploy-infra:
-    environment: development
-    # permissions:
-    #   id-token: write
-    #   contents: read
-    # uses: ./.github/workflows/aws_deploy_infra.yaml
-    # with:
-    #   environment: development
-    #   project_name: ${{ vars.PROJECT_NAME }}
-    #   aws_region: ${{ vars.AWS_REGION }}
-    # secrets:
-    #   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-    #   AWS_DEPLOY_ROLE: ${{ secrets.AWS_DEPLOY_ROLE }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: DEBUG ENV VAR
-        run: |
-          echo "AWS_REGION: ${{ vars.AWS_REGION }}"
-          echo "AWS_PROJECT_NAME: ${{ vars.PROJECT_NAME }}"
+    permissions:
+      id-token: write
+      contents: read
+    uses: ./.github/workflows/aws_deploy_infra.yaml
+    with:
+      environment: development
+      project_name: gorillionaire
+      aws_region: us-east-1
+    secrets:
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      AWS_DEPLOY_ROLE: ${{ secrets.AWS_DEPLOY_ROLE }}
