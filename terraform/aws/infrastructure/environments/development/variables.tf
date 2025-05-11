@@ -48,6 +48,12 @@ variable "availability_zones" {
   default     = ["us-east-1a"]
 }
 
+variable "az_count" {
+  description = "Number of availability zones"
+  type        = number
+  default     = 1
+}
+
 # variable "domain_name" {
 #   description = "Domain name for the ALB"
 #   type        = string
