@@ -5,6 +5,7 @@ on:
 
 jobs:
   deploy-infra:
+    environment: development
     # permissions:
     #   id-token: write
     #   contents: read
