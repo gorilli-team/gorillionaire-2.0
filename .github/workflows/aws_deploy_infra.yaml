@@ -40,7 +40,7 @@ jobs:
       - name: Deploy infrastructure
         run: |
           cd terraform/aws/infrastructure/environments/${{ inputs.environment }}
-          terraform init
+          terraform init -input=false
           terraform plan -out=plan.tfplan \
             -var="aws_region=${{ inputs.aws_region }}" \
             -var="project_name=${{ inputs.project_name }}" \
