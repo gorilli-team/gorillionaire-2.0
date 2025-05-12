@@ -30,21 +30,25 @@ module "vpc" {
   availability_zones = var.availability_zones
 }
 
+module "ecs" {
+  source = "../../modules/ecs"
+
+  project_name = var.project_name
+  environment  = var.environment
+}
+
+module "nats" {
+  source = "../../modules/nats"
+
+  project_name = var.project_name
+  environment  = var.environment
+  vpc_cidr     = var.vpc_cidr
+  vpc_id       = module.vpc.vpc_id
+  subnet_id    = module.vpc.public_subnet_ids[0]
+}
 
 
-# module "ecr" {
-#   source = "../../modules/ecr"
 
-#   project_name = var.project_name
-#   environment  = var.environment
-# }
-
-# module "ecs" {
-#   source = "../../modules/ecs"
-
-#   project_name = var.project_name
-#   environment  = var.environment
-# }
 
 # module "certificate" {
 #   source = "../../modules/certificate"
